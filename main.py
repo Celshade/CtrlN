@@ -60,7 +60,9 @@ class Player:
 
     def draw(self, screen):
         pygame.draw.rect(screen, YELLOW, (self.x, self.y, self.size, self.size))
-        pygame.draw.rect(screen, BLACK, (self.x, self.y, self.size, self.size), 2)
+        pygame.draw.rect(
+            screen, BLACK, (self.x, self.y, self.size, self.size), 2
+        )
 
     def is_dead(self):
         return self.y + self.size >= GROUND_Y or self.y < 0
@@ -78,10 +80,13 @@ class Pipe:
     def draw(self, screen):
         # Top pipe
         pygame.draw.rect(screen, GREEN, (self.x, 0, PIPE_WIDTH, self.gap_start))
-        pygame.draw.rect(screen, BLACK, (self.x, 0, PIPE_WIDTH, self.gap_start), 2)
+        pygame.draw.rect(screen, BLACK,
+                         (self.x, 0, PIPE_WIDTH, self.gap_start), 2)
         # Bottom pipe
-        pygame.draw.rect(screen, GREEN, (self.x, self.gap_end, PIPE_WIDTH, GROUND_Y - self.gap_end))
-        pygame.draw.rect(screen, BLACK, (self.x, self.gap_end, PIPE_WIDTH, GROUND_Y - self.gap_end), 2)
+        pygame.draw.rect(screen, GREEN,
+            (self.x, self.gap_end, PIPE_WIDTH, GROUND_Y - self.gap_end))
+        pygame.draw.rect(screen, BLACK,
+            (self.x, self.gap_end, PIPE_WIDTH, GROUND_Y - self.gap_end), 2)
 
     def is_off_screen(self):
         return self.x < -PIPE_WIDTH
@@ -89,8 +94,12 @@ class Pipe:
     def collides_with(self, player):
         player_rect = pygame.Rect(player.x, player.y, player.size, player.size)
         top_rect = pygame.Rect(self.x, 0, PIPE_WIDTH, self.gap_start)
-        bottom_rect = pygame.Rect(self.x, self.gap_end, PIPE_WIDTH, GROUND_Y - self.gap_end)
-        return player_rect.colliderect(top_rect) or player_rect.colliderect(bottom_rect)
+        bottom_rect = pygame.Rect(self.x, self.gap_end,
+                                  PIPE_WIDTH, GROUND_Y - self.gap_end)
+
+        # NOTE
+        return (player_rect.colliderect(top_rect)
+                or player_rect.colliderect(bottom_rect))
 
 # ============================================================================
 # GAME ENGINE
@@ -99,7 +108,8 @@ class Pipe:
 class Game:
     def __init__(self):
         print("Creating window...")
-        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SHOWN)
+        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT),
+                                              pygame.SHOWN)
         pygame.display.set_caption("Game")
         print("Window created!")
 
@@ -190,7 +200,8 @@ class Game:
             pipe.draw(self.screen)
 
         # Draw ground
-        pygame.draw.rect(self.screen, GROUND_COLOR, (0, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT))
+        pygame.draw.rect(self.screen, GROUND_COLOR,
+                         (0, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT))
 
         # Draw player
         self.player.draw(self.screen)
@@ -212,12 +223,20 @@ class Game:
         title1 = self.font_large.render("Clacky", True, BLACK)
         title2 = self.font_large.render("Key", True, BLACK)
         subtitle = self.font_small.render("Press SPACE to Start", True, BLACK)
-        high_score_text = self.font_small.render(f"High Score: {self.high_score}", True, BLACK)
+        high_score_text = self.font_small.render(
+            f"High Score: {self.high_score}", True, BLACK
+        )
 
-        self.screen.blit(title1, (WINDOW_WIDTH // 2 - title1.get_width() // 2, 150))
-        self.screen.blit(title2, (WINDOW_WIDTH // 2 - title2.get_width() // 2, 220))
-        self.screen.blit(subtitle, (WINDOW_WIDTH // 2 - subtitle.get_width() // 2, 400))
-        self.screen.blit(high_score_text, (WINDOW_WIDTH // 2 - high_score_text.get_width() // 2, 500))
+        self.screen.blit(title1,
+                         (WINDOW_WIDTH // 2 - title1.get_width() // 2, 150))
+        self.screen.blit(title2,
+                         (WINDOW_WIDTH // 2 - title2.get_width() // 2, 220))
+        self.screen.blit(subtitle,
+                         (WINDOW_WIDTH // 2 - subtitle.get_width() // 2, 400))
+        self.screen.blit(
+            high_score_text,
+            (WINDOW_WIDTH // 2 - high_score_text.get_width() // 2, 500)
+        )
 
     def draw_game_over(self):
         # Semi-transparent overlay
@@ -228,15 +247,29 @@ class Game:
 
         # Game over text
         game_over = self.font_large.render("Game Over", True, RED)
-        score_text = self.font_small.render(f"Score: {self.score}", True, WHITE)
-        high_score = self.font_small.render(f"High Score: {self.high_score}", True, WHITE)
+        score_text = self.font_small.render(f"Score: {self.score}",
+                                            True, WHITE)
+        high_score = self.font_small.render(f"High Score: {self.high_score}",
+                                            True, WHITE)
         restart = self.font_small.render("Press SPACE to Restart", True, WHITE)
 
         y = 250
-        self.screen.blit(game_over, (WINDOW_WIDTH // 2 - game_over.get_width() // 2, y))
-        self.screen.blit(score_text, (WINDOW_WIDTH // 2 - score_text.get_width() // 2, y + 80))
-        self.screen.blit(high_score, (WINDOW_WIDTH // 2 - high_score.get_width() // 2, y + 140))
-        self.screen.blit(restart, (WINDOW_WIDTH // 2 - restart.get_width() // 2, y + 220))
+        self.screen.blit(
+            game_over,
+            (WINDOW_WIDTH // 2 - game_over.get_width() // 2, y)
+        )
+        self.screen.blit(
+            score_text,
+            (WINDOW_WIDTH // 2 - score_text.get_width() // 2, y + 80)
+        )
+        self.screen.blit(
+            high_score,
+            (WINDOW_WIDTH // 2 - high_score.get_width() // 2, y + 140)
+        )
+        self.screen.blit(
+            restart,
+            (WINDOW_WIDTH // 2 - restart.get_width() // 2, y + 220)
+        )
 
     def run(self):
         print("Game loop starting...\n")
@@ -251,7 +284,8 @@ class Game:
 
             frame += 1
             if frame % 60 == 0:
-                print(f"Frame {frame}: State={self.state.name}, Score={self.score}")
+                print(f"Frame {frame}: State={self.state.name}",
+                      f"Score={self.score}")
 
         print("\nShutting down...")
         pygame.quit()
