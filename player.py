@@ -1,8 +1,11 @@
 import pygame
 
-from config import *
+from config import *  # TODO refine
 
 
+# ==================== #
+# ### Player Class ### #
+# ==================== #
 class Player:
     def __init__(self):
         self.x = PLAYER_START_X
