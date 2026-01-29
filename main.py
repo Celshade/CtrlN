@@ -1,27 +1,44 @@
 #!/usr/bin/env python3
-import pygame
+
+import os
 import sys
 import random
-import os
 from enum import Enum
 
-# Set window positioning
-os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
+import pygame
 
-# ============================================================================
-# SETUP
-# ============================================================================
 
-print("\n" + "="*70)
-print("GAME - STARTING")
-print("="*70)
-print(f"Display: {os.environ.get('DISPLAY', 'NOT SET')}")
-print(f"Python: {sys.version.split()[0]}")
+# =================== #
+# ### ENTRY POINT ### #
+# =================== #
+def main() -> None:
+    # NOTE: if we keep terminal output, implement Rich to make it look good
+    # System data
+    print(
+        f"\n{'=' * 79}",
+        "\nGAME - STARTING",
+        f"\n{'=' * 79}",
+        f"\nDisplay: {os.environ.get('DISPLAY', 'NOT SET')}",
+        f"\nPython: {sys.version.split()[0]}"
+    )
 
-# Initialize Pygame
-pygame.init()
-print(f"Pygame initialized")
-print(f"Display driver: {pygame.display.get_driver()}")
+    # Initialize Pygame
+    pygame.init()
+    print(f"Pygame initialized")  # System data
+    print(f"Display driver: {pygame.display.get_driver()}")  # System data
+    print(f"{'=' * 79}\n")
+
+    # Run the game
+    try:
+        game = Game()
+        game.run()
+    except Exception as e:
+        print(f"\n[ERROR] {e}")
+
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+
 
 # ============================================================================
 # CONFIGURATION
@@ -280,17 +297,9 @@ class Game:
         pygame.quit()
         sys.exit()
 
-# ============================================================================
-# MAIN
-# ============================================================================
 
+# =================== #
+# ### ENTRY POINT ### #
+# =================== #
 if __name__ == "__main__":
-    print("="*70 + "\n")
-    try:
-        game = Game()
-        game.run()
-    except Exception as e:
-        print(f"\n[ERROR] {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+    main()
