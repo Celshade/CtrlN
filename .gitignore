@@ -4,5 +4,6 @@ venv/*
 __pycache__/*
 
 # ### Development Resources ### #
+.vscode/*
 .temp/*
 BuildResources/*
