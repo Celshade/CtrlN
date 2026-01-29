@@ -1,7 +1,8 @@
-# py
+# ### Python ### #
+venv/*
 .pyc/*
 __pycache__/*
 
-# other
-venv/*
-.temp/* 
+# ### Development Resources ### #
+.temp/*
+BuildResources/*
