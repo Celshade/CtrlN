@@ -11,7 +11,10 @@ from config import *
 class Pipe:
     def __init__(self, x):
         self.x = x
-        self.gap_start = random.randint(80, GROUND_Y - PIPE_GAP - 80)
+        # Position gap randomly with margins
+        min_gap = PIPE_MIN_MARGIN
+        max_gap = GROUND_Y - PIPE_GAP - PIPE_MAX_MARGIN
+        self.gap_start = random.randint(min_gap, max_gap)
         self.gap_end = self.gap_start + PIPE_GAP
         self.scored = False
 
