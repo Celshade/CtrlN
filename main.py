@@ -42,9 +42,9 @@ def main() -> None:
         sys.exit(1)
 
 
-# ============================================================================
-# GAME ENGINE
-# ============================================================================
+# =================== #
+# ### GAME ENGINE ### #
+# =================== #
 class Game:
     def __init__(self):
         print("Creating window...")
@@ -222,6 +222,7 @@ class Game:
             self.draw()
             self.clock.tick(FPS)
 
+            # NOTE: FPS counter
             frame += 1
             if frame % 60 == 0:
                 print(f"Frame {frame}: State={self.state.name}",
