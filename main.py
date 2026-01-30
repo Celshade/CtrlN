@@ -50,18 +50,18 @@ class Game:
         print("Creating window...")
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT),
                                               pygame.SHOWN)
-        pygame.display.set_caption("Game")
+        pygame.display.set_caption("Clacky Key")  # window title
         print("Window created!")
 
-        self.clock = pygame.time.Clock()
-        self.font_large = pygame.font.Font(None, int(72 * SCALE))
+        self.clock = pygame.time.Clock()  # init game clock
+        self.font_large = pygame.font.Font(None, int(36 * SCALE))
         self.font_small = pygame.font.Font(None, int(36 * SCALE))
 
         self.state = GameState.MENU
         self.score = 0
         self.high_score = 0
 
-        self.player = Player()
+        self.player = Player()  # init player
         self.pipes = []
         self.pipe_timer = 0
 
