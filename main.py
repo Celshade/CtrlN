@@ -57,18 +57,18 @@ class Game:
         self.font_large = pygame.font.Font(None, int(36 * SCALE))
         self.font_small = pygame.font.Font(None, int(36 * SCALE))
 
+        # Menu and scoring
         self.state = GameState.MENU
         self.score = 0
         self.high_score = 0
 
-        self.player = Player()  # init player
+        # Init player and prep object handling
+        self.player = Player()
         self.pipes = []
         self.pipe_timer = 0
 
         # Load background with parallax support
-        bg_path = os.path.join(os.path.dirname(__file__),
-                               'assets', 'day_level.gif')
-        self.bg_image = pygame.image.load(bg_path)
+        self.bg_image = pygame.image.load("assets/day_level2.gif")
         self.bg_image = pygame.transform.scale(self.bg_image,
                                                (WINDOW_WIDTH, WINDOW_HEIGHT))
         self.bg_offset = 0  # Parallax offset
