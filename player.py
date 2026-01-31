@@ -13,11 +13,10 @@ class Player:
         self.y = PLAYER_START_Y
         self.vel = 0
         self.size = PLAYER_SIZE
-        
+
         # Load player sprite
-        asset_path = os.path.join(os.path.dirname(__file__), 'assets', 'player.png')
-        self.image = pygame.image.load(asset_path)
-        self.image = pygame.transform.scale(self.image, (int(self.size), int(self.size)))
+        self.image = pygame.image.load("assets/player.png")
+        self.image = pygame.transform.scale(self.image, (self.size, self.size))
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
 
     def update(self):
