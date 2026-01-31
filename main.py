@@ -65,6 +65,15 @@ class Game:
         self.pipes = []
         self.pipe_timer = 0
 
+        # Load background with parallax support
+        bg_path = os.path.join(os.path.dirname(__file__),
+                               'assets', 'day_level.gif')
+        self.bg_image = pygame.image.load(bg_path)
+        self.bg_image = pygame.transform.scale(self.bg_image,
+                                               (WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.bg_offset = 0  # Parallax offset
+        self.parallax_speed = 0.3  # Parallax speed factor
+
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -94,12 +103,19 @@ class Game:
         self.player = Player()
         self.pipes = []
         self.pipe_timer = 0
+        self.bg_offset = 0  # Reset parallax offset
 
     def update(self):
         if self.state != GameState.PLAYING:
             return
 
         self.player.update()
+
+        # Update parallax background
+        self.bg_offset += PIPE_SPEED * self.parallax_speed
+        # Wrap the background offset for seamless scrolling
+        if self.bg_offset < -WINDOW_WIDTH:
+            self.bg_offset += WINDOW_WIDTH
 
         # Spawn pipes
         self.pipe_timer += 1
@@ -132,8 +148,10 @@ class Game:
             self.high_score = self.score
 
     def draw(self):
-        # Clear screen
-        self.screen.fill(SKY_BLUE)
+        # Draw background with parallax scrolling
+        self.screen.blit(self.bg_image, (int(self.bg_offset), 0))
+        # Draw second copy of background for seamless scrolling
+        self.screen.blit(self.bg_image, (int(self.bg_offset + WINDOW_WIDTH), 0))
 
         # Draw pipes
         for pipe in self.pipes:
