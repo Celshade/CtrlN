@@ -84,7 +84,7 @@ class Game:
         if self.state != GameState.PLAYING:
             return
 
-        self.player.update()
+        self.player.update()  # Update the Player
 
         # Update parallax background
         self.bg_offset += PIPE_SPEED * self.parallax_speed
@@ -101,7 +101,7 @@ class Game:
         # Update pipes
         for pipe in self.pipes:
             pipe.update()
-            if pipe.x + PIPE_WIDTH < self.player.x and not pipe.scored:
+            if pipe.x_pos + PIPE_WIDTH < self.player.x and not pipe.scored:
                 pipe.scored = True
                 self.score += 1
 
