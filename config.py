@@ -39,7 +39,7 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
 SKY_BLUE = (135, 206, 235)
-GROUND_COLOR = (34, 139, 34)
+# GROUND_COLOR = (34, 139, 34)
 
 
 # NOTE: Breakout into a types module if we generate more than one state/type

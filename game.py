@@ -8,7 +8,7 @@ from config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
     PIPE_SPEED, PIPE_SPAWN_RATE, PIPE_WIDTH,
-    GROUND_COLOR, GROUND_Y, GROUND_HEIGHT,
+    GROUND_Y, GROUND_HEIGHT,
     BLACK, WHITE, RED
 )
 
@@ -39,8 +39,8 @@ class Game:
         self.pipe_timer = 0
 
         # Load background with parallax support
-        # self.bg_image = pygame.image.load("assets/day_level2.gif")
-        self.bg_image = pygame.image.load("assets/day_level.gif")
+        self.bg_image = pygame.image.load("assets/day_level3.gif")
+        # self.bg_image = pygame.image.load("assets/day_level.gif")
         self.bg_image = pygame.transform.scale(self.bg_image,
                                                (WINDOW_WIDTH, WINDOW_HEIGHT))
         self.bg_offset = 0  # Parallax offset
@@ -132,9 +132,9 @@ class Game:
         for pipe in self.pipes:
             pipe.draw(self.screen)
 
-        # Draw ground
-        pygame.draw.rect(self.screen, GROUND_COLOR,
-                         (0, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT))
+        # # Draw ground
+        # pygame.draw.rect(self.screen, GROUND_COLOR,
+        #                  (0, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT))
 
         # Draw player
         self.player.draw(self.screen)
