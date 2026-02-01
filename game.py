@@ -101,7 +101,7 @@ class Game:
         # Update pipes
         for pipe in self.pipes:
             pipe.update()
-            if pipe.x_pos + PIPE_WIDTH < self.player.x and not pipe.scored:
+            if pipe.x_pos + PIPE_WIDTH < self.player.x_pos and not pipe.scored:
                 pipe.scored = True
                 self.score += 1
 
