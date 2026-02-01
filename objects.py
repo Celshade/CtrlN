@@ -47,7 +47,8 @@ class Pipe:
     def collides_with(self, player: Player) -> bool:
         # NOTE: player is effectively a 68x68 square for now
         # TODO: Add sprite masking for more accurate collision?
-        player_rect = pygame.Rect(player.x, player.y, player.size, player.size)
+        player_rect = pygame.Rect(player.x_pos, player.y_pos,
+                                  player.size, player.size)
         top_rect = pygame.Rect(self.x_pos, 0, PIPE_WIDTH, self.gap_start)
         bottom_rect = pygame.Rect(self.x_pos, self.gap_end,
                                   PIPE_WIDTH, GROUND_Y - self.gap_end)
