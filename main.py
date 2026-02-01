@@ -68,33 +68,33 @@ class Game:
         self.pipe_timer = 0
 
         # Load background with parallax support
-        self.bg_image = pygame.image.load("assets/day_level2.gif")
+        # self.bg_image = pygame.image.load("assets/day_level2.gif")
+        self.bg_image = pygame.image.load("assets/day_level.gif")
+
         self.bg_image = pygame.transform.scale(self.bg_image,
                                                (WINDOW_WIDTH, WINDOW_HEIGHT))
         self.bg_offset = 0  # Parallax offset
         self.parallax_speed = 0.3  # Parallax speed factor
 
+    def handle_gamestate(self):
+        if self.state == GameState.MENU:
+            self.start_game()
+        elif self.state == GameState.PLAYING:
+            self.player.keypress()
+        elif self.state == GameState.GAME_OVER:
+            self.state = GameState.MENU
+
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
-            if event.type == pygame.KEYDOWN:
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return False
-                if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
-                    if self.state == GameState.MENU:
-                        self.start_game()
-                    elif self.state == GameState.PLAYING:
-                        self.player.keypress()
-                    elif self.state == GameState.GAME_OVER:
-                        self.state = GameState.MENU
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.state == GameState.MENU:
-                    self.start_game()
-                elif self.state == GameState.PLAYING:
-                    self.player.keypress()
-                elif self.state == GameState.GAME_OVER:
-                    self.state = GameState.MENU
+                elif event.key == pygame.K_SPACE or event.key == pygame.K_UP:
+                    self.handle_gamestate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                self.handle_gamestate()
         return True
 
     def start_game(self):
