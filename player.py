@@ -1,6 +1,7 @@
 import pygame
 
-from config import *
+from config import (PLAYER_START_X, PLAYER_START_Y, PLAYER_SIZE,
+                    GRAVITY, KEY_POWER, GROUND_Y)
 
 
 # ==================== #
