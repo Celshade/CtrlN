@@ -86,13 +86,17 @@ class Game:
 
     def handle_events(self):
         for event in pygame.event.get():
+            # Handle quit
             if event.type == pygame.QUIT:
                 return False
             elif event.type == pygame.KEYDOWN:
+                # Handle escape
                 if event.key == pygame.K_ESCAPE:
                     return False
+                # Handle keyboard movement
                 elif event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                     self.handle_gamestate()
+            # Handle mouse movement
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self.handle_gamestate()
         return True
