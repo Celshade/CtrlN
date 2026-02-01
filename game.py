@@ -161,14 +161,14 @@ class Game:
         )
 
         self.screen.blit(title1,
-                         (WINDOW_WIDTH // 2 - title1.get_width() // 2, 150))
+                         (WINDOW_WIDTH // 2 - title1.get_width() // 2, 100))
         self.screen.blit(title2,
-                         (WINDOW_WIDTH // 2 - title2.get_width() // 2, 220))
+                         (WINDOW_WIDTH // 2 - title2.get_width() // 2, 250))
         self.screen.blit(subtitle,
-                         (WINDOW_WIDTH // 2 - subtitle.get_width() // 2, 400))
+                         (WINDOW_WIDTH // 2 - subtitle.get_width() // 2, 450))
         self.screen.blit(
             high_score_text,
-            (WINDOW_WIDTH // 2 - high_score_text.get_width() // 2, 500)
+            (WINDOW_WIDTH // 2 - high_score_text.get_width() // 2, 1025)
         )
 
     def draw_game_over(self) -> None:
