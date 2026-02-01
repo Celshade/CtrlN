@@ -11,7 +11,7 @@ from objects import Pipe
 # ### GAME ENGINE ### #
 # =================== #
 class Game:
-    def __init__(self):
+    def __init__(self) -> None:
         print("Creating window...")
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT),
                                               pygame.SHOWN)
@@ -41,7 +41,7 @@ class Game:
         self.bg_offset = 0  # Parallax offset
         self.parallax_speed = 0.3  # Parallax speed factor
 
-    def handle_gamestate(self):
+    def handle_gamestate(self) -> None:
         if self.state == GameState.MENU:
             self.start_game()
         elif self.state == GameState.PLAYING:
@@ -49,7 +49,7 @@ class Game:
         elif self.state == GameState.GAME_OVER:
             self.state = GameState.MENU
 
-    def handle_events(self):
+    def handle_events(self) -> bool:
         for event in pygame.event.get():
             # Handle quit
             if event.type == pygame.QUIT:
@@ -66,7 +66,7 @@ class Game:
                 self.handle_gamestate()
         return True
 
-    def start_game(self):
+    def start_game(self) -> None:
         self.state = GameState.PLAYING
         self.score = 0
         self.player = Player()
@@ -74,7 +74,7 @@ class Game:
         self.pipe_timer = 0
         self.bg_offset = 0  # Reset parallax offset
 
-    def update(self):
+    def update(self) -> None:
         if self.state != GameState.PLAYING:
             return
 
@@ -111,12 +111,12 @@ class Game:
         if self.player.is_dead():
             self.end_game()
 
-    def end_game(self):
+    def end_game(self) -> None:
         self.state = GameState.GAME_OVER
         if self.score > self.high_score:
             self.high_score = self.score
 
-    def draw(self):
+    def draw(self) -> None:
         # Draw background with parallax scrolling
         self.screen.blit(self.bg_image, (int(self.bg_offset), 0))
         # Draw second copy of background for seamless scrolling
@@ -146,7 +146,7 @@ class Game:
         pygame.display.flip()
         pygame.display.update()
 
-    def draw_menu(self):
+    def draw_menu(self) -> None:
         title1 = self.font_large.render("Clacky", True, BLACK)
         title2 = self.font_large.render("Key", True, BLACK)
         subtitle = self.font_small.render("Press SPACE to Start", True, BLACK)
@@ -165,7 +165,7 @@ class Game:
             (WINDOW_WIDTH // 2 - high_score_text.get_width() // 2, 500)
         )
 
-    def draw_game_over(self):
+    def draw_game_over(self) -> None:
         # Semi-transparent overlay
         overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         overlay.set_alpha(200)
@@ -198,7 +198,7 @@ class Game:
             (WINDOW_WIDTH // 2 - restart.get_width() // 2, y + 220)
         )
 
-    def run(self):
+    def run(self) -> None:
         print("Game loop starting...\n")
         running = True
         frame = 0
