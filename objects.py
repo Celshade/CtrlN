@@ -2,8 +2,9 @@ import random
 
 import pygame
 
-from config import *
 from player import Player
+from config import (WINDOW_HEIGHT, GROUND_Y, PIPE_GAP, PIPE_WIDTH,
+                    PIPE_MIN_MARGIN, PIPE_MAX_MARGIN, PIPE_SPEED)
 
 
 # ==================== #

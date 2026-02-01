@@ -2,9 +2,15 @@ import sys
 
 import pygame
 
-from config import *
-from player import Player
 from objects import Pipe
+from player import Player
+from config import (
+    GameState, FPS, SCALE,
+    WINDOW_WIDTH, WINDOW_HEIGHT,
+    PIPE_SPEED, PIPE_SPAWN_RATE, PIPE_WIDTH,
+    GROUND_COLOR, GROUND_Y, GROUND_HEIGHT,
+    BLACK, WHITE, RED
+)
 
 
 # =================== #
