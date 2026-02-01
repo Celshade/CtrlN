@@ -33,7 +33,7 @@ class Game:
         self.score = 0
         self.high_score = 0
 
-        # Init player and prep object handling
+        # Init player and prep object vars
         self.player = Player()
         self.pipes = []
         self.pipe_timer = 0
@@ -41,7 +41,6 @@ class Game:
         # Load background with parallax support
         # self.bg_image = pygame.image.load("assets/day_level2.gif")
         self.bg_image = pygame.image.load("assets/day_level.gif")
-
         self.bg_image = pygame.transform.scale(self.bg_image,
                                                (WINDOW_WIDTH, WINDOW_HEIGHT))
         self.bg_offset = 0  # Parallax offset
@@ -49,7 +48,7 @@ class Game:
 
     def handle_gamestate(self) -> None:
         if self.state == GameState.MENU:
-            self.start_game()
+            self.restart_game()
         elif self.state == GameState.PLAYING:
             self.player.keypress()
         elif self.state == GameState.GAME_OVER:
@@ -72,7 +71,8 @@ class Game:
                 self.handle_gamestate()
         return True
 
-    def start_game(self) -> None:
+    def restart_game(self) -> None:
+        # Reset game vars
         self.state = GameState.PLAYING
         self.score = 0
         self.player = Player()
