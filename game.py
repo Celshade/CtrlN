@@ -193,11 +193,11 @@ class Game:
         )
         self.screen.blit(
             score_text,
-            (WINDOW_WIDTH // 2 - score_text.get_width() // 2, y + 80)
+            (WINDOW_WIDTH // 2 - score_text.get_width() // 2, y + 625)
         )
         self.screen.blit(
             high_score,
-            (WINDOW_WIDTH // 2 - high_score.get_width() // 2, y + 140)
+            (WINDOW_WIDTH // 2 - high_score.get_width() // 2, y + 775)
         )
         self.screen.blit(
             restart,
