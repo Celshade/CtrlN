@@ -3,14 +3,15 @@ import random
 import pygame
 
 from config import *
+from player import Player
 
 
 # ==================== #
 # ### GAME OBJECTS ### #
 # ==================== #
 class Pipe:
-    def __init__(self, x):
-        self.x = x
+    def __init__(self, x_pos) -> None:
+        self.x_pos = x_pos
         # Position gap randomly with margins
         min_gap = PIPE_MIN_MARGIN
         max_gap = GROUND_Y - PIPE_GAP - PIPE_MAX_MARGIN
@@ -22,33 +23,33 @@ class Pipe:
         self.pipe_image = pygame.image.load("assets/pipe.png")
         # Scale the pipe image to fit the PIPE_WIDTH
         self.pipe_image = pygame.transform.scale(
-            self.pipe_image, (int(PIPE_WIDTH), int(WINDOW_HEIGHT))
+            self.pipe_image, (PIPE_WIDTH, WINDOW_HEIGHT)
         )
 
-    def update(self):
-        self.x += PIPE_SPEED
+    def update(self) -> None:
+        self.x_pos += PIPE_SPEED
 
-    def draw(self, screen):
+    def draw(self, screen) -> None:
         # Top pipe - scale to gap_start height
         top_pipe = pygame.transform.scale(self.pipe_image,
                                           (PIPE_WIDTH, self.gap_start))
-        screen.blit(top_pipe, (self.x, 0))
+        screen.blit(top_pipe, (self.x_pos, 0))
 
         # Bottom pipe - scale to the height needed
         bottom_height = GROUND_Y - self.gap_end
         bottom_pipe = pygame.transform.scale(self.pipe_image,
                                              (PIPE_WIDTH, bottom_height))
-        screen.blit(bottom_pipe, (self.x, self.gap_end))
+        screen.blit(bottom_pipe, (self.x_pos, self.gap_end))
 
-    def is_off_screen(self):
-        return self.x < -PIPE_WIDTH
+    def is_off_screen(self) -> int:
+        return self.x_pos < -PIPE_WIDTH
 
-    def collides_with(self, player):
+    def collides_with(self, player: Player) -> bool:
         # NOTE: player is effectively a 68x68 square for now
         # TODO: Add sprite masking for more accurate collision?
         player_rect = pygame.Rect(player.x, player.y, player.size, player.size)
-        top_rect = pygame.Rect(self.x, 0, PIPE_WIDTH, self.gap_start)
-        bottom_rect = pygame.Rect(self.x, self.gap_end,
+        top_rect = pygame.Rect(self.x_pos, 0, PIPE_WIDTH, self.gap_start)
+        bottom_rect = pygame.Rect(self.x_pos, self.gap_end,
                                   PIPE_WIDTH, GROUND_Y - self.gap_end)
 
         return (player_rect.colliderect(top_rect)
