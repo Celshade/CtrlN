@@ -8,6 +8,7 @@ from config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
     ORB_SPEED, ORB_SPAWN_RATE,
+    GROUND_Y, PLAYER_SIZE,
     BLACK, WHITE, RED
 )
 
@@ -108,13 +109,33 @@ class Game:
         self.orbs = [o for o in self.orbs if not o.is_off_screen()]
 
         # Check collisions
+        orb_to_remove = None
         for orb in self.orbs:
             if orb.collides_with(self.player):
-                self.end_game()
-                return
+                if self.player.has_shield(self.score):
+                    self.player.destroy_shield()
+                    orb_to_remove = orb  # Mark orb for removal
+                    break
+                else:
+                    self.end_game()
+                    return
+
+        # Remove the orb that hit the shield
+        if orb_to_remove:
+            self.orbs.remove(orb_to_remove)
+            return
 
         if self.player.is_dead():
-            self.end_game()
+            if self.player.has_shield(self.score):
+                self.player.destroy_shield()
+                # Clamp player position back in bounds
+                self.player.y_pos = max(0, min(self.player.y_pos,
+                                               GROUND_Y - PLAYER_SIZE))
+                self.player.rect.topleft = (self.player.x_pos,
+                                            self.player.y_pos)
+                return
+            else:
+                self.end_game()
 
     def end_game(self) -> None:
         self.state = GameState.GAME_OVER

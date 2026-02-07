@@ -31,6 +31,10 @@ class Player:
         self.shield_image = pygame.transform.scale(self.shield_image,
                                                    (self.size, self.size))
 
+        # Shield state
+        self.shield_charges = 0  # Current number of shields (0-2 max)
+        self.next_shield_threshold = 5  # Score at which we grant the next shield
+
     def _load_keypress_animation(self):
         """Load and cache all frames from the keypress animation webp."""
         frames = []
@@ -72,13 +76,27 @@ class Player:
             self.animation_frame = 0
             self.playing_animation = True
 
+    def has_shield(self, score) -> bool:
+        """Check if shield is currently active."""
+        # Grant a new shield when reaching next threshold (capped at 2)
+        if score >= self.next_shield_threshold and self.shield_charges < 2:
+            self.shield_charges += 1
+            self.next_shield_threshold += 5
+
+        return self.shield_charges > 0
+
+    def destroy_shield(self) -> None:
+        """Destroy the shield when hit."""
+        if self.shield_charges > 0:
+            self.shield_charges -= 1
+
     def draw(self, screen, score=0) -> None:
         # Only draw player sprite if animation is not active
         if not self.playing_animation:
             screen.blit(self.image, self.rect)
 
-        # Draw shield if score is 5 or more
-        if score >= 5:
+        # Draw shield if active (score >= 5 and not broken)
+        if self.has_shield(score):
             screen.blit(self.shield_image, self.rect)
 
         # Draw keypress animation if active
