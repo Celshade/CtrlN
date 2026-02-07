@@ -30,10 +30,12 @@ class Player:
         frames = []
         try:
             pil_image = Image.open("assets/keypress_with_thruster+fx.webP")
+
             try:
                 while True:
                     frame = pil_image.convert("RGBA")
-                    frame = frame.resize((self.size, self.size), Image.Resampling.LANCZOS)
+                    frame = frame.resize((self.size, self.size),
+                                         Image.Resampling.LANCZOS)
                     pygame_frame = pygame.image.fromstring(
                         frame.tobytes(), frame.size, frame.mode
                     )
@@ -68,7 +70,9 @@ class Player:
         screen.blit(self.image, self.rect)
 
         # Draw keypress animation if active
-        if self.playing_animation and self.animation_frame < len(self.keypress_animation_frames):
+        if (self.playing_animation
+            and self.animation_frame < len(self.keypress_animation_frames)
+        ):
             current_frame = self.keypress_animation_frames[self.animation_frame]
             anim_rect = current_frame.get_rect(
                 center=(self.rect.centerx, self.rect.centery)
