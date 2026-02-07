@@ -67,7 +67,9 @@ class Player:
             self.playing_animation = True
 
     def draw(self, screen) -> None:
-        screen.blit(self.image, self.rect)
+        # Only draw player sprite if animation is not active
+        if not self.playing_animation:
+            screen.blit(self.image, self.rect)
 
         # Draw keypress animation if active
         if (self.playing_animation
