@@ -8,7 +8,6 @@ from config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
     ORB_SPEED, ORB_SPAWN_RATE,
-    GROUND_Y, GROUND_HEIGHT,
     BLACK, WHITE, RED
 )
 
@@ -137,7 +136,7 @@ class Game:
         #                  (0, GROUND_Y, WINDOW_WIDTH, GROUND_HEIGHT))
 
         # Draw player
-        self.player.draw(self.screen)
+        self.player.draw(self.screen, self.score)
 
         # Draw UI
         if self.state == GameState.MENU:
