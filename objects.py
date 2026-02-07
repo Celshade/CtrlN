@@ -46,13 +46,33 @@ class Pipe:
         return self.x_pos < -PIPE_WIDTH
 
     def collides_with(self, player: Player) -> bool:
-        # NOTE: player is effectively a 68x68 square for now
-        # TODO: Add sprite masking for more accurate collision?
+        # Use sprite masking for pixel-perfect collision detection
         player_rect = pygame.Rect(player.x_pos, player.y_pos,
                                   player.size, player.size)
         top_rect = pygame.Rect(self.x_pos, 0, PIPE_WIDTH, self.gap_start)
         bottom_rect = pygame.Rect(self.x_pos, self.gap_end,
                                   PIPE_WIDTH, GROUND_Y - self.gap_end)
 
-        return (player_rect.colliderect(top_rect)
-                or player_rect.colliderect(bottom_rect))
+        # Check rect collision first (broad phase)
+        if player_rect.colliderect(top_rect):
+            # Use mask collision for accurate detection
+            offset_x = int(self.x_pos - player.x_pos)
+            offset_y = int(0 - player.y_pos)
+            # Create a mask for the top pipe rect
+            top_mask_surf = pygame.Surface((PIPE_WIDTH, self.gap_start))
+            top_mask_surf.fill((255, 255, 255))
+            top_mask = pygame.mask.from_surface(top_mask_surf)
+            return player.mask.overlap(top_mask, (offset_x, offset_y))
+
+        if player_rect.colliderect(bottom_rect):
+            # Use mask collision for accurate detection
+            offset_x = int(self.x_pos - player.x_pos)
+            offset_y = int(self.gap_end - player.y_pos)
+            # Create a mask for the bottom pipe rect
+            bottom_height = GROUND_Y - self.gap_end
+            bottom_mask_surf = pygame.Surface((PIPE_WIDTH, bottom_height))
+            bottom_mask_surf.fill((255, 255, 255))
+            bottom_mask = pygame.mask.from_surface(bottom_mask_surf)
+            return player.mask.overlap(bottom_mask, (offset_x, offset_y))
+
+        return False

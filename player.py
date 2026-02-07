@@ -19,6 +19,7 @@ class Player:
         self.image = pygame.image.load("assets/player.png")
         self.image = pygame.transform.scale(self.image, (self.size, self.size))
         self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
+        self.mask = pygame.mask.from_surface(self.image)
 
         # Load keypress animation frames once at initialization
         self.keypress_animation_frames = self._load_keypress_animation()
