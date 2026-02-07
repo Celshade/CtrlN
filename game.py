@@ -2,12 +2,12 @@ import sys
 
 import pygame
 
-from objects import Pipe
+from objects import Orb
 from player import Player
 from config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
-    PIPE_SPEED, PIPE_SPAWN_RATE, PIPE_WIDTH,
+    ORB_SPEED, ORB_SPAWN_RATE,
     GROUND_Y, GROUND_HEIGHT,
     BLACK, WHITE, RED
 )
@@ -35,8 +35,8 @@ class Game:
 
         # Init player and prep object vars
         self.player = Player()
-        self.pipes = []
-        self.pipe_timer = 0
+        self.orbs = []
+        self.orb_timer = 0
 
         # Load background with parallax support
         self.bg_image = pygame.image.load("assets/day_level3.gif")
@@ -76,8 +76,8 @@ class Game:
         self.state = GameState.PLAYING
         self.score = 0
         self.player = Player()
-        self.pipes = []
-        self.pipe_timer = 0
+        self.orbs = []
+        self.orb_timer = 0
         self.bg_offset = 0  # Reset parallax offset
 
     def update(self) -> None:
@@ -87,30 +87,30 @@ class Game:
         self.player.update()  # Update the Player
 
         # Update parallax background
-        self.bg_offset += PIPE_SPEED * self.parallax_speed
+        self.bg_offset += ORB_SPEED * self.parallax_speed
         # Wrap the background offset for seamless scrolling
         if self.bg_offset < -WINDOW_WIDTH:
             self.bg_offset += WINDOW_WIDTH
 
-        # Spawn pipes
-        self.pipe_timer += 1
-        if self.pipe_timer >= PIPE_SPAWN_RATE:
-            self.pipes.append(Pipe(WINDOW_WIDTH))
-            self.pipe_timer = 0
+        # Spawn orbs
+        self.orb_timer += 1
+        if self.orb_timer >= ORB_SPAWN_RATE:
+            self.orbs.append(Orb(WINDOW_WIDTH))
+            self.orb_timer = 0
 
-        # Update pipes
-        for pipe in self.pipes:
-            pipe.update()
-            if pipe.x_pos + PIPE_WIDTH < self.player.x_pos and not pipe.scored:
-                pipe.scored = True
+        # Update orbs
+        for orb in self.orbs:
+            orb.update()
+            if orb.x_pos < self.player.x_pos and not orb.scored:
+                orb.scored = True
                 self.score += 1
 
-        # Remove off-screen pipes
-        self.pipes = [p for p in self.pipes if not p.is_off_screen()]
+        # Remove off-screen orbs
+        self.orbs = [o for o in self.orbs if not o.is_off_screen()]
 
         # Check collisions
-        for pipe in self.pipes:
-            if pipe.collides_with(self.player):
+        for orb in self.orbs:
+            if orb.collides_with(self.player):
                 self.end_game()
                 return
 
@@ -128,9 +128,9 @@ class Game:
         # Draw second copy of background for seamless scrolling
         self.screen.blit(self.bg_image, (int(self.bg_offset + WINDOW_WIDTH), 0))
 
-        # Draw pipes
-        for pipe in self.pipes:
-            pipe.draw(self.screen)
+        # Draw orbs
+        for orb in self.orbs:
+            orb.draw(self.screen)
 
         # # Draw ground
         # pygame.draw.rect(self.screen, GROUND_COLOR,

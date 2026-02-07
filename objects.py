@@ -3,76 +3,48 @@ import random
 import pygame
 
 from player import Player
-from config import (WINDOW_HEIGHT, GROUND_Y, PIPE_GAP, PIPE_WIDTH,
-                    PIPE_MIN_MARGIN, PIPE_MAX_MARGIN, PIPE_SPEED)
+from config import (GROUND_Y, ORB_SIZE, ORB_SPEED,
+                    ORB_MIN_MARGIN, ORB_MAX_MARGIN, ORANGE)
 
 
 # ==================== #
 # ### GAME OBJECTS ### #
 # ==================== #
-class Pipe:
+class Orb:
     def __init__(self, x_pos) -> None:
         self.x_pos = x_pos
-        # Position gap randomly with margins
-        min_gap = PIPE_MIN_MARGIN
-        max_gap = GROUND_Y - PIPE_GAP - PIPE_MAX_MARGIN
-        self.gap_start = random.randint(min_gap, max_gap)
-        self.gap_end = self.gap_start + PIPE_GAP
+        # Position orb randomly with margins
+        min_y = ORB_MIN_MARGIN
+        max_y = GROUND_Y - ORB_SIZE - ORB_MAX_MARGIN
+        self.y_pos = random.randint(min_y, max_y)
         self.scored = False
 
-        # Load pipe sprite
-        self.pipe_image = pygame.image.load("assets/pipe.png")
-        # Scale the pipe image to fit the PIPE_WIDTH
-        self.pipe_image = pygame.transform.scale(
-            self.pipe_image, (PIPE_WIDTH, WINDOW_HEIGHT)
-        )
+        # Create orange circle sprite
+        self.image = pygame.Surface((ORB_SIZE, ORB_SIZE), pygame.SRCALPHA)
+        pygame.draw.circle(self.image, ORANGE,
+                          (ORB_SIZE // 2, ORB_SIZE // 2), ORB_SIZE // 2)
+        self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update(self) -> None:
-        self.x_pos += PIPE_SPEED
+        self.x_pos += ORB_SPEED
+        self.rect.x = int(self.x_pos)
 
     def draw(self, screen) -> None:
-        # Top pipe - scale to gap_start height
-        top_pipe = pygame.transform.scale(self.pipe_image,
-                                          (PIPE_WIDTH, self.gap_start))
-        screen.blit(top_pipe, (self.x_pos, 0))
+        screen.blit(self.image, self.rect)
 
-        # Bottom pipe - scale to the height needed
-        bottom_height = GROUND_Y - self.gap_end
-        bottom_pipe = pygame.transform.scale(self.pipe_image,
-                                             (PIPE_WIDTH, bottom_height))
-        screen.blit(bottom_pipe, (self.x_pos, self.gap_end))
-
-    def is_off_screen(self) -> int:
-        return self.x_pos < -PIPE_WIDTH
+    def is_off_screen(self) -> bool:
+        return self.x_pos < -ORB_SIZE
 
     def collides_with(self, player: Player) -> bool:
-        # Use sprite masking for pixel-perfect collision detection
+        # Check rect collision first (broad phase)
         player_rect = pygame.Rect(player.x_pos, player.y_pos,
                                   player.size, player.size)
-        top_rect = pygame.Rect(self.x_pos, 0, PIPE_WIDTH, self.gap_start)
-        bottom_rect = pygame.Rect(self.x_pos, self.gap_end,
-                                  PIPE_WIDTH, GROUND_Y - self.gap_end)
 
-        # Check rect collision first (broad phase)
-        if player_rect.colliderect(top_rect):
+        if player_rect.colliderect(self.rect):
             # Use mask collision for accurate detection
             offset_x = int(self.x_pos - player.x_pos)
-            offset_y = int(0 - player.y_pos)
-            # Create a mask for the top pipe rect
-            top_mask_surf = pygame.Surface((PIPE_WIDTH, self.gap_start))
-            top_mask_surf.fill((255, 255, 255))
-            top_mask = pygame.mask.from_surface(top_mask_surf)
-            return player.mask.overlap(top_mask, (offset_x, offset_y))
-
-        if player_rect.colliderect(bottom_rect):
-            # Use mask collision for accurate detection
-            offset_x = int(self.x_pos - player.x_pos)
-            offset_y = int(self.gap_end - player.y_pos)
-            # Create a mask for the bottom pipe rect
-            bottom_height = GROUND_Y - self.gap_end
-            bottom_mask_surf = pygame.Surface((PIPE_WIDTH, bottom_height))
-            bottom_mask_surf.fill((255, 255, 255))
-            bottom_mask = pygame.mask.from_surface(bottom_mask_surf)
-            return player.mask.overlap(bottom_mask, (offset_x, offset_y))
+            offset_y = int(self.y_pos - player.y_pos)
+            return player.mask.overlap(self.mask, (offset_x, offset_y))
 
         return False
