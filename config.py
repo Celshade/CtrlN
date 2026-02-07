@@ -10,8 +10,8 @@ WINDOW_WIDTH = 2670
 WINDOW_HEIGHT = 1200
 FPS = 60
 
-# Scale factor (2670x1200 is 6.675x 400x800)
-SCALE = 6.675
+# Scale factor (2670x1200 is the Solana Seeker display in landscape)
+SCALE = 3.0
 
 # Objects
 PIPE_GAP = 300
