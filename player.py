@@ -26,6 +26,11 @@ class Player:
         self.animation_frame = 0
         self.playing_animation = False
 
+        # Load shield sprite
+        self.shield_image = pygame.image.load("assets/shield.png")
+        self.shield_image = pygame.transform.scale(self.shield_image,
+                                                   (self.size, self.size))
+
     def _load_keypress_animation(self):
         """Load and cache all frames from the keypress animation webp."""
         frames = []
@@ -67,10 +72,14 @@ class Player:
             self.animation_frame = 0
             self.playing_animation = True
 
-    def draw(self, screen) -> None:
+    def draw(self, screen, score=0) -> None:
         # Only draw player sprite if animation is not active
         if not self.playing_animation:
             screen.blit(self.image, self.rect)
+
+        # Draw shield if score is 5 or more
+        if score >= 5:
+            screen.blit(self.shield_image, self.rect)
 
         # Draw keypress animation if active
         if (self.playing_animation
