@@ -31,6 +31,11 @@ class Player:
         self.shield_image = pygame.transform.scale(self.shield_image,
                                                    (self.size, self.size))
 
+        # Load shield charge animation frames
+        self.shield_charge_animation_frames = self._load_shield_charge_animation()
+        self.shield_animation_frame = 0
+        self.playing_shield_animation = False
+
         # Shield state
         self.shield_charges = 0  # Current number of shields (0-2 max)
         self.next_shield_threshold = 5  # Score at which we grant the next shield
@@ -57,6 +62,28 @@ class Player:
             print(f"Warning: Could not load keypress animation: {e}")
         return frames
 
+    def _load_shield_charge_animation(self):
+        """Load and cache all frames from the shield charge animation webp."""
+        frames = []
+        try:
+            pil_image = Image.open("assets/shield_key_fx3.2.webP")
+
+            try:
+                while True:
+                    frame = pil_image.convert("RGBA")
+                    frame = frame.resize((self.size, self.size),
+                                         Image.Resampling.LANCZOS)
+                    pygame_frame = pygame.image.fromstring(
+                        frame.tobytes(), frame.size, frame.mode
+                    )
+                    frames.append(pygame_frame)
+                    pil_image.seek(pil_image.tell() + 1)
+            except EOFError:
+                pass  # End of frames
+        except Exception as e:
+            print(f"Warning: Could not load shield charge animation: {e}")
+        return frames
+
     def update(self) -> None:
         self.vel += GRAVITY
         self.y_pos += self.vel
@@ -68,6 +95,13 @@ class Player:
             if self.animation_frame >= len(self.keypress_animation_frames):
                 self.playing_animation = False
                 self.animation_frame = 0
+
+        # Update shield charge animation frame
+        if self.playing_shield_animation:
+            self.shield_animation_frame += 1
+            if self.shield_animation_frame >= len(self.shield_charge_animation_frames):
+                self.playing_shield_animation = False
+                self.shield_animation_frame = 0
 
     def keypress(self) -> None:
         self.vel = KEY_POWER
@@ -82,6 +116,10 @@ class Player:
         if score >= self.next_shield_threshold and self.shield_charges < 2:
             self.shield_charges += 1
             self.next_shield_threshold += 5
+            # Trigger shield charge animation
+            if self.shield_charge_animation_frames:
+                self.shield_animation_frame = 0
+                self.playing_shield_animation = True
 
         return self.shield_charges > 0
 
@@ -91,16 +129,17 @@ class Player:
             self.shield_charges -= 1
 
     def draw(self, screen, score=0) -> None:
-        # Only draw player sprite if animation is not active
-        if not self.playing_animation:
-            screen.blit(self.image, self.rect)
-
-        # Draw shield if active (score >= 5 and not broken)
-        if self.has_shield(score):
-            screen.blit(self.shield_image, self.rect)
-
-        # Draw keypress animation if active
-        if (self.playing_animation
+        # Draw shield charge animation if active (highest priority)
+        if (self.playing_shield_animation
+            and self.shield_animation_frame < len(self.shield_charge_animation_frames)
+        ):
+            current_frame = self.shield_charge_animation_frames[self.shield_animation_frame]
+            anim_rect = current_frame.get_rect(
+                center=(self.rect.centerx, self.rect.centery)
+            )
+            screen.blit(current_frame, anim_rect)
+        # Draw keypress animation if active and no shield animation
+        elif (self.playing_animation
             and self.animation_frame < len(self.keypress_animation_frames)
         ):
             current_frame = self.keypress_animation_frames[self.animation_frame]
@@ -108,6 +147,13 @@ class Player:
                 center=(self.rect.centerx, self.rect.centery)
             )
             screen.blit(current_frame, anim_rect)
+        # Only draw player sprite if no animation is active
+        else:
+            screen.blit(self.image, self.rect)
+
+        # Draw shield if active (score >= 5 and not broken) - only when no shield charge animation
+        if self.has_shield(score) and not self.playing_shield_animation:
+            screen.blit(self.shield_image, self.rect)
 
     def is_dead(self) -> bool:
         return self.y_pos + self.size >= GROUND_Y or self.y_pos < 0
