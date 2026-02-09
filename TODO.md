@@ -26,13 +26,13 @@
 * Create/implement passive shield system ☑️
 * [S0] finish shield 1.0 idle art/animation ☑️
 * [S1] finish shield 1.0 spawn animation ☑️
+* [S1i] implement shield 1.0 animations ☑️
 
 ## In Progress
 * [LV1] finish level 1 (day) art [@Psy]
 * [C1] create character concept art [@momo]
 * [B1] create bird/animation [@psy]
 * [B2] create perched bird/animation [@psy]
-* [S1i] implement shield 1.0 animations
 * [S2] create colored shield charges
 * [S2i] implement colored shield charges
 * [S3] create shield count orbs
