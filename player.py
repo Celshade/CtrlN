@@ -39,7 +39,7 @@ class Player:
         """Load and cache all frames from the keypress animation webp."""
         frames = []
         try:
-            pil_image = Image.open("assets/keypress_with_thruster+fx.webP")
+            pil_image = Image.open("assets/keypress_thruster_fx.webP")
 
             try:
                 while True:
