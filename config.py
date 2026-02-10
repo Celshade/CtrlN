@@ -35,10 +35,15 @@ ORB_SPAWN_RATE = 60
 ORB_MIN_MARGIN = int(50 * SCALE)
 ORB_MAX_MARGIN = int(50 * SCALE)
 
-# Contraints
+# Constraints
 GRAVITY = 0.5
 GROUND_HEIGHT = int(12.5 * SCALE)
 GROUND_Y = WINDOW_HEIGHT - GROUND_HEIGHT
+
+# Trees (foreground obstacles)
+TREE_SIZE = int(PLAYER_SIZE * 1.5)
+TREE_SPEED = PIPE_SPEED
+TREE_SPAWN_RATE = 60
 
 # Colors
 WHITE = (255, 255, 255)
