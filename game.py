@@ -303,7 +303,6 @@ class Game:
 
         # Flush display
         pygame.display.flip()
-        pygame.display.update()
 
     def draw_menu(self) -> None:
         title1 = self.font_large.render("Clacky", True, BLACK)
@@ -372,7 +371,7 @@ class Game:
             frame += 1
             if frame % 60 == 0:
                 print(f"Frame {frame}: State={self.state.name}",
-                      f"Score={self.score}")
+                      f"Score={self.score} Orbs={len(self.orbs)} Trees={len(self.trees)}")
 
         print("\nShutting down...")
         pygame.quit()
