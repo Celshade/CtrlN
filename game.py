@@ -2,12 +2,13 @@ import sys
 
 import pygame
 
-from objects import Orb
+from objects import Orb, Tree
 from player import Player
 from config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
     ORB_SPEED, ORB_SPAWN_RATE,
+    TREE_SPEED, TREE_SPAWN_RATE,
     GROUND_Y, PLAYER_SIZE,
     BLACK, WHITE, RED
 )
@@ -37,6 +38,8 @@ class Game:
         self.player = Player()
         self.orbs = []
         self.orb_timer = 0
+        self.trees = []
+        self.tree_timer = 0
 
         # Load background layers with parallax support
         # Format: {"image": loaded_image, "speed": parallax_speed, "offset": current_offset}
@@ -83,16 +86,25 @@ class Game:
                     pygame.image.load("assets/background.png"),
                     (WINDOW_WIDTH, WINDOW_HEIGHT)
                 ),
-                "speed": 0.05,
+                "speed": 0.04,
                 "offset": 0
             },
             {
-                "name": "middleground",
+                "name": "middleground_dark",
                 "image": pygame.transform.scale(
-                    pygame.image.load("assets/middleground.png"),
+                    pygame.image.load("assets/middleground_dark.png"),
                     (WINDOW_WIDTH, WINDOW_HEIGHT)
                 ),
                 "speed": 0.0625,
+                "offset": 0
+            },
+            {
+                "name": "middleground_light",
+                "image": pygame.transform.scale(
+                    pygame.image.load("assets/middleground_light.png"),
+                    (WINDOW_WIDTH, WINDOW_HEIGHT)
+                ),
+                "speed": 0.08,
                 "offset": 0
             },
             {
@@ -101,7 +113,16 @@ class Game:
                     pygame.image.load("assets/foreground.png"),
                     (WINDOW_WIDTH, WINDOW_HEIGHT)
                 ),
-                "speed": 0.25,
+                "speed": 0.2,
+                "offset": 0
+            },
+            {
+                "name": "ground",
+                "image": pygame.transform.scale(
+                    pygame.image.load("assets/ground.png"),
+                    (WINDOW_WIDTH, WINDOW_HEIGHT)
+                ),
+                "speed": 0.5,
                 "offset": 0
             }
         ]
@@ -138,6 +159,8 @@ class Game:
         self.player = Player()
         self.orbs = []
         self.orb_timer = 0
+        self.trees = []
+        self.tree_timer = 0
         # Reset parallax offsets for all layers
         for layer in self.bg_layers:
             layer["offset"] = 0
@@ -162,6 +185,12 @@ class Game:
             self.orbs.append(Orb(WINDOW_WIDTH))
             self.orb_timer = 0
 
+        # Spawn trees
+        self.tree_timer += 1
+        if self.tree_timer >= TREE_SPAWN_RATE:
+            self.trees.append(Tree(WINDOW_WIDTH))
+            self.tree_timer = 0
+
         # Update orbs
         for orb in self.orbs:
             orb.update()
@@ -169,10 +198,17 @@ class Game:
                 orb.scored = True
                 self.score += 1
 
+        # Update trees
+        for tree in self.trees:
+            tree.update()
+
         # Remove off-screen orbs
         self.orbs = [o for o in self.orbs if not o.is_off_screen()]
 
-        # Check collisions
+        # Remove off-screen trees
+        self.trees = [t for t in self.trees if not t.is_off_screen()]
+
+        # Check collisions with orbs
         orb_to_remove = None
         for orb in self.orbs:
             if orb.collides_with(self.player):
@@ -187,6 +223,23 @@ class Game:
         # Remove the orb that hit the shield
         if orb_to_remove:
             self.orbs.remove(orb_to_remove)
+            return
+
+        # Check collisions with trees
+        tree_to_remove = None
+        for tree in self.trees:
+            if tree.collides_with(self.player):
+                if self.player.has_shield(self.score):
+                    self.player.destroy_shield()
+                    tree_to_remove = tree  # Mark tree for removal
+                    break
+                else:
+                    self.end_game()
+                    return
+
+        # Remove the tree that hit the shield
+        if tree_to_remove:
+            self.trees.remove(tree_to_remove)
             return
 
         if self.player.is_dead():
@@ -221,6 +274,10 @@ class Game:
         # Draw orbs
         for orb in self.orbs:
             orb.draw(self.screen)
+        # Draw trees
+        for tree in self.trees:
+            tree.draw(self.screen)
+
 
         # # Draw ground
         # pygame.draw.rect(self.screen, GROUND_COLOR,
