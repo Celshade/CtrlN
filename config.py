@@ -6,11 +6,12 @@ from enum import Enum
 # ===================== #
 
 # Game settings
-WINDOW_WIDTH = 2670
-WINDOW_HEIGHT = 1200
+# Display at actual Solana Seeker phone dimensions (base resolution)
+WINDOW_WIDTH = 890
+WINDOW_HEIGHT = 400
 FPS = 60
 
-# Scale factor (2670x1200 is the Solana Seeker display in landscape)
+# Scale factor (base 890x400 is the Solana Seeker display, 2670x1200 is 3x scale)
 SCALE = 3.0
 
 # Objects
@@ -23,7 +24,7 @@ PIPE_MAX_MARGIN = int(30 * SCALE)
 
 # Player
 KEY_POWER = -9
-PLAYER_SIZE = int(40 * SCALE)
+PLAYER_SIZE = int(20 * SCALE)
 PLAYER_START_X = int(50 * SCALE)
 PLAYER_START_Y = WINDOW_HEIGHT // 2 - PLAYER_SIZE // 2
 
@@ -36,7 +37,7 @@ ORB_MAX_MARGIN = int(50 * SCALE)
 
 # Contraints
 GRAVITY = 0.5
-GROUND_HEIGHT = int(25 * SCALE)
+GROUND_HEIGHT = int(12.5 * SCALE)
 GROUND_Y = WINDOW_HEIGHT - GROUND_HEIGHT
 
 # Colors
