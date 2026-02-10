@@ -4,9 +4,9 @@ import pygame
 from PIL import Image
 
 from player import Player
-from config import (GROUND_Y, ORB_SIZE, ORB_SPEED,
+from config import (GROUND_Y, ORB_SIZE, OBJECT_SPEED,
                     ORB_MIN_MARGIN, ORB_MAX_MARGIN, ORANGE,
-                    TREE_SIZE, TREE_SPEED,
+                    TREE_SIZE, OBJECT_SPEED,
                     WINDOW_WIDTH)
 
 
@@ -34,7 +34,7 @@ class Tree:
         self.mask = pygame.mask.from_surface(self.image)
 
     def update(self) -> None:
-        self.x_pos += TREE_SPEED
+        self.x_pos += OBJECT_SPEED
         self.rect.x = int(self.x_pos)
 
     def draw(self, screen) -> None:
@@ -112,7 +112,7 @@ class Orb:
         return frames
 
     def update(self) -> None:
-        self.x_pos += ORB_SPEED
+        self.x_pos += OBJECT_SPEED
         self.rect.x = int(self.x_pos)
 
         # Animate bird (cycle through frames)

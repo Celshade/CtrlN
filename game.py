@@ -8,8 +8,8 @@ from player import Player
 from config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
-    ORB_SPEED, ORB_SPAWN_RATE,
-    TREE_SPEED, TREE_SPAWN_RATE, TREE_SPACING,
+    OBJECT_SPEED, ORB_SPAWN_RATE,
+    OBJECT_SPEED, TREE_SPAWN_RATE, TREE_SPACING,
     GROUND_Y, PLAYER_SIZE,
     BLACK, WHITE, RED
 )
@@ -123,7 +123,7 @@ class Game:
                     pygame.image.load("assets/ground.png"),
                     (WINDOW_WIDTH, WINDOW_HEIGHT)
                 ),
-                "speed": 0.5,
+                "speed": 1.0,
                 "offset": 0
             }
         ]
@@ -175,7 +175,7 @@ class Game:
         # Update parallax background layers
         for layer in self.bg_layers:
             if layer["speed"] > 0:  # Only update if not static
-                layer["offset"] += ORB_SPEED * layer["speed"]
+                layer["offset"] += OBJECT_SPEED * layer["speed"]
                 # Wrap the layer offset for seamless scrolling
                 if layer["offset"] < -WINDOW_WIDTH:
                     layer["offset"] += WINDOW_WIDTH

@@ -34,7 +34,6 @@ class Player:
         # Load shield charge animation frames
         self.shield_charge_animation_frames = self._load_shield_charge_animation()
         self.shield_animation_frame = 0
-        self.shield_animation_counter = 0  # Counter for slowing down animation
         self.playing_shield_animation = False
 
         # Shield state
@@ -97,15 +96,12 @@ class Player:
                 self.playing_animation = False
                 self.animation_frame = 0
 
-        # Update shield charge animation frame (slowed down by 4x)
+        # Update shield charge animation frame
         if self.playing_shield_animation:
-            self.shield_animation_counter += 1
-            if self.shield_animation_counter >= 4:
-                self.shield_animation_counter = 0
-                self.shield_animation_frame += 1
-                if self.shield_animation_frame >= len(self.shield_charge_animation_frames):
-                    self.playing_shield_animation = False
-                    self.shield_animation_frame = 0
+            self.shield_animation_frame += 1
+            if self.shield_animation_frame >= len(self.shield_charge_animation_frames):
+                self.playing_shield_animation = False
+                self.shield_animation_frame = 0
 
     def keypress(self) -> None:
         self.vel = KEY_POWER
@@ -123,7 +119,6 @@ class Player:
             # Trigger shield charge animation
             if self.shield_charge_animation_frames:
                 self.shield_animation_frame = 0
-                self.shield_animation_counter = 0
                 self.playing_shield_animation = True
 
         return self.shield_charges > 0
