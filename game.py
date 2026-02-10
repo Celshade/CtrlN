@@ -1,4 +1,5 @@
 import sys
+import random
 
 import pygame
 
@@ -8,7 +9,7 @@ from config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
     ORB_SPEED, ORB_SPAWN_RATE,
-    TREE_SPEED, TREE_SPAWN_RATE,
+    TREE_SPEED, TREE_SPAWN_RATE, TREE_SPACING,
     GROUND_Y, PLAYER_SIZE,
     BLACK, WHITE, RED
 )
@@ -185,10 +186,15 @@ class Game:
             self.orbs.append(Orb(WINDOW_WIDTH))
             self.orb_timer = 0
 
-        # Spawn trees
+        # Spawn trees (1-3 at a time at random intervals)
         self.tree_timer += 1
         if self.tree_timer >= TREE_SPAWN_RATE:
-            self.trees.append(Tree(WINDOW_WIDTH))
+            # Randomly spawn 1-3 trees
+            num_trees = random.randint(1, 3)  # NOTE: Adjust this limit
+            for i in range(num_trees):
+                # Offset each tree horizontally
+                tree_x = WINDOW_WIDTH + (i * TREE_SPACING)
+                self.trees.append(Tree(tree_x))
             self.tree_timer = 0
 
         # Update orbs

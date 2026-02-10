@@ -44,6 +44,7 @@ GROUND_Y = WINDOW_HEIGHT - GROUND_HEIGHT
 TREE_SIZE = int(PLAYER_SIZE * 1.5)
 TREE_SPEED = PIPE_SPEED
 TREE_SPAWN_RATE = 60
+TREE_SPACING = int(TREE_SIZE * 0.8)  # Horizontal spacing between trees in a group
 
 # Colors
 WHITE = (255, 255, 255)
