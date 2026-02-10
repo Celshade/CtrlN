@@ -38,13 +38,73 @@ class Game:
         self.orbs = []
         self.orb_timer = 0
 
-        # Load background with parallax support
-        self.bg_image = pygame.image.load("assets/day_level3.gif")
-        # self.bg_image = pygame.image.load("assets/day_level.gif")
-        self.bg_image = pygame.transform.scale(self.bg_image,
-                                               (WINDOW_WIDTH, WINDOW_HEIGHT))
-        self.bg_offset = 0  # Parallax offset
-        self.parallax_speed = 0.3  # Parallax speed factor
+        # Load background layers with parallax support
+        # Format: {"image": loaded_image, "speed": parallax_speed, "offset": current_offset}
+        self.bg_layers = [
+            {
+                "name": "sky_and_grass",
+                "image": pygame.transform.scale(
+                    pygame.image.load("assets/sky_and_grass.png"),
+                    (WINDOW_WIDTH, WINDOW_HEIGHT)
+                ),
+                "speed": 0.0,  # Static - no parallax
+                "offset": 0
+            },
+            {
+                "name": "big_clouds",
+                "image": pygame.transform.scale(
+                    pygame.image.load("assets/big_clouds.png"),
+                    (WINDOW_WIDTH, WINDOW_HEIGHT)
+                ),
+                "speed": 0.025,
+                "offset": 0
+            },
+            {
+                "name": "mountains",
+                "image": pygame.transform.scale(
+                    pygame.image.load("assets/mountains.png"),
+                    (WINDOW_WIDTH, WINDOW_HEIGHT)
+                ),
+                "speed": 0.0,  # Static - no parallax
+                "offset": 0
+            },
+            {
+                "name": "little_clouds",
+                "image": pygame.transform.scale(
+                    pygame.image.load("assets/little_clouds.png"),
+                    (WINDOW_WIDTH, WINDOW_HEIGHT)
+                ),
+                "speed": 0.05,
+                "offset": 0
+            },
+            {
+                "name": "background",
+                "image": pygame.transform.scale(
+                    pygame.image.load("assets/background.png"),
+                    (WINDOW_WIDTH, WINDOW_HEIGHT)
+                ),
+                "speed": 0.05,
+                "offset": 0
+            },
+            {
+                "name": "middleground",
+                "image": pygame.transform.scale(
+                    pygame.image.load("assets/middleground.png"),
+                    (WINDOW_WIDTH, WINDOW_HEIGHT)
+                ),
+                "speed": 0.0625,
+                "offset": 0
+            },
+            {
+                "name": "foreground",
+                "image": pygame.transform.scale(
+                    pygame.image.load("assets/foreground.png"),
+                    (WINDOW_WIDTH, WINDOW_HEIGHT)
+                ),
+                "speed": 0.25,
+                "offset": 0
+            }
+        ]
 
     def handle_gamestate(self) -> None:
         if self.state == GameState.MENU:
@@ -78,7 +138,9 @@ class Game:
         self.player = Player()
         self.orbs = []
         self.orb_timer = 0
-        self.bg_offset = 0  # Reset parallax offset
+        # Reset parallax offsets for all layers
+        for layer in self.bg_layers:
+            layer["offset"] = 0
 
     def update(self) -> None:
         if self.state != GameState.PLAYING:
@@ -86,11 +148,13 @@ class Game:
 
         self.player.update()  # Update the Player
 
-        # Update parallax background
-        self.bg_offset += ORB_SPEED * self.parallax_speed
-        # Wrap the background offset for seamless scrolling
-        if self.bg_offset < -WINDOW_WIDTH:
-            self.bg_offset += WINDOW_WIDTH
+        # Update parallax background layers
+        for layer in self.bg_layers:
+            if layer["speed"] > 0:  # Only update if not static
+                layer["offset"] += ORB_SPEED * layer["speed"]
+                # Wrap the layer offset for seamless scrolling
+                if layer["offset"] < -WINDOW_WIDTH:
+                    layer["offset"] += WINDOW_WIDTH
 
         # Spawn orbs
         self.orb_timer += 1
@@ -143,10 +207,16 @@ class Game:
             self.high_score = self.score
 
     def draw(self) -> None:
-        # Draw background with parallax scrolling
-        self.screen.blit(self.bg_image, (int(self.bg_offset), 0))
-        # Draw second copy of background for seamless scrolling
-        self.screen.blit(self.bg_image, (int(self.bg_offset + WINDOW_WIDTH), 0))
+        # Draw background layers in order from back to front
+        for layer in self.bg_layers:
+            offset = int(layer["offset"])
+            # Static layers only need to be drawn once
+            if layer["speed"] == 0.0:
+                self.screen.blit(layer["image"], (0, 0))
+            else:
+                # Parallax layers - draw with wrapping for seamless scrolling
+                self.screen.blit(layer["image"], (offset, 0))
+                self.screen.blit(layer["image"], (offset + WINDOW_WIDTH, 0))
 
         # Draw orbs
         for orb in self.orbs:
