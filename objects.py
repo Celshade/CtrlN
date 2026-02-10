@@ -1,6 +1,7 @@
 import random
 
 import pygame
+from PIL import Image
 
 from player import Player
 from config import (GROUND_Y, ORB_SIZE, ORB_SPEED,
@@ -57,7 +58,14 @@ class Tree:
 
 
 class Orb:
+    # Class-level animation frames (shared across all orbs)
+    animation_frames = []
+
     def __init__(self, x_pos) -> None:
+        # Load animation frames once on first instantiation
+        if not Orb.animation_frames:
+            Orb.animation_frames = self._load_bird_animation()
+
         self.x_pos = x_pos
         # Position orb randomly with margins
         min_y = ORB_MIN_MARGIN
@@ -65,16 +73,58 @@ class Orb:
         self.y_pos = random.randint(min_y, max_y)
         self.scored = False
 
-        # Create orange circle sprite
-        self.image = pygame.Surface((ORB_SIZE, ORB_SIZE), pygame.SRCALPHA)
-        pygame.draw.circle(self.image, ORANGE,
-                          (ORB_SIZE // 2, ORB_SIZE // 2), ORB_SIZE // 2)
+        # Animation state
+        self.animation_frame = 0
+        self.animation_counter = 0
+
+        # Use first frame for initial rect
+        if Orb.animation_frames:
+            self.image = Orb.animation_frames[0]
+        else:
+            # Fallback to orange circle if animation fails to load
+            self.image = pygame.Surface((ORB_SIZE, ORB_SIZE), pygame.SRCALPHA)
+            pygame.draw.circle(self.image, ORANGE,
+                              (ORB_SIZE // 2, ORB_SIZE // 2), ORB_SIZE // 2)
+
         self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
         self.mask = pygame.mask.from_surface(self.image)
+
+    def _load_bird_animation(self):
+        """Load and cache all frames from BirdFlying.gif."""
+        frames = []
+        try:
+            pil_image = Image.open("assets/BirdFlying.gif")
+
+            try:
+                while True:
+                    frame = pil_image.convert("RGBA")
+                    frame = frame.resize((ORB_SIZE, ORB_SIZE),
+                                         Image.Resampling.LANCZOS)
+                    pygame_frame = pygame.image.fromstring(
+                        frame.tobytes(), frame.size, frame.mode
+                    )
+                    frames.append(pygame_frame)
+                    pil_image.seek(pil_image.tell() + 1)
+            except EOFError:
+                pass  # End of frames
+        except Exception as e:
+            print(f"Warning: Could not load bird animation: {e}")
+        return frames
 
     def update(self) -> None:
         self.x_pos += ORB_SPEED
         self.rect.x = int(self.x_pos)
+
+        # Animate bird (cycle through frames)
+        if Orb.animation_frames:
+            self.animation_counter += 1
+            if self.animation_counter >= 2:  # Each frame lasts 2 updates
+                self.animation_counter = 0
+                self.animation_frame = (self.animation_frame + 1) % len(Orb.animation_frames)
+                self.image = Orb.animation_frames[self.animation_frame]
+                # Update rect and mask with new frame
+                self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
+                self.mask = pygame.mask.from_surface(self.image)
 
     def draw(self, screen) -> None:
         screen.blit(self.image, self.rect)
