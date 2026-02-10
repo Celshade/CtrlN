@@ -14,35 +14,26 @@ FPS = 60
 # Scale factor (base 890x400 is the Solana Seeker display, 2670x1200 is 3x scale)
 SCALE = 3.0
 
-# Objects
-PIPE_GAP = 300
-PIPE_WIDTH = int(80 * SCALE)
-PIPE_SPEED = int(-6 * SCALE)
-PIPE_SPAWN_RATE = 90
-PIPE_MIN_MARGIN = int(30 * SCALE)
-PIPE_MAX_MARGIN = int(30 * SCALE)
-
 # Player
-KEY_POWER = -9
-PLAYER_SIZE = int(20 * SCALE)
+KEY_POWER = -8
+PLAYER_SIZE = int(25 * SCALE)
 PLAYER_START_X = int(50 * SCALE)
 PLAYER_START_Y = WINDOW_HEIGHT // 2 - PLAYER_SIZE // 2
 
-# Orbs (obstacles)
+# Orbs (obstacles)  # FIXME birds
+OBJECT_SPEED = int(-8 * SCALE)  # NOTE lower => faster
 ORB_SIZE = int(PLAYER_SIZE * 0.5)
-ORB_SPEED = PIPE_SPEED
-ORB_SPAWN_RATE = 60
+ORB_SPAWN_RATE = 30
 ORB_MIN_MARGIN = int(50 * SCALE)
 ORB_MAX_MARGIN = int(50 * SCALE)
 
 # Constraints
-GRAVITY = 0.5
+GRAVITY = 0.69
 GROUND_HEIGHT = int(12.5 * SCALE)
 GROUND_Y = WINDOW_HEIGHT - GROUND_HEIGHT
 
-# Trees (foreground obstacles)
+# Trees (obstacles)
 TREE_SIZE = int(PLAYER_SIZE * 1.5)
-TREE_SPEED = PIPE_SPEED
 TREE_SPAWN_RATE = 60
 TREE_SPACING = int(TREE_SIZE * 0.8)  # Horizontal spacing between trees in a group
 
