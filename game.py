@@ -43,6 +43,10 @@ class Game:
         self.tree_timer = 0
         self.perched_birds = []
 
+        # spawn rates
+        self.orb_spawn_rate = None
+        self.tree_spawn_rate = None
+
         # Load background layers with parallax support
         # Format: {"image": Surface, "speed": float, "offset": int}
         self.bg_layers = [
@@ -168,6 +172,23 @@ class Game:
         for layer in self.bg_layers:
             layer["offset"] = 0
 
+
+    def _get_spawn_rate(self, object_type: str, score: int) -> int:
+        rates = {"orb": ORB_SPAWN_RATE, "tree": TREE_SPAWN_RATE}
+        rate = rates[object_type]
+
+        if score < 25:
+            return rate
+        elif 25 <= score < 50:
+            return int(rate * 0.75)
+        elif 50 <= score < 75:
+            return int(rate * 0.5)
+        elif 75 <= score < 100:
+            return int(rate * 0.35)
+        else:  # score >= 100
+            return int(rate * 0.25)
+
+
     def update(self) -> None:
         if self.state != GameState.PLAYING:
             return
@@ -183,8 +204,11 @@ class Game:
                     layer["offset"] += WINDOW_WIDTH
 
         # Spawn orbs (1-3 at a time at random intervals)
+        # Increase spawn frequency after reaching 100 points
+        self.orb_spawn_rate = self._get_spawn_rate(object_type="orb",
+                                                   score=self.score)
         self.orb_timer += 1
-        if self.orb_timer >= ORB_SPAWN_RATE:
+        if self.orb_timer >= self.orb_spawn_rate:
             # Randomly spawn 1-3 orbs at various heights
             num_orbs = random.randint(1, 3)
             for i in range(num_orbs):
@@ -194,8 +218,11 @@ class Game:
             self.orb_timer = 0
 
         # Spawn trees (1-3 at a time at random intervals)
+        # Increase spawn frequency after reaching 100 points
+        self.tree_spawn_rate = self._get_spawn_rate(object_type="tree",
+                                                    score=self.score)
         self.tree_timer += 1
-        if self.tree_timer >= TREE_SPAWN_RATE:
+        if self.tree_timer >= self.tree_spawn_rate:
             # Randomly spawn 1-3 trees
             num_trees = random.randint(1, 3)  # NOTE: Adjust this limit
             for i in range(num_trees):
