@@ -123,8 +123,12 @@ class Player:
             self.animation_frame = 0
             self.playing_animation = True
 
-    def has_shield(self, score) -> bool:
-        """Check if shield is currently active."""
+    def has_shield(self) -> bool:
+        """Check if shield is currently active (no side effects)."""
+        return self.shield_charges > 0
+
+    def update_shields(self, score) -> None:
+        """Grant new shields based on score threshold."""
         # Grant a new shield when reaching next threshold (capped at 2)
         if score >= self.next_shield_threshold and self.shield_charges < 2:
             self.shield_charges += 1
@@ -143,8 +147,6 @@ class Player:
                     self.shield_animation_frame = 0
                     self.playing_shield_animation = False
                     self.playing_shield_animation_tier2 = True
-
-        return self.shield_charges > 0
 
     def destroy_shield(self) -> None:
         """Destroy the shield when hit."""

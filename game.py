@@ -228,7 +228,7 @@ class Game:
                 self.score += 1
 
         # Check for shield earnings based on score (triggers animations)
-        self.player.has_shield(self.score)
+        self.player.update_shields(self.score)
 
         # Remove off-screen orbs
         self.orbs = [o for o in self.orbs if not o.is_off_screen()]
@@ -243,7 +243,7 @@ class Game:
         orb_to_remove = None
         for orb in self.orbs:
             if orb.collides_with(self.player):
-                if self.player.has_shield(self.score):
+                if self.player.has_shield():
                     self.player.destroy_shield()
                     orb_to_remove = orb  # Mark orb for removal
                     break
@@ -260,7 +260,7 @@ class Game:
         tree_to_remove = None
         for tree in self.trees:
             if tree.collides_with(self.player):
-                if self.player.has_shield(self.score):
+                if self.player.has_shield():
                     self.player.destroy_shield()
                     tree_to_remove = tree  # Mark tree for removal
                     break
@@ -277,7 +277,7 @@ class Game:
         bird_to_remove = None
         for bird in self.perched_birds:
             if bird.collides_with(self.player):
-                if self.player.has_shield(self.score):
+                if self.player.has_shield():
                     self.player.destroy_shield()
                     bird_to_remove = bird  # Mark bird for removal
                     break
@@ -291,7 +291,7 @@ class Game:
             return
 
         if self.player.is_dead():
-            if self.player.has_shield(self.score):
+            if self.player.has_shield():
                 self.player.destroy_shield()
                 # Clamp player position back in bounds
                 self.player.y_pos = max(0, min(self.player.y_pos,
