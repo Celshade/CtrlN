@@ -58,7 +58,8 @@ class Tree:
 
         return False
 
-
+# TODO: Change Orb [name] to something more appropriate for inheritance
+#   or just create separate classes for each instance of a flying obj (Bird)
 class Orb:
     # Class-level animation frames (shared across all orbs)
     animation_frames = []

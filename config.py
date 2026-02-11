@@ -11,7 +11,7 @@ WINDOW_WIDTH = 890
 WINDOW_HEIGHT = 400
 FPS = 60
 
-# Scale factor (base 890x400 is the Solana Seeker display, 2670x1200 is 3x scale)
+# Scale factor (base 890x400 is the Solana Seeker display, 2670x1200 is 3x)
 SCALE = 3.0
 
 # Player
