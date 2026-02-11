@@ -43,7 +43,7 @@ class Game:
         self.tree_timer = 0
 
         # Load background layers with parallax support
-        # Format: {"image": loaded_image, "speed": parallax_speed, "offset": current_offset}
+        # Format: {"image": Surface, "speed": float, "offset": int}
         self.bg_layers = [
             {
                 "name": "sky_and_grass",
