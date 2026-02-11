@@ -24,7 +24,7 @@ PLAYER_START_Y = WINDOW_HEIGHT // 2 - PLAYER_SIZE // 2
 OBJECT_SPEED = int(-8 * SCALE)  # NOTE lower => faster
 ORB_SIZE = int(PLAYER_SIZE * 0.5)
 ORB_SPAWN_RATE = 30
-ORB_MIN_MARGIN = int(25 * SCALE)  # NOTE: drastically affects game difficulty
+ORB_MIN_MARGIN = 0  # NOTE: drastically affects game difficulty
 ORB_MAX_MARGIN = int(25 * SCALE)  # NOTE: drastically affects game difficulty
 
 # Constraints
