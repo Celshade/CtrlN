@@ -227,6 +227,9 @@ class Game:
                 bird.scored = True
                 self.score += 1
 
+        # Check for shield earnings based on score (triggers animations)
+        self.player.has_shield(self.score)
+
         # Remove off-screen orbs
         self.orbs = [o for o in self.orbs if not o.is_off_screen()]
 
