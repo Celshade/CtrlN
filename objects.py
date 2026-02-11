@@ -6,7 +6,7 @@ from PIL import Image
 from player import Player
 from config import (
     GROUND_Y, ORB_SIZE, OBJECT_SPEED, ORB_MIN_MARGIN, ORB_MAX_MARGIN, ORANGE,
-    TREE_SIZE, OBJECT_SPEED
+    TREE_SIZE, OBJECT_SPEED, PERCHED_BIRD_SIZE
 )
 
 
@@ -58,7 +58,59 @@ class Tree:
 
         return False
 
-# TODO: Change Orb [name] to something more appropriate for inheritance
+
+class BirdPerched:
+    """A bird perched at the tip of a tree."""
+    def __init__(self, tree: 'Tree') -> None:
+        self.tree = tree
+        self.scored = False
+
+        # Load and scale the perched bird image
+        try:
+            bird_image = pygame.image.load("assets/BirdPerched.png")
+            self.image = pygame.transform.scale(bird_image,
+                                                (PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE))
+        except Exception as e:
+            print(f"Warning: Could not load perched bird image: {e}")
+            # Fallback to a simple rectangle if image fails
+            self.image = pygame.Surface((PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE), pygame.SRCALPHA)
+            pygame.draw.rect(self.image,
+                             (255, 200, 0), (0, 0, PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE))
+
+        self.update_position()
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def update_position(self) -> None:
+        """Update bird position based on tree position (at the tip)."""
+        # Position bird at the tip of the tree (center-top area)
+        self.x_pos = self.tree.x_pos + (TREE_SIZE - PERCHED_BIRD_SIZE) // 2
+        self.y_pos = self.tree.y_pos - PERCHED_BIRD_SIZE + 43  # Slightly above the tree top
+        self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
+
+    def update(self) -> None:
+        """Update bird to follow the tree."""
+        self.update_position()
+
+    def draw(self, screen) -> None:
+        screen.blit(self.image, self.rect)
+
+    def is_off_screen(self) -> bool:
+        return self.x_pos < -PERCHED_BIRD_SIZE
+
+    def collides_with(self, player: Player) -> bool:
+        # Check rect collision first (broad phase)
+        player_rect = pygame.Rect(player.x_pos, player.y_pos,
+                                  player.size, player.size)
+
+        if player_rect.colliderect(self.rect):
+            # Use mask collision for accurate detection
+            offset_x = int(self.x_pos - player.x_pos)
+            offset_y = int(self.y_pos - player.y_pos)
+            return player.mask.overlap(self.mask, (offset_x, offset_y))
+
+        return False
+
+
 #   or just create separate classes for each instance of a flying obj (Bird)
 class Orb:
     # Class-level animation frames (shared across all orbs)

@@ -3,15 +3,15 @@ import random
 
 import pygame
 
-from objects import Orb, Tree
+from objects import Orb, Tree, BirdPerched
 from player import Player
 from config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
-    OBJECT_SPEED, ORB_SPAWN_RATE,
+    OBJECT_SPEED, ORB_SPAWN_RATE, ORB_SIZE,
     OBJECT_SPEED, TREE_SPAWN_RATE, TREE_SPACING,
     GROUND_Y, PLAYER_SIZE,
-    BLACK, WHITE, RED
+    BLACK, WHITE, RED, PERCHED_BIRD_SPAWN_CHANCE
 )
 
 
@@ -41,6 +41,7 @@ class Game:
         self.orb_timer = 0
         self.trees = []
         self.tree_timer = 0
+        self.perched_birds = []
 
         # Load background layers with parallax support
         # Format: {"image": Surface, "speed": float, "offset": int}
@@ -162,6 +163,7 @@ class Game:
         self.orb_timer = 0
         self.trees = []
         self.tree_timer = 0
+        self.perched_birds = []
         # Reset parallax offsets for all layers
         for layer in self.bg_layers:
             layer["offset"] = 0
@@ -180,10 +182,15 @@ class Game:
                 if layer["offset"] < -WINDOW_WIDTH:
                     layer["offset"] += WINDOW_WIDTH
 
-        # Spawn orbs
+        # Spawn orbs (1-3 at a time at random intervals)
         self.orb_timer += 1
         if self.orb_timer >= ORB_SPAWN_RATE:
-            self.orbs.append(Orb(WINDOW_WIDTH))
+            # Randomly spawn 1-3 orbs at various heights
+            num_orbs = random.randint(1, 3)
+            for i in range(num_orbs):
+                # Offset each orb horizontally
+                orb_x = WINDOW_WIDTH + (i * ORB_SIZE * 0.8)
+                self.orbs.append(Orb(orb_x))
             self.orb_timer = 0
 
         # Spawn trees (1-3 at a time at random intervals)
@@ -194,7 +201,12 @@ class Game:
             for i in range(num_trees):
                 # Offset each tree horizontally
                 tree_x = WINDOW_WIDTH + (i * TREE_SPACING)
-                self.trees.append(Tree(tree_x))
+                tree = Tree(tree_x)
+                self.trees.append(tree)
+                # Randomly spawn a perched bird on this tree
+                if random.random() < PERCHED_BIRD_SPAWN_CHANCE:
+                    bird = BirdPerched(tree)
+                    self.perched_birds.append(bird)
             self.tree_timer = 0
 
         # Update orbs
@@ -208,11 +220,21 @@ class Game:
         for tree in self.trees:
             tree.update()
 
+        # Update perched birds
+        for bird in self.perched_birds:
+            bird.update()
+            if bird.x_pos < self.player.x_pos and not bird.scored:
+                bird.scored = True
+                self.score += 1
+
         # Remove off-screen orbs
         self.orbs = [o for o in self.orbs if not o.is_off_screen()]
 
         # Remove off-screen trees
         self.trees = [t for t in self.trees if not t.is_off_screen()]
+
+        # Remove off-screen perched birds
+        self.perched_birds = [b for b in self.perched_birds if not b.is_off_screen()]
 
         # Check collisions with orbs
         orb_to_remove = None
@@ -246,6 +268,23 @@ class Game:
         # Remove the tree that hit the shield
         if tree_to_remove:
             self.trees.remove(tree_to_remove)
+            return
+
+        # Check collisions with perched birds
+        bird_to_remove = None
+        for bird in self.perched_birds:
+            if bird.collides_with(self.player):
+                if self.player.has_shield(self.score):
+                    self.player.destroy_shield()
+                    bird_to_remove = bird  # Mark bird for removal
+                    break
+                else:
+                    self.end_game()
+                    return
+
+        # Remove the perched bird that hit the shield
+        if bird_to_remove:
+            self.perched_birds.remove(bird_to_remove)
             return
 
         if self.player.is_dead():
@@ -283,6 +322,9 @@ class Game:
         # Draw trees
         for tree in self.trees:
             tree.draw(self.screen)
+        # Draw perched birds
+        for bird in self.perched_birds:
+            bird.draw(self.screen)
 
 
         # # Draw ground
@@ -371,7 +413,7 @@ class Game:
             frame += 1
             if frame % 60 == 0:
                 print(f"Frame {frame}: State={self.state.name}",
-                      f"Score={self.score} Orbs={len(self.orbs)} Trees={len(self.trees)}")
+                      f"Score={self.score} Orbs={len(self.orbs)} Trees={len(self.trees)} PerchedBirds={len(self.perched_birds)}")
 
         print("\nShutting down...")
         pygame.quit()
