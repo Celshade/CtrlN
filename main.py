@@ -7,6 +7,11 @@ import pygame
 
 from game import Game
 
+
+# General NOTE: iirc, pygame counts from the top-down, along the y-axis.
+#  i.e. 200 is "lower" than 100
+
+
 # =================== #
 # ### ENTRY POINT ### #
 # =================== #
