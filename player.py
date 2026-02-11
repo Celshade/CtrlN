@@ -192,4 +192,4 @@ class Player:
             screen.blit(self.shield_image, self.rect)
 
     def is_dead(self) -> bool:
-        return self.y_pos + self.size >= GROUND_Y or self.y_pos < 0
+        return self.y_pos + self.size >= GROUND_Y or self.y_pos < -14
