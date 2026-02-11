@@ -83,7 +83,7 @@ class BirdPerched:
             self.y_pos = self.tree.y_pos - PERCHED_BIRD_SIZE + 43
             self.y_start = self.y_pos
             self.transition_frame = 0  # Counter for 5-frame transition
-            self.y_distance_per_frame = 120 / 5  # 30 pixels per frame
+            self.y_distance_per_frame = 200 / 10  # 20 pixels per frame
 
             # Use flying animation
             if BirdPerched.flying_animation_frames:
