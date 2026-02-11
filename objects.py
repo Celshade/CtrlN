@@ -60,25 +60,78 @@ class Tree:
 
 
 class BirdPerched:
-    """A bird perched at the tip of a tree."""
+    """A bird perched at the tip of a tree, with a chance to fly."""
+    # Class-level animation frames (shared across all flying birds)
+    flying_animation_frames = []
+
     def __init__(self, tree: 'Tree') -> None:
+        # Load flying animation frames once on first instantiation
+        if not BirdPerched.flying_animation_frames:
+            BirdPerched.flying_animation_frames = self._load_flying_animation()
+
         self.tree = tree
         self.scored = False
 
-        # Load and scale the perched bird image
-        try:
-            bird_image = pygame.image.load("assets/BirdPerched.png")
-            self.image = pygame.transform.scale(bird_image,
-                                                (PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE))
-        except Exception as e:
-            print(f"Warning: Could not load perched bird image: {e}")
-            # Fallback to a simple rectangle if image fails
-            self.image = pygame.Surface((PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE), pygame.SRCALPHA)
-            pygame.draw.rect(self.image,
-                             (255, 200, 0), (0, 0, PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE))
+        # 33% chance to start flying
+        self.is_flying = random.random() < 0.33
 
-        self.update_position()
+        if self.is_flying:
+            # Flying state
+            self.animation_frame = 0
+            self.animation_counter = 0
+            self.x_pos = self.tree.x_pos + (TREE_SIZE - PERCHED_BIRD_SIZE) // 2
+            self.y_pos = self.tree.y_pos - PERCHED_BIRD_SIZE + 43
+            self.y_start = self.y_pos
+            self.transition_frame = 0  # Counter for 5-frame transition
+            self.y_distance_per_frame = 120 / 5  # 30 pixels per frame
+
+            # Use flying animation
+            if BirdPerched.flying_animation_frames:
+                self.image = BirdPerched.flying_animation_frames[0]
+            else:
+                # Fallback
+                self.image = pygame.Surface((PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE), pygame.SRCALPHA)
+                pygame.draw.rect(self.image, (255, 200, 0), (0, 0, PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE))
+        else:
+            # Perched state - original behavior
+            # Load and scale the perched bird image
+            try:
+                bird_image = pygame.image.load("assets/BirdPerched.png")
+                self.image = pygame.transform.scale(bird_image,
+                                                    (PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE))
+            except Exception as e:
+                print(f"Warning: Could not load perched bird image: {e}")
+                # Fallback to a simple rectangle if image fails
+                self.image = pygame.Surface((PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE), pygame.SRCALPHA)
+                pygame.draw.rect(self.image,
+                                 (255, 200, 0), (0, 0, PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE))
+
+            self.update_position()
+
+        self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
         self.mask = pygame.mask.from_surface(self.image)
+
+    def _load_flying_animation(self):
+        """Load and cache all frames from BirdFlying.gif."""
+        frames = []
+        try:
+            pil_image = Image.open("assets/BirdFlying.gif")
+
+            try:
+                while True:
+                    frame = pil_image.convert("RGBA")
+                    frame = frame.resize((ORB_SIZE, ORB_SIZE),
+                                         Image.Resampling.LANCZOS)
+                    pygame_frame = pygame.image.fromstring(
+                        frame.tobytes(), frame.size, frame.mode
+                    )
+                    frames.append(pygame_frame)
+                    pil_image.seek(pil_image.tell() + 1)
+            except EOFError:
+                pass  # End of frames
+        except Exception as e:
+            print(f"Warning: Could not load bird flying animation: {e}")
+        return frames
 
     def update_position(self) -> None:
         """Update bird position based on tree position (at the tip)."""
@@ -88,8 +141,32 @@ class BirdPerched:
         self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
 
     def update(self) -> None:
-        """Update bird to follow the tree."""
-        self.update_position()
+        """Update bird state."""
+        if self.is_flying:
+            # Flying behavior
+            self.x_pos += OBJECT_SPEED
+            self.rect.x = int(self.x_pos)
+
+            # Move up over 7 frames
+            if self.transition_frame < 7:
+                self.y_pos -= self.y_distance_per_frame
+                self.transition_frame += 1
+
+            # Animate bird (cycle through frames)
+            if BirdPerched.flying_animation_frames:
+                self.animation_counter += 1
+                if self.animation_counter >= 2:  # Each frame lasts 2 updates
+                    self.animation_counter = 0
+                    self.animation_frame = (self.animation_frame + 1) % len(BirdPerched.flying_animation_frames)
+                    self.image = BirdPerched.flying_animation_frames[self.animation_frame]
+                    # Update rect and mask with new frame
+                    self.rect = self.image.get_rect(
+                        topleft=(self.x_pos, self.y_pos)
+                    )
+                    self.mask = pygame.mask.from_surface(self.image)
+        else:
+            # Perched behavior - follow the tree
+            self.update_position()
 
     def draw(self, screen) -> None:
         screen.blit(self.image, self.rect)
