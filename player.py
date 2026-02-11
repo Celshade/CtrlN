@@ -38,7 +38,7 @@ class Player:
 
         # Shield state
         self.shield_charges = 0  # Current number of shields (0-2 max)
-        self.next_shield_threshold = 5  # Score at which we grant the next shield
+        self.next_shield_threshold = 5  # Score threshold for next shield
 
     def _load_keypress_animation(self):
         """Load and cache all frames from the keypress animation webp."""
@@ -151,7 +151,7 @@ class Player:
         else:
             screen.blit(self.image, self.rect)
 
-        # Draw shield if active (score >= 5 and not broken) - only when no shield charge animation
+        # Draw shield if it's active - only when no shield charge animation
         if self.has_shield(score) and not self.playing_shield_animation:
             screen.blit(self.shield_image, self.rect)
 

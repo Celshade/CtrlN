@@ -4,10 +4,10 @@ import pygame
 from PIL import Image
 
 from player import Player
-from config import (GROUND_Y, ORB_SIZE, OBJECT_SPEED,
-                    ORB_MIN_MARGIN, ORB_MAX_MARGIN, ORANGE,
-                    TREE_SIZE, OBJECT_SPEED,
-                    WINDOW_WIDTH)
+from config import (
+    GROUND_Y, ORB_SIZE, OBJECT_SPEED, ORB_MIN_MARGIN, ORB_MAX_MARGIN, ORANGE,
+    TREE_SIZE, OBJECT_SPEED
+)
 
 
 
@@ -23,12 +23,14 @@ class Tree:
         # Load tree sprite
         try:
             tree_image = pygame.image.load("assets/tree_obj.png")
-            self.image = pygame.transform.scale(tree_image, (TREE_SIZE, TREE_SIZE))
+            self.image = pygame.transform.scale(tree_image,
+                                                (TREE_SIZE, TREE_SIZE))
         except Exception as e:
             print(f"Warning: Could not load tree image: {e}")
             # Fallback to a simple rectangle if image fails
             self.image = pygame.Surface((TREE_SIZE, TREE_SIZE), pygame.SRCALPHA)
-            pygame.draw.rect(self.image, (139, 69, 19), (0, 0, TREE_SIZE, TREE_SIZE))
+            pygame.draw.rect(self.image,
+                             (139, 69, 19), (0, 0, TREE_SIZE, TREE_SIZE))
 
         self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
         self.mask = pygame.mask.from_surface(self.image)
@@ -123,7 +125,9 @@ class Orb:
                 self.animation_frame = (self.animation_frame + 1) % len(Orb.animation_frames)
                 self.image = Orb.animation_frames[self.animation_frame]
                 # Update rect and mask with new frame
-                self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
+                self.rect = self.image.get_rect(
+                    topleft=(self.x_pos, self.y_pos)
+                )
                 self.mask = pygame.mask.from_surface(self.image)
 
     def draw(self, screen) -> None:
