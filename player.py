@@ -36,8 +36,8 @@ class Player:
                                                          (self.size, self.size))
 
         # Load shield charge animation frames
-        self.shield_charge_animation_frames = self._load_shield_charge_animation("assets/shield_key_fx3.2.webP")
-        self.shield_charge_animation_frames_tier2 = self._load_shield_charge_animation("assets/shield_key_fx3.4.webP")
+        self.shield_charge_animation_frames = self._load_shield_charge_animation("assets/shield_fx3.2.webP")
+        self.shield_charge_animation_frames_tier2 = self._load_shield_charge_animation("assets/shield_fx3.4.webP")
         self.shield_animation_frame = 0
         self.playing_shield_animation = False
         self.playing_shield_animation_tier2 = False
@@ -157,25 +157,8 @@ class Player:
             self.playing_shield_animation = False
 
     def draw(self, screen, score=0) -> None:
-        # Draw shield charge animation if active (highest priority)
-        if (self.playing_shield_animation
-            and self.shield_animation_frame < len(self.shield_charge_animation_frames)
-        ):
-            current_frame = self.shield_charge_animation_frames[self.shield_animation_frame]
-            anim_rect = current_frame.get_rect(
-                center=(self.rect.centerx, self.rect.centery)
-            )
-            screen.blit(current_frame, anim_rect)
-        elif (self.playing_shield_animation_tier2
-            and self.shield_animation_frame < len(self.shield_charge_animation_frames_tier2)
-        ):
-            current_frame = self.shield_charge_animation_frames_tier2[self.shield_animation_frame]
-            anim_rect = current_frame.get_rect(
-                center=(self.rect.centerx, self.rect.centery)
-            )
-            screen.blit(current_frame, anim_rect)
-        # Draw keypress animation if active and no shield animation
-        elif (self.playing_animation
+        # Draw player sprite or keypress animation (base layer)
+        if (self.playing_animation
             and self.animation_frame < len(self.keypress_animation_frames)
         ):
             current_frame = self.keypress_animation_frames[self.animation_frame]
@@ -183,9 +166,26 @@ class Player:
                 center=(self.rect.centerx, self.rect.centery)
             )
             screen.blit(current_frame, anim_rect)
-        # Only draw player sprite if no animation is active
         else:
             screen.blit(self.image, self.rect)
+
+        # Draw shield charge animation if active (on top, highest priority)
+        if (self.playing_shield_animation
+            and self.shield_animation_frame < len(self.shield_charge_animation_frames)
+        ):
+            current_frame = self.shield_charge_animation_frames[self.shield_animation_frame]
+            anim_rect = current_frame.get_rect(
+                center=(self.rect.centerx, self.rect.centery)
+            )
+            screen.blit(current_frame, anim_rect, special_flags=pygame.BLEND_RGBA_MAX)
+        elif (self.playing_shield_animation_tier2
+            and self.shield_animation_frame < len(self.shield_charge_animation_frames_tier2)
+        ):
+            current_frame = self.shield_charge_animation_frames_tier2[self.shield_animation_frame]
+            anim_rect = current_frame.get_rect(
+                center=(self.rect.centerx, self.rect.centery)
+            )
+            screen.blit(current_frame, anim_rect, special_flags=pygame.BLEND_RGBA_MAX)
 
         # Draw shield if it's active - only when no shield charge animation
         if self.shield_charges == 2 and not self.playing_shield_animation_tier2:
