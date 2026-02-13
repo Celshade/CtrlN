@@ -41,6 +41,12 @@ TREE_SPACING = int(TREE_SIZE * 0.8)  # Horizontal spacing between trees in a gro
 PERCHED_BIRD_SIZE = int(PLAYER_SIZE * 1)
 PERCHED_BIRD_SPAWN_CHANCE = 0.4  # 40% chance of a bird on each tree
 
+# Tutorial settings
+TUTORIAL_DURATION = 10  # Points needed to complete tutorial
+TUTORIAL_SPAWN_MULTIPLIER = 2.0  # Reduced spawn rate during tutorial (higher = slower)
+TUTORIAL_PAUSE_FRAMES = 90  # Frames to pause at game start (at 60 FPS = 1.5 seconds)
+SHIELD_EXPLANATION_PAUSE_FRAMES = 90  # Frames to pause for shield explanation (at 60 FPS = 1.5 seconds)
+
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)

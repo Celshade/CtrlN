@@ -11,7 +11,9 @@ from config import (
     OBJECT_SPEED, ORB_SPAWN_RATE, ORB_SIZE,
     OBJECT_SPEED, TREE_SPAWN_RATE, TREE_SPACING,
     GROUND_Y, PLAYER_SIZE,
-    BLACK, WHITE, RED, PERCHED_BIRD_SPAWN_CHANCE
+    BLACK, WHITE, RED, PERCHED_BIRD_SPAWN_CHANCE,
+    TUTORIAL_DURATION, TUTORIAL_SPAWN_MULTIPLIER, TUTORIAL_PAUSE_FRAMES, YELLOW,
+    SHIELD_EXPLANATION_PAUSE_FRAMES
 )
 
 
@@ -29,6 +31,7 @@ class Game:
         self.clock = pygame.time.Clock()  # init game clock
         self.font_large = pygame.font.Font(None, int(36 * SCALE))
         self.font_small = pygame.font.Font(None, int(36 * SCALE))
+        self.font_tutorial = pygame.font.Font(None, int(18 * SCALE))  # 50% smaller for tutorials
 
         # Menu and scoring
         self.state = GameState.MENU
@@ -46,6 +49,13 @@ class Game:
         # spawn rates
         self.orb_spawn_rate = None
         self.tree_spawn_rate = None
+
+        # Tutorial tracking
+        self.tutorial_active = False
+        self.frames_since_start = 0
+        self.shield_explanation_active = False
+        self.shield_explanation_frames = 0
+        self.shield_explanation_shown = False
 
         # Load background layers with parallax support
         # Format: {"image": Surface, "speed": float, "offset": int}
@@ -137,7 +147,16 @@ class Game:
         if self.state == GameState.MENU:
             self.restart_game()
         elif self.state == GameState.PLAYING:
-            self.player.keypress()
+            # Check if we can interrupt a tutorial pause
+            if self.frames_since_start <= TUTORIAL_PAUSE_FRAMES:
+                # Skip initial tutorial pause
+                self.frames_since_start = TUTORIAL_PAUSE_FRAMES + 1
+            elif self.shield_explanation_active:
+                # Skip shield explanation pause
+                self.shield_explanation_active = False
+            else:
+                # Normal gameplay - trigger jump
+                self.player.keypress()
         elif self.state == GameState.GAME_OVER:
             self.state = GameState.MENU
 
@@ -172,10 +191,21 @@ class Game:
         for layer in self.bg_layers:
             layer["offset"] = 0
 
+        # Initialize tutorial
+        self.tutorial_active = True
+        self.frames_since_start = 0
+        self.shield_explanation_active = False
+        self.shield_explanation_frames = 0
+        self.shield_explanation_shown = False
+
 
     def _get_spawn_rate(self, object_type: str, score: int) -> int:
         rates = {"orb": ORB_SPAWN_RATE, "tree": TREE_SPAWN_RATE}
         rate = rates[object_type]
+
+        # Tutorial phase: slower spawn rate
+        if self.tutorial_active:
+            rate = int(rate * TUTORIAL_SPAWN_MULTIPLIER)
 
         if score < 25:
             return rate
@@ -191,6 +221,25 @@ class Game:
 
     def update(self) -> None:
         if self.state != GameState.PLAYING:
+            return
+
+        self.frames_since_start += 1
+
+        # Pause at game start for tutorial
+        if self.frames_since_start <= TUTORIAL_PAUSE_FRAMES:
+            return
+
+        # Check if we reached 5 points and should show shield explanation
+        if self.score >= 5 and not self.shield_explanation_shown:
+            self.shield_explanation_active = True
+            self.shield_explanation_shown = True
+            self.shield_explanation_frames = 0
+
+        # Pause for shield explanation
+        if self.shield_explanation_active:
+            self.shield_explanation_frames += 1
+            if self.shield_explanation_frames > SHIELD_EXPLANATION_PAUSE_FRAMES:
+                self.shield_explanation_active = False
             return
 
         self.player.update()  # Update the Player
@@ -256,6 +305,10 @@ class Game:
 
         # Check for shield earnings based on score (triggers animations)
         self.player.update_shields(self.score)
+
+        # End tutorial phase when score reaches threshold
+        if self.tutorial_active and self.score >= TUTORIAL_DURATION:
+            self.tutorial_active = False
 
         # Remove off-screen orbs
         self.orbs = [o for o in self.orbs if not o.is_off_screen()]
@@ -370,6 +423,9 @@ class Game:
         elif self.state == GameState.PLAYING:
             score_text = self.font_large.render(str(self.score), True, BLACK)
             self.screen.blit(score_text, (20, 20))
+
+            # Draw tutorial elements
+            self.draw_tutorial()
         elif self.state == GameState.GAME_OVER:
             self.draw_game_over()
 
@@ -427,6 +483,56 @@ class Game:
             restart,
             (WINDOW_WIDTH // 2 - restart.get_width() // 2, y + 220)
         )
+
+    def draw_tutorial(self) -> None:
+        """Draw tutorial instructions and pause overlay during warm-up."""
+        # Show pause overlay and instructions during initial pause
+        if self.frames_since_start <= TUTORIAL_PAUSE_FRAMES:
+            overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+            overlay.set_alpha(150)
+            overlay.fill(BLACK)
+            self.screen.blit(overlay, (0, 0))
+
+            title = self.font_tutorial.render("Get Ready!", True, YELLOW)
+            instruction = self.font_tutorial.render("Press SPACE or CLICK to Jump", True, WHITE)
+
+            self.screen.blit(
+                title,
+                (WINDOW_WIDTH // 2 - title.get_width() // 2, WINDOW_HEIGHT // 2 - 150)
+            )
+            self.screen.blit(
+                instruction,
+                (WINDOW_WIDTH // 2 - instruction.get_width() // 2, WINDOW_HEIGHT // 2 + 50)
+            )
+
+        # Show shield explanation pause
+        elif self.shield_explanation_active:
+            overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+            overlay.set_alpha(150)
+            overlay.fill(BLACK)
+            self.screen.blit(overlay, (0, 0))
+            shield_tutorial_text = self.font_tutorial.render(
+                "Every 5 points, a shield charge will regenerate.",
+                True,
+                WHITE
+            )
+            self.screen.blit(shield_tutorial_text, (20, WINDOW_HEIGHT - 100))
+
+        # Show tutorial progress indicator while in tutorial phase
+        elif self.tutorial_active:
+            tutorial_text = self.font_tutorial.render(
+                f"TUTORIAL: Reach {TUTORIAL_DURATION} to Continue",
+                True,
+                YELLOW
+            )
+            self.screen.blit(tutorial_text, (20, WINDOW_HEIGHT - 100))
+
+            progress_text = self.font_tutorial.render(
+                f"Progress: {self.score}/{TUTORIAL_DURATION}",
+                True,
+                YELLOW
+            )
+            self.screen.blit(progress_text, (20, WINDOW_HEIGHT - 50))
 
     def run(self) -> None:
         print("Game loop starting...\n")
