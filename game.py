@@ -207,13 +207,20 @@ class Game:
         if self.tutorial_active:
             rate = int(rate * TUTORIAL_SPAWN_MULTIPLIER)
 
-        # Smooth progression curve with endgame cap at 2.5x difficulty
-        # Score 0: 1.0x multiplier (easiest)
-        # Score 100: 0.6x multiplier (1.67x harder)
-        # Score 150: 0.4x multiplier (2.5x harder - maximum cap)
-        # Score 200+: stays capped at 0.4x multiplier
-        # TODO increase scaling for more points/difficulty
-        difficulty_multiplier = max(0.4, 1.0 - score / 250)
+        # Three-phase difficulty progression:
+        # Phase 1 (Score 0-150): Smooth scaling to 2.5x difficulty (multiplier 1.0 → 0.4)
+        # Phase 2 (Score 150-300): Maintains 2.5x difficulty (multiplier 0.4)
+        # Phase 3 (Score 300+): Continue scaling to 4x difficulty (multiplier 0.4 → 0.25)
+        if score < 150:
+            # Linear progression to 2.5x cap
+            difficulty_multiplier = 1.0 - score / 250
+        elif score < 300:
+            # Maintain 2.5x plateau
+            difficulty_multiplier = 0.4
+        else:
+            # Continue scaling beyond 300 to reach 4x at score 450+
+            difficulty_multiplier = max(0.25, 0.4 - (score - 300) / 1000)
+        
         return int(rate * difficulty_multiplier)
 
 
