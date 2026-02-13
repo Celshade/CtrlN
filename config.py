@@ -50,6 +50,9 @@ SHIELD_EXPLANATION_PAUSE_FRAMES = 90  # Frames to pause for shield explanation (
 # Shield protection
 SHIELD_INVULNERABILITY_FRAMES = 30  # Brief invulnerability after shield break (0.5 seconds at 60 FPS)
 
+# Spawn rate smoothing
+MIN_SPAWN_GAP = PLAYER_SIZE + int(3 * SCALE)  # Minimum gap between orbs and other obstacles
+
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)

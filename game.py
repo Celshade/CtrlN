@@ -13,7 +13,7 @@ from config import (
     GROUND_Y, PLAYER_SIZE,
     BLACK, WHITE, RED, PERCHED_BIRD_SPAWN_CHANCE,
     TUTORIAL_DURATION, TUTORIAL_SPAWN_MULTIPLIER, TUTORIAL_PAUSE_FRAMES, YELLOW,
-    SHIELD_EXPLANATION_PAUSE_FRAMES
+    SHIELD_EXPLANATION_PAUSE_FRAMES, MIN_SPAWN_GAP, TREE_SIZE
 )
 
 
@@ -199,6 +199,15 @@ class Game:
         self.shield_explanation_shown = False
 
 
+    def _get_rightmost_obstacle_x(self) -> float:
+        """Get the x position of the rightmost orb."""
+        rightmost = 0
+
+        for orb in self.orbs:
+            rightmost = max(rightmost, orb.x_pos + ORB_SIZE)
+
+        return rightmost
+
     def _get_spawn_rate(self, object_type: str, score: int) -> int:
         rates = {"orb": ORB_SPAWN_RATE, "tree": TREE_SPAWN_RATE}
         rate = rates[object_type]
@@ -220,7 +229,7 @@ class Game:
         else:
             # Continue scaling beyond 300 to reach 4x at score 450+
             difficulty_multiplier = max(0.25, 0.4 - (score - 300) / 1000)
-        
+
         return int(rate * difficulty_multiplier)
 
 
@@ -257,28 +266,29 @@ class Game:
                 if layer["offset"] < -WINDOW_WIDTH:
                     layer["offset"] += WINDOW_WIDTH
 
-        # Spawn orbs (1-3 at a time at random intervals)
-        # Increase spawn frequency after reaching 100 points
+        # Spawn orbs (1-3 at a time with minimum spacing from other orbs)
         self.orb_spawn_rate = self._get_spawn_rate(object_type="orb",
                                                    score=self.score)
         self.orb_timer += 1
         if self.orb_timer >= self.orb_spawn_rate:
-            # Randomly spawn 1-3 orbs at various heights
-            num_orbs = random.randint(1, 3)
-            for i in range(num_orbs):
-                # Offset each orb horizontally
-                orb_x = WINDOW_WIDTH + (i * ORB_SIZE * 0.8)
-                self.orbs.append(Orb(orb_x))
-            self.orb_timer = 0
+            # Check if there's enough gap since last orb
+            rightmost = self._get_rightmost_obstacle_x()
+            if WINDOW_WIDTH - rightmost >= MIN_SPAWN_GAP:
+                # Spawn 1-3 orbs at various heights
+                num_orbs = random.randint(1, 3)
+                for i in range(num_orbs):
+                    # Offset each orb horizontally
+                    orb_x = WINDOW_WIDTH + (i * ORB_SIZE * 0.8)
+                    self.orbs.append(Orb(orb_x))
+                self.orb_timer = 0
 
-        # Spawn trees (1-3 at a time at random intervals)
-        # Increase spawn frequency after reaching 100 points
+        # Spawn trees (1-3 at a time at random intervals - no gap constraint)
         self.tree_spawn_rate = self._get_spawn_rate(object_type="tree",
                                                     score=self.score)
         self.tree_timer += 1
         if self.tree_timer >= self.tree_spawn_rate:
-            # Randomly spawn 1-3 trees
-            num_trees = random.randint(1, 3)  # NOTE: Adjust this limit
+            # Spawn 1-3 trees
+            num_trees = random.randint(1, 3)
             for i in range(num_trees):
                 # Offset each tree horizontally
                 tree_x = WINDOW_WIDTH + (i * TREE_SPACING)
