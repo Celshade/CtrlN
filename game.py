@@ -325,6 +325,9 @@ class Game:
                     self.player.destroy_shield()
                     orb_to_remove = orb  # Mark orb for removal
                     break
+                elif self.player.is_invulnerable():
+                    # Skip collision during invulnerability period
+                    break
                 else:
                     self.end_game()
                     return
@@ -341,6 +344,9 @@ class Game:
                 if self.player.has_shield():
                     self.player.destroy_shield()
                     tree_to_remove = tree  # Mark tree for removal
+                    break
+                elif self.player.is_invulnerable():
+                    # Skip collision during invulnerability period
                     break
                 else:
                     self.end_game()
@@ -359,6 +365,9 @@ class Game:
                     self.player.destroy_shield()
                     bird_to_remove = bird  # Mark bird for removal
                     break
+                elif self.player.is_invulnerable():
+                    # Skip collision during invulnerability period
+                    break
                 else:
                     self.end_game()
                     return
@@ -372,6 +381,13 @@ class Game:
             if self.player.has_shield():
                 self.player.destroy_shield()
                 # Clamp player position back in bounds
+                self.player.y_pos = max(0, min(self.player.y_pos,
+                                               GROUND_Y - PLAYER_SIZE))
+                self.player.rect.topleft = (self.player.x_pos,
+                                            self.player.y_pos)
+                return
+            elif self.player.is_invulnerable():
+                # Don't end game during invulnerability, clamp player back
                 self.player.y_pos = max(0, min(self.player.y_pos,
                                                GROUND_Y - PLAYER_SIZE))
                 self.player.rect.topleft = (self.player.x_pos,

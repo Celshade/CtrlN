@@ -47,6 +47,9 @@ TUTORIAL_SPAWN_MULTIPLIER = 2.0  # Reduced spawn rate during tutorial (higher = 
 TUTORIAL_PAUSE_FRAMES = 90  # Frames to pause at game start (at 60 FPS = 1.5 seconds)
 SHIELD_EXPLANATION_PAUSE_FRAMES = 90  # Frames to pause for shield explanation (at 60 FPS = 1.5 seconds)
 
+# Shield protection
+SHIELD_INVULNERABILITY_FRAMES = 5  # Brief invulnerability after shield break to prevent cascade hits
+
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)

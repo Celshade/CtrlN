@@ -2,7 +2,7 @@ import pygame
 from PIL import Image
 
 from config import (PLAYER_START_X, PLAYER_START_Y, PLAYER_SIZE,
-                    GRAVITY, KEY_POWER, GROUND_Y, FPS)
+                    GRAVITY, KEY_POWER, GROUND_Y, FPS, SHIELD_INVULNERABILITY_FRAMES)
 
 
 # ==================== #
@@ -45,6 +45,9 @@ class Player:
         # Shield state
         self.shield_charges = 0  # Current number of shields (0-2 max)
         self.next_shield_threshold = 5  # Score threshold for next shield
+
+        # Invulnerability tracking
+        self.invulnerability_frames = 0  # Frames remaining of invulnerability after shield break
 
     def _load_keypress_animation(self):
         """Load and cache all frames from the keypress animation webp."""
@@ -116,6 +119,10 @@ class Player:
                 self.playing_shield_animation_tier2 = False
                 self.shield_animation_frame = 0
 
+        # Update invulnerability frames
+        if self.invulnerability_frames > 0:
+            self.invulnerability_frames -= 1
+
     def keypress(self) -> None:
         self.vel = KEY_POWER
         # Trigger the keypress animation
@@ -126,6 +133,10 @@ class Player:
     def has_shield(self) -> bool:
         """Check if shield is currently active (no side effects)."""
         return self.shield_charges > 0
+
+    def is_invulnerable(self) -> bool:
+        """Check if player is currently invulnerable after shield break."""
+        return self.invulnerability_frames > 0
 
     def update_shields(self, score) -> None:
         """Grant new shields based on score threshold."""
@@ -155,6 +166,8 @@ class Player:
             # Reset animation flags when shield is consumed
             self.playing_shield_animation_tier2 = False
             self.playing_shield_animation = False
+            # Activate brief invulnerability period after shield break
+            self.invulnerability_frames = SHIELD_INVULNERABILITY_FRAMES
 
     def draw(self, screen, score=0) -> None:
         # Draw player sprite or keypress animation (base layer)
