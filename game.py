@@ -207,16 +207,14 @@ class Game:
         if self.tutorial_active:
             rate = int(rate * TUTORIAL_SPAWN_MULTIPLIER)
 
-        if score < 25:
-            return rate
-        elif 25 <= score < 50:
-            return int(rate * 0.75)
-        elif 50 <= score < 75:
-            return int(rate * 0.5)
-        elif 75 <= score < 100:
-            return int(rate * 0.35)
-        else:  # score >= 100
-            return int(rate * 0.25)
+        # Smooth progression curve with endgame cap at 2.5x difficulty
+        # Score 0: 1.0x multiplier (easiest)
+        # Score 100: 0.6x multiplier (1.67x harder)
+        # Score 150: 0.4x multiplier (2.5x harder - maximum cap)
+        # Score 200+: stays capped at 0.4x multiplier
+        # TODO increase scaling for more points/difficulty
+        difficulty_multiplier = max(0.4, 1.0 - score / 250)
+        return int(rate * difficulty_multiplier)
 
 
     def update(self) -> None:
