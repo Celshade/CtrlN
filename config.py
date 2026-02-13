@@ -48,7 +48,7 @@ TUTORIAL_PAUSE_FRAMES = 90  # Frames to pause at game start (at 60 FPS = 1.5 sec
 SHIELD_EXPLANATION_PAUSE_FRAMES = 90  # Frames to pause for shield explanation (at 60 FPS = 1.5 seconds)
 
 # Shield protection
-SHIELD_INVULNERABILITY_FRAMES = 5  # Brief invulnerability after shield break to prevent cascade hits
+SHIELD_INVULNERABILITY_FRAMES = 30  # Brief invulnerability after shield break (0.5 seconds at 60 FPS)
 
 # Colors
 WHITE = (255, 255, 255)
