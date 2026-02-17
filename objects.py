@@ -94,9 +94,13 @@ class BirdPerched:
                 pygame.draw.rect(self.image, (255, 200, 0), (0, 0, PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE))
         else:
             # Perched state - original behavior
+            # 50% chance to spawn a red bird instead of normal
+            is_red = random.random() < 0.5
+            bird_filename = "assets/BirdPerchedRed.png" if is_red else "assets/BirdPerched.png"
+            
             # Load and scale the perched bird image
             try:
-                bird_image = pygame.image.load("assets/BirdPerched.png")
+                bird_image = pygame.image.load(bird_filename)
                 self.image = pygame.transform.scale(bird_image,
                                                     (PERCHED_BIRD_SIZE, PERCHED_BIRD_SIZE))
             except Exception as e:
