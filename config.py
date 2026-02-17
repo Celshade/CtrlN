@@ -9,7 +9,7 @@ from enum import Enum
 # Display at actual Solana Seeker phone dimensions (base resolution)
 WINDOW_WIDTH = 890
 WINDOW_HEIGHT = 400
-FPS = 60
+FPS = 30
 
 # Scale factor (base 890x400 is the Solana Seeker display, 2670x1200 is 3x)
 SCALE = 3.0
@@ -44,11 +44,11 @@ PERCHED_BIRD_SPAWN_CHANCE = 0.4  # 40% chance of a bird on each tree
 # Tutorial settings
 TUTORIAL_DURATION = 10  # Points needed to complete tutorial
 TUTORIAL_SPAWN_MULTIPLIER = 2.0  # Reduced spawn rate during tutorial (higher = slower)
-TUTORIAL_PAUSE_FRAMES = 90  # Frames to pause at game start (at 60 FPS = 1.5 seconds)
-SHIELD_EXPLANATION_PAUSE_FRAMES = 90  # Frames to pause for shield explanation (at 60 FPS = 1.5 seconds)
+TUTORIAL_PAUSE_FRAMES = 45  # Frames to pause at game start (at 30 FPS = 1.5 seconds)
+SHIELD_EXPLANATION_PAUSE_FRAMES = 45  # Frames to pause for shield explanation (at 30 FPS = 1.5 seconds)
 
 # Shield protection
-SHIELD_INVULNERABILITY_FRAMES = 30  # Brief invulnerability after shield break (0.5 seconds at 60 FPS)
+SHIELD_INVULNERABILITY_FRAMES = 15  # Brief invulnerability after shield break (0.5 seconds at 30 FPS)
 
 # Spawn rate smoothing
 MIN_SPAWN_GAP = PLAYER_SIZE + int(3 * SCALE)  # Minimum gap between orbs and other obstacles

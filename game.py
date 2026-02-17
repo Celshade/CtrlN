@@ -578,7 +578,7 @@ class Game:
 
             # NOTE: FPS counter
             frame += 1
-            if frame % 60 == 0:
+            if frame % 30 == 0:
                 print(f"Frame {frame}: State={self.state.name}",
                       f"Score={self.score} Orbs={len(self.orbs)} Trees={len(self.trees)} PerchedBirds={len(self.perched_birds)}")
 
