@@ -38,7 +38,7 @@ TREE_SPAWN_RATE = 60
 TREE_SPACING = int(TREE_SIZE * 0.8)  # Horizontal spacing between trees in a group
 
 # Perched Birds (obstacles on trees)
-PERCHED_BIRD_SIZE = int(PLAYER_SIZE * 1)
+PERCHED_BIRD_SIZE = int(PLAYER_SIZE * 4)
 PERCHED_BIRD_SPAWN_CHANCE = 0.4  # 40% chance of a bird on each tree
 
 # Tutorial settings

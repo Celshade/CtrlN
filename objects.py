@@ -79,8 +79,8 @@ class BirdPerched:
             # Flying state
             self.animation_frame = 0
             self.animation_counter = 0
-            self.x_pos = self.tree.x_pos + (TREE_SIZE - PERCHED_BIRD_SIZE) // 2
-            self.y_pos = self.tree.y_pos - PERCHED_BIRD_SIZE + 43
+            self.x_pos = self.tree.x_pos + (TREE_SIZE - PERCHED_BIRD_SIZE) // 2 - 46
+            self.y_pos = self.tree.y_pos - PERCHED_BIRD_SIZE // 1.9
             self.y_start = self.y_pos
             self.transition_frame = 0  # Counter for 5-frame transition
             self.y_distance_per_frame = 200 / 10  # 20 pixels per frame
@@ -136,8 +136,8 @@ class BirdPerched:
     def update_position(self) -> None:
         """Update bird position based on tree position (at the tip)."""
         # Position bird at the tip of the tree (center-top area)
-        self.x_pos = self.tree.x_pos + (TREE_SIZE - PERCHED_BIRD_SIZE) // 2
-        self.y_pos = self.tree.y_pos - PERCHED_BIRD_SIZE + 43  # Slightly above the tree top
+        self.x_pos = self.tree.x_pos + (TREE_SIZE - PERCHED_BIRD_SIZE) // 2 - 46
+        self.y_pos = self.tree.y_pos - PERCHED_BIRD_SIZE // 1.9
         self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
 
     def update(self) -> None:
