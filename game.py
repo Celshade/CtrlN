@@ -106,27 +106,27 @@ class Game:
                 "offset": 0
             },
             {
-                "name": "middleground_dark",
+                "name": "middleground_back",
                 "image": pygame.transform.scale(
-                    pygame.image.load("assets/middleground_dark.png"),
+                    pygame.image.load("assets/middleground_back.png"),
                     (WINDOW_WIDTH, WINDOW_HEIGHT)
                 ),
                 "speed": 0.0625,
                 "offset": 0
             },
             {
-                "name": "middleground_light",
+                "name": "middleground_middle",
                 "image": pygame.transform.scale(
-                    pygame.image.load("assets/middleground_light.png"),
+                    pygame.image.load("assets/middleground_middle.png"),
                     (WINDOW_WIDTH, WINDOW_HEIGHT)
                 ),
                 "speed": 0.08,
                 "offset": 0
             },
             {
-                "name": "foreground",
+                "name": "middleground_front",
                 "image": pygame.transform.scale(
-                    pygame.image.load("assets/foreground.png"),
+                    pygame.image.load("assets/middleground_front.png"),
                     (WINDOW_WIDTH, WINDOW_HEIGHT)
                 ),
                 "speed": 0.2,
