@@ -97,7 +97,7 @@ class BirdPerched:
             # 50% chance to spawn a red bird instead of normal
             is_red = random.random() < 0.5
             bird_filename = "assets/BirdPerchedRed.png" if is_red else "assets/BirdPerched.png"
-            
+
             # Load and scale the perched bird image
             try:
                 bird_image = pygame.image.load(bird_filename)
