@@ -5,6 +5,7 @@ import pygame
 
 from objects import Orb, Tree, BirdPerched
 from player import Player
+from counter import Counter
 from config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
@@ -37,6 +38,9 @@ class Game:
         self.state = GameState.MENU
         self.score = 0
         self.high_score = 0
+        
+        # Init counter display
+        self.counter = Counter(x_pos=20, y_pos=20)
 
         # Init player and prep object vars
         self.player = Player()
@@ -181,6 +185,7 @@ class Game:
         # Reset game vars
         self.state = GameState.PLAYING
         self.score = 0
+        self.counter = Counter(x_pos=20, y_pos=20)
         self.player = Player()
         self.orbs = []
         self.orb_timer = 0
@@ -306,6 +311,7 @@ class Game:
             if orb.x_pos < self.player.x_pos and not orb.scored:
                 orb.scored = True
                 self.score += 1
+                self.counter.update_score(self.score)
 
         # Update trees
         for tree in self.trees:
@@ -317,7 +323,11 @@ class Game:
             if bird.x_pos < self.player.x_pos and not bird.scored:
                 bird.scored = True
                 self.score += 1
+                self.counter.update_score(self.score)
 
+        # Update counter animations
+        self.counter.update()
+        
         # Check for shield earnings based on score (triggers animations)
         self.player.update_shields(self.score)
 
@@ -452,8 +462,7 @@ class Game:
         if self.state == GameState.MENU:
             self.draw_menu()
         elif self.state == GameState.PLAYING:
-            score_text = self.font_large.render(str(self.score), True, BLACK)
-            self.screen.blit(score_text, (20, 20))
+            self.counter.draw(self.screen)
 
             # Draw tutorial elements
             self.draw_tutorial()
