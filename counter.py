@@ -19,8 +19,8 @@ class Counter:
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.score = 0
-        self.digit_size = 64  # Size of each digit sprite
-        self.digit_spacing = 5  # Space between digits
+        self.digit_size = 15  # Size of each digit sprite
+        self.digit_spacing = 2  # Space between digits
         # Animation state: determines what's currently being animated
         # 'idle' = showing static digits
         # 'new_digit' = playing new_digit.gif animation
@@ -160,9 +160,8 @@ class Counter:
 
         # Draw digits (from left to right)
         for digit_index, digit_char in enumerate(score_str):
-            digit_num = int(digit_char)
 
-            if (self.animation_state == 'transition' and 
+            if (self.animation_state == 'transition' and
                 digit_index in self.animating_digit_indices):
                 # Play transition animation for this digit
                 transition_key = self.transition_direction[digit_index]

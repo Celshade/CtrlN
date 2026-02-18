@@ -38,9 +38,9 @@ class Game:
         self.state = GameState.MENU
         self.score = 0
         self.high_score = 0
-        
+
         # Init counter display
-        self.counter = Counter(x_pos=20, y_pos=20)
+        self.counter = Counter(x_pos=0, y_pos=0)
 
         # Init player and prep object vars
         self.player = Player()
@@ -185,7 +185,7 @@ class Game:
         # Reset game vars
         self.state = GameState.PLAYING
         self.score = 0
-        self.counter = Counter(x_pos=20, y_pos=20)
+        self.counter = Counter(x_pos=0, y_pos=0)
         self.player = Player()
         self.orbs = []
         self.orb_timer = 0
@@ -327,7 +327,7 @@ class Game:
 
         # Update counter animations
         self.counter.update()
-        
+
         # Check for shield earnings based on score (triggers animations)
         self.player.update_shields(self.score)
 
