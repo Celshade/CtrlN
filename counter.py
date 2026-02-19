@@ -13,7 +13,7 @@ class Counter:
     transition_gifs = {}  # {"0-1": [frames], "1-2": [frames], ...}
     new_digit_animation = []  # List of frames for new_digit.gif
 
-    def __init__(self, x_pos=20, y_pos=20):
+    def __init__(self, x_pos=0, y_pos=0):
         """Initialize counter at given position."""
         self._load_assets_once()
         self.x_pos = x_pos
@@ -80,6 +80,7 @@ class Counter:
             print(f"Warning: Could not load gif {filepath}: {e}")
         return frames
 
+    # TODO check this and clean up if possible
     def update_score(self, new_score):
         """Update score and trigger animations as needed."""
         if new_score == self.score:
@@ -98,6 +99,7 @@ class Counter:
             # Determine which digit(s) changed and start transition animations
             self._identify_changed_digits(old_score, new_score)
 
+    # TODO clean this up
     def _identify_changed_digits(self, old_score, new_score):
         """Identify which digits changed and set up transition animations."""
         old_str = str(old_score).zfill(len(str(new_score)))
