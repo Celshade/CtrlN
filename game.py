@@ -40,7 +40,7 @@ class Game:
         self.high_score = 0
 
         # Init counter display
-        self.counter = Counter(x_pos=0, y_pos=0)
+        self.counter = Counter()
 
         # Init player and prep object vars
         self.player = Player()
@@ -185,7 +185,7 @@ class Game:
         # Reset game vars
         self.state = GameState.PLAYING
         self.score = 0
-        self.counter = Counter(x_pos=0, y_pos=0)
+        self.counter = Counter()
         self.player = Player()
         self.orbs = []
         self.orb_timer = 0

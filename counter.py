@@ -13,7 +13,7 @@ class Counter:
     transition_gifs = {}  # {"0-1": [frames], "1-2": [frames], ...}
     new_digit_animation = []  # List of frames for new_digit.gif
 
-    def __init__(self, x_pos=0, y_pos=0):
+    def __init__(self, x_pos=-40, y_pos=-30):
         """Initialize counter at given position."""
         self._load_assets_once()
         self.x_pos = x_pos
