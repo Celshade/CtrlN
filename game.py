@@ -42,6 +42,9 @@ class Game:
         # Init counter display
         self.counter = Counter()
 
+        # Tutorial assets
+        self.tutorial_image = pygame.image.load("assets/tutorial.png")
+
         # Init player and prep object vars
         self.player = Player()
         self.orbs = []
@@ -560,19 +563,22 @@ class Game:
 
         # Show tutorial progress indicator while in tutorial phase
         elif self.tutorial_active:
-            tutorial_text = self.font_tutorial.render(
-                f"TUTORIAL: Reach {TUTORIAL_DURATION} to Continue",
-                True,
-                YELLOW
-            )
-            self.screen.blit(tutorial_text, (20, WINDOW_HEIGHT - 100))
+            # tutorial_text = self.font_tutorial.render(
+            #     f"TUTORIAL: Reach {TUTORIAL_DURATION} to Continue",
+            #     True,
+            #     YELLOW
+            # )
+            # self.screen.blit(tutorial_text, (20, WINDOW_HEIGHT - 100))
+            # Render and display tutorial image - left-aligned at bottom
+            img_rect = self.tutorial_image.get_rect(bottomleft=(-150, WINDOW_HEIGHT + 175))
+            self.screen.blit(self.tutorial_image, img_rect)
 
             progress_text = self.font_tutorial.render(
                 f"Progress: {self.score}/{TUTORIAL_DURATION}",
                 True,
                 YELLOW
             )
-            self.screen.blit(progress_text, (20, WINDOW_HEIGHT - 50))
+            self.screen.blit(progress_text, (10, WINDOW_HEIGHT - 50))
 
     def run(self) -> None:
         print("Game loop starting...\n")
