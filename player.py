@@ -1,8 +1,11 @@
 import pygame
 from PIL import Image
 
-from config import (PLAYER_START_X, PLAYER_START_Y, PLAYER_SIZE,
-                    GRAVITY, KEY_POWER, GROUND_Y, FPS, SHIELD_INVULNERABILITY_FRAMES)
+from config import (
+    PLAYER_START_X, PLAYER_START_Y, PLAYER_SIZE,
+    GRAVITY, KEY_POWER, GROUND_Y, FPS,
+    SHIELD_INVULNERABILITY_FRAMES
+)
 
 
 # ==================== #
@@ -32,12 +35,22 @@ class Player:
                                                    (self.size, self.size))
 
         self.shield_image_tier2 = pygame.image.load("assets/shield_3.4.png")
-        self.shield_image_tier2 = pygame.transform.scale(self.shield_image_tier2,
-                                                         (self.size, self.size))
+        self.shield_image_tier2 = pygame.transform.scale(
+            self.shield_image_tier2,
+            (self.size, self.size)
+        )
 
         # Load shield charge animation frames
-        self.shield_charge_animation_frames = self._load_shield_charge_animation("assets/shield_fx3.2.webP")
-        self.shield_charge_animation_frames_tier2 = self._load_shield_charge_animation("assets/shield_fx3.4.webP")
+        self.shield_charge_animation_frames = (
+            self._load_shield_charge_animation(
+                "assets/shield_fx3.2.webP"
+            )
+        )
+        self.shield_charge_animation_frames_tier2 = (
+            self._load_shield_charge_animation(
+                "assets/shield_fx3.4.webP"
+            )
+        )
         self.shield_animation_frame = 0
         self.playing_shield_animation = False
         self.playing_shield_animation_tier2 = False
@@ -47,7 +60,8 @@ class Player:
         self.next_shield_threshold = 5  # Score threshold for next shield
 
         # Invulnerability tracking
-        self.invulnerability_frames = 0  # Frames remaining of invulnerability after shield break
+        # Frames remaining of invulnerability after shield break
+        self.invulnerability_frames = 0
 
     def _load_keypress_animation(self):
         """Load and cache all frames from the keypress animation webp."""
@@ -71,7 +85,10 @@ class Player:
             print(f"Warning: Could not load keypress animation: {e}")
         return frames
 
-    def _load_shield_charge_animation(self, filepath="assets/shield_key_fx3.2.webP"):
+    def _load_shield_charge_animation(self, filepath=None):
+        """Load shield charge animation from given filepath."""
+        if filepath is None:
+            filepath = "assets/shield_key_fx3.2.webP"
         """Load and cache all frames from the shield charge animation webp."""
         frames = []
         try:
@@ -90,7 +107,11 @@ class Player:
             except EOFError:
                 pass  # End of frames
         except Exception as e:
-            print(f"Warning: Could not load shield charge animation from {filepath}: {e}")
+            msg = (
+                f"Warning: Could not load shield charge animation "
+                f"from {filepath}: {e}"
+            )
+            print(msg)
         return frames
 
     def update(self) -> None:
@@ -108,14 +129,16 @@ class Player:
         # Update shield charge animation frame (tier 1)
         if self.playing_shield_animation:
             self.shield_animation_frame += 1
-            if self.shield_animation_frame >= len(self.shield_charge_animation_frames):
+            if (self.shield_animation_frame >=
+                    len(self.shield_charge_animation_frames)):
                 self.playing_shield_animation = False
                 self.shield_animation_frame = 0
 
         # Update shield charge animation frame (tier 2)
         if self.playing_shield_animation_tier2:
             self.shield_animation_frame += 1
-            if self.shield_animation_frame >= len(self.shield_charge_animation_frames_tier2):
+            if (self.shield_animation_frame >=
+                    len(self.shield_charge_animation_frames_tier2)):
                 self.playing_shield_animation_tier2 = False
                 self.shield_animation_frame = 0
 
@@ -183,22 +206,34 @@ class Player:
             screen.blit(self.image, self.rect)
 
         # Draw shield charge animation if active (on top, highest priority)
-        if (self.playing_shield_animation
-            and self.shield_animation_frame < len(self.shield_charge_animation_frames)
-        ):
-            current_frame = self.shield_charge_animation_frames[self.shield_animation_frame]
+        if (self.playing_shield_animation and
+                self.shield_animation_frame <
+                len(self.shield_charge_animation_frames)):
+            current_frame = (
+                self.shield_charge_animation_frames
+                [self.shield_animation_frame]
+            )
             anim_rect = current_frame.get_rect(
                 center=(self.rect.centerx, self.rect.centery)
             )
-            screen.blit(current_frame, anim_rect, special_flags=pygame.BLEND_RGBA_MAX)
-        elif (self.playing_shield_animation_tier2
-            and self.shield_animation_frame < len(self.shield_charge_animation_frames_tier2)
-        ):
-            current_frame = self.shield_charge_animation_frames_tier2[self.shield_animation_frame]
+            screen.blit(
+                current_frame, anim_rect,
+                special_flags=pygame.BLEND_RGBA_MAX
+            )
+        elif (self.playing_shield_animation_tier2 and
+                self.shield_animation_frame <
+                len(self.shield_charge_animation_frames_tier2)):
+            current_frame = (
+                self.shield_charge_animation_frames_tier2
+                [self.shield_animation_frame]
+            )
             anim_rect = current_frame.get_rect(
                 center=(self.rect.centerx, self.rect.centery)
             )
-            screen.blit(current_frame, anim_rect, special_flags=pygame.BLEND_RGBA_MAX)
+            screen.blit(
+                current_frame, anim_rect,
+                special_flags=pygame.BLEND_RGBA_MAX
+            )
 
         # Draw shield if it's active - only when no shield charge animation
         if self.shield_charges == 2 and not self.playing_shield_animation_tier2:
