@@ -27,8 +27,10 @@ class Counter:
         # 'transition' = playing digit transition animation(s)
         self.animation_state = 'idle'
         self.animation_frame = 0
-        self.animating_digit_indices = []  # Which digit column(s) are currently animating
-        self.transition_direction = {}  # Track which direction each digit is transitioning
+        # Which digit column(s) are currently animating
+        self.animating_digit_indices = []
+        # Track which direction each digit is transitioning
+        self.transition_direction = {}
 
     @classmethod
     def _load_assets_once(cls):
@@ -42,19 +44,26 @@ class Counter:
                 cls.digit_images[str(i)] = img
             except Exception as e:
                 print(f"Warning: Could not load counter digit {i}: {e}")
-        # Load transition animations (0-1, 1-2, ..., 9-0)
         transitions = [
-            "0-1", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7", "7-8", "8-9", "9-0"
+            "0-1", "1-2", "2-3", "3-4", "4-5",
+            "5-6", "6-7", "7-8", "8-9", "9-0"
         ]
         for transition in transitions:
             try:
-                frames = cls._load_gif(f"assets/counter/{transition}.gif")
+                frames = cls._load_gif(
+                    f"assets/counter/{transition}.gif"
+                )
                 cls.transition_gifs[transition] = frames
             except Exception as e:
-                print(f"Warning: Could not load counter transition {transition}: {e}")
+                msg = (
+                    f"Warning: Could not load counter "
+                    f"transition {transition}: {e}"
+                )
+                print(msg)
         # Load new_digit animation
         try:
-            cls.new_digit_animation = cls._load_gif("assets/counter/new_digit.gif")
+            new_digit_path = "assets/counter/new_digit.gif"
+            cls.new_digit_animation = cls._load_gif(new_digit_path)
         except Exception as e:
             print(f"Warning: Could not load new_digit animation: {e}")
 
@@ -140,7 +149,10 @@ class Counter:
             for idx in self.animating_digit_indices:
                 transition_key = self.transition_direction[idx]
                 if transition_key in self.transition_gifs:
-                    max_frames = max(max_frames, len(self.transition_gifs[transition_key]))
+                    transition_frames = (
+                        self.transition_gifs[transition_key]
+                    )
+                    max_frames = max(max_frames, len(transition_frames))
 
             if self.animation_frame >= max_frames:
                 # All transitions complete
@@ -154,28 +166,39 @@ class Counter:
 
         # Draw new digit animation if active
         if self.animation_state == 'new_digit' and self.new_digit_animation:
-            frame = self.new_digit_animation[min(self.animation_frame, 
-                                                 len(self.new_digit_animation) - 1)]
+            frame_idx = min(
+                self.animation_frame,
+                len(self.new_digit_animation) - 1
+            )
+            frame = self.new_digit_animation[frame_idx]
             screen.blit(frame, (self.x_pos, self.y_pos))
-            # After new_digit animation, we'll show the static digit next frame
+            # After new_digit animation, we'll show the static digit
             return
 
         # Draw digits (from left to right)
         for digit_index, digit_char in enumerate(score_str):
 
             if (self.animation_state == 'transition' and
-                digit_index in self.animating_digit_indices):
+                    digit_index in self.animating_digit_indices):
                 # Play transition animation for this digit
                 transition_key = self.transition_direction[digit_index]
                 if transition_key in self.transition_gifs:
                     frames = self.transition_gifs[transition_key]
                     if frames:
-                        frame = frames[min(self.animation_frame, len(frames) - 1)]
-                        screen.blit(frame, (self.x_pos + x_offset, self.y_pos))
+                        frame_idx = min(
+                            self.animation_frame,
+                            len(frames) - 1
+                        )
+                        frame = frames[frame_idx]
+                        screen.blit(
+                            frame, (self.x_pos + x_offset, self.y_pos)
+                        )
             else:
                 # Draw static digit
                 if digit_char in self.digit_images:
-                    screen.blit(self.digit_images[digit_char], 
-                               (self.x_pos + x_offset, self.y_pos))
+                    screen.blit(
+                        self.digit_images[digit_char],
+                        (self.x_pos + x_offset, self.y_pos)
+                    )
 
             x_offset += self.digit_size + self.digit_spacing
