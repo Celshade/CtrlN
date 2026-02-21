@@ -32,7 +32,8 @@ class Game:
         self.clock = pygame.time.Clock()  # init game clock
         self.font_large = pygame.font.Font(None, int(36 * SCALE))
         self.font_small = pygame.font.Font(None, int(36 * SCALE))
-        self.font_tutorial = pygame.font.Font(None, int(18 * SCALE))  # 50% smaller for tutorials
+        # 50% smaller for tutorials
+        self.font_tutorial = pygame.font.Font(None, int(18 * SCALE))
 
         # Menu and scoring
         self.state = GameState.MENU
@@ -225,9 +226,11 @@ class Game:
             rate = int(rate * TUTORIAL_SPAWN_MULTIPLIER)
 
         # Three-phase difficulty progression:
-        # Phase 1 (Score 0-150): Smooth scaling to 2.5x difficulty (multiplier 1.0 → 0.4)
+        # Phase 1 (Score 0-150): Smooth scaling to 2.5x difficulty
+        # (multiplier 1.0 → 0.4)
         # Phase 2 (Score 150-300): Maintains 2.5x difficulty (multiplier 0.4)
-        # Phase 3 (Score 300+): Continue scaling to 4x difficulty (multiplier 0.4 → 0.25)
+        # Phase 3 (Score 300+): Continue scaling to 4x difficulty
+        # (multiplier 0.4 → 0.25)
         if score < 150:
             # Linear progression to 2.5x cap
             difficulty_multiplier = 1.0 - score / 250
@@ -345,7 +348,9 @@ class Game:
         self.trees = [t for t in self.trees if not t.is_off_screen()]
 
         # Remove off-screen perched birds
-        self.perched_birds = [b for b in self.perched_birds if not b.is_off_screen()]
+        self.perched_birds = [
+            b for b in self.perched_birds if not b.is_off_screen()
+        ]
 
         # Check collisions with orbs
         orb_to_remove = None
@@ -537,15 +542,19 @@ class Game:
             self.screen.blit(overlay, (0, 0))
 
             title = self.font_tutorial.render("Get Ready!", True, YELLOW)
-            instruction = self.font_tutorial.render("Press SPACE or CLICK to Jump", True, WHITE)
+            instruction = self.font_tutorial.render(
+                "Press SPACE or CLICK to Jump", True, WHITE
+            )
 
             self.screen.blit(
                 title,
-                (WINDOW_WIDTH // 2 - title.get_width() // 2, WINDOW_HEIGHT // 2 - 150)
+                (WINDOW_WIDTH // 2 - title.get_width() // 2,
+                 WINDOW_HEIGHT // 2 - 150)
             )
             self.screen.blit(
                 instruction,
-                (WINDOW_WIDTH // 2 - instruction.get_width() // 2, WINDOW_HEIGHT // 2 + 50)
+                (WINDOW_WIDTH // 2 - instruction.get_width() // 2,
+                 WINDOW_HEIGHT // 2 + 50)
             )
 
         # Show shield explanation pause
@@ -570,7 +579,9 @@ class Game:
             # )
             # self.screen.blit(tutorial_text, (20, WINDOW_HEIGHT - 100))
             # Render and display tutorial image - left-aligned at bottom
-            img_rect = self.tutorial_image.get_rect(bottomleft=(-150, WINDOW_HEIGHT + 175))
+            img_rect = self.tutorial_image.get_rect(
+                bottomleft=(-150, WINDOW_HEIGHT + 175)
+            )
             self.screen.blit(self.tutorial_image, img_rect)
 
             progress_text = self.font_tutorial.render(
@@ -594,8 +605,13 @@ class Game:
             # NOTE: FPS counter
             frame += 1
             if frame % 30 == 0:
-                print(f"Frame {frame}: State={self.state.name}",
-                      f"Score={self.score} Orbs={len(self.orbs)} Trees={len(self.trees)} PerchedBirds={len(self.perched_birds)}")
+                debug_str = (
+                    f"Frame {frame}: State={self.state.name} "
+                    f"Score={self.score} Orbs={len(self.orbs)} "
+                    f"Trees={len(self.trees)} "
+                    f"PerchedBirds={len(self.perched_birds)}"
+                )
+                print(debug_str)
 
         print("\nShutting down...")
         pygame.quit()
