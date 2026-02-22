@@ -6,46 +6,48 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 # XP Rank definitions with thresholds and unlocks
+# NOTE ranks reset every "season" (can be triggered manually or on a schedule)
+# NOTE "<color>_key", "role", "server_access" will persist even in season reset
 RANKS = {
     0: {
         "name": "Unranked",
         "min_points": None,
-        "unlocks": []
+        "unlocks": ["basic_access"]
     },
     1: {
         "name": "Diamond",
         "min_points": 10000,
-        "unlocks": ["diamond_cosmetics", "exclusive_emotes"]
+        "unlocks": ["role", "server_access", "prestige", "stabilizers"]
     },
     2: {
         "name": "Platinum",
         "min_points": 7500,
-        "unlocks": ["custom_profiles"]
+        "unlocks": ["role", "shield_strength+1"]
     },
     3: {
         "name": "Gold",
         "min_points": 5000,
-        "unlocks": ["leaderboard_access"]
+        "unlocks": ["role", "gold_key", "shield_boost+1", "xp_boost+5%"]
     },
     4: {
         "name": "Silver",
         "min_points": 3000,
-        "unlocks": ["game_statistics"]
+        "unlocks": ["role", "silver_key", "leaderboard_access", "xp_boost+2%"]
     },
     5: {
         "name": "Bronze",
         "min_points": 1500,
-        "unlocks": ["custom_keyboard_themes"]
+        "unlocks": ["role", "shield_charge+1", "game_stats"]
     },
     6: {
         "name": "Iron",
         "min_points": 500,
-        "unlocks": ["custom_player_colors"]
+        "unlocks": ["green_key", "orange_key"]
     },
     7: {
         "name": "Bamboo",
-        "min_points": 0,
-        "unlocks": ["basic_game_access"]
+        "min_points": 100,
+        "unlocks": ["yellow_key", "purple_key"]
     }
 }
 
@@ -381,7 +383,7 @@ def save_player_rank_data(player_id: str, rank_data: Dict) -> bool:
         print(f"Error saving player data: {e}")
         return False
 
-
+# FIXME Why are we using dict.copy()?
 def load_player_rank_data(player_id: str) -> Dict:
     """
     Load player's saved XP and rank data from storage.
@@ -397,6 +399,7 @@ def load_player_rank_data(player_id: str) -> Dict:
         return _player_data[player_id].copy()
 
     # Try to load from file
+    # TODO Are we making use of Path()? Benefit over just a str?
     data_dir = Path("player_data")
     file_path = data_dir / f"{player_id}.json"
 
@@ -417,5 +420,4 @@ def load_player_rank_data(player_id: str) -> Dict:
         "current_rank": 0
     }
     _player_data[player_id] = default_data
-    return default_data.copy()
     return default_data.copy()
