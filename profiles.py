@@ -13,9 +13,118 @@ class Profile:
     persistence. All progression logic is in the Player class.
     """
     # memory-efficient attribute storage
-    __slots__ = ("player_id", "player_name", "current_xp", "total_xp",
-                 "rank", "highest_rank", "prestige", "seasons_played",
-                 "achievements")
+    __slots__ = ("_player_id", "_player_name", "_current_xp", "_total_xp",
+                 "_rank", "_highest_rank", "_prestige", "_seasons_played",
+                 "_achievements")
+
+# Getters and Setters with type validation
+    @property
+    def player_id(self) -> str:
+        """Get player ID."""
+        return self._player_id
+
+    @player_id.setter
+    def player_id(self, value: str) -> None:
+        """Set player ID with validation."""
+        if not isinstance(value, str) or not value:
+            raise ValueError("player_id must be a non-empty string")
+        self._player_id = value
+
+    @property
+    def player_name(self) -> str:
+        """Get player name."""
+        return self._player_name
+
+    @player_name.setter
+    def player_name(self, value: str) -> None:
+        """Set player name with validation."""
+        if not isinstance(value, str) or not value:
+            raise ValueError("player_name must be a non-empty string")
+        self._player_name = value
+
+    @property
+    def current_xp(self) -> int:
+        """Get current season XP."""
+        return self._current_xp
+
+    @current_xp.setter
+    def current_xp(self, value: int) -> None:
+        """Set current season XP with validation."""
+        if not isinstance(value, int) or value < 0:
+            raise ValueError("current_xp must be a non-negative integer")
+        self._current_xp = value
+
+    @property
+    def total_xp(self) -> int:
+        """Get total all-time XP."""
+        return self._total_xp
+
+    @total_xp.setter
+    def total_xp(self, value: int) -> None:
+        """Set total all-time XP with validation."""
+        if not isinstance(value, int) or value < 0:
+            raise ValueError("total_xp must be a non-negative integer")
+        self._total_xp = value
+
+    @property
+    def rank(self) -> int:
+        """Get current rank."""
+        return self._rank
+
+    @rank.setter
+    def rank(self, value: int) -> None:
+        """Set current rank with validation."""
+        if not isinstance(value, int) or value < 0:
+            raise ValueError("rank must be a non-negative integer")
+        self._rank = value
+
+    @property
+    def highest_rank(self) -> int:
+        """Get highest rank achieved."""
+        return self._highest_rank
+
+    @highest_rank.setter
+    def highest_rank(self, value: int) -> None:
+        """Set highest rank with validation."""
+        if not isinstance(value, int) or value < 0:
+            raise ValueError("highest_rank must be a non-negative integer")
+        self._highest_rank = value
+
+    @property
+    def prestige(self) -> int:
+        """Get prestige level."""
+        return self._prestige
+
+    @prestige.setter
+    def prestige(self, value: int) -> None:
+        """Set prestige level with validation."""
+        if not isinstance(value, int) or value < 0:
+            raise ValueError("prestige must be a non-negative integer")
+        self._prestige = value
+
+    @property
+    def seasons_played(self) -> int:
+        """Get number of seasons played."""
+        return self._seasons_played
+
+    @seasons_played.setter
+    def seasons_played(self, value: int) -> None:
+        """Set number of seasons played with validation."""
+        if not isinstance(value, int) or value < 0:
+            raise ValueError("seasons_played must be a non-negative integer")
+        self._seasons_played = value
+
+    @property
+    def achievements(self) -> list:
+        """Get list of achievements."""
+        return self._achievements
+
+    @achievements.setter
+    def achievements(self, value: list) -> None:
+        """Set achievements with validation."""
+        if not isinstance(value, list):
+            raise ValueError("achievements must be a list")
+        self._achievements = value
 
     def __init__(self,
                  player_id: str, player_name: str,
