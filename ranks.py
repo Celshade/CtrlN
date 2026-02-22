@@ -18,7 +18,7 @@ RANKS = {
     1: {
         "name": "Diamond",
         "min_points": 10000,
-        "unlocks": ["role", "server_access", "prestige", "stabilizers"]
+        "unlocks": ["role", "server_access", "prestige", "shield_stabilizers"]
     },
     2: {
         "name": "Platinum",
