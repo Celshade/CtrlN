@@ -180,3 +180,13 @@ class Profile:
         except (IOError, json.JSONDecodeError) as e:
             print(f"Error saving profile: {e}")
             return False
+
+    def update_profile(self, data: dict) -> None:
+        """Update profile attributes from a data dictionary.
+
+        Args:
+            data: Dictionary containing profile fields to update.
+        """
+        for key, value in data.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
