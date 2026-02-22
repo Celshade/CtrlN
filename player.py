@@ -1,6 +1,9 @@
 import pygame
 from PIL import Image
+from typing import Dict, List, Optional
 
+from profiles import Profile
+from ranks import RANKS
 from config import (
     PLAYER_START_X, PLAYER_START_Y, PLAYER_SIZE,
     GRAVITY, KEY_POWER, GROUND_Y, FPS,
@@ -12,7 +15,47 @@ from config import (
 # ### Player Class ### #
 # ==================== #
 class Player:
-    def __init__(self) -> None:
+    """In-game player sprite with physics, animation, and XP tracking.
+
+    Manages visual representation, collision detection, shield mechanics,
+    and integrates with player progression profile.
+    """
+    def __init__(self, profile: Optional[Profile] = None) -> None:
+        """Initialize player entity.
+
+        Args:
+            profile: Optional Profile instance for persistence. If
+                provided, player stats are initialized from profile.
+        """
+        self.profile = profile
+        self.x_pos = PLAYER_START_X
+        self.y_pos = PLAYER_START_Y
+        self.vel = 0
+        self.size = PLAYER_SIZE
+
+        # Initialize progression stats (from profile if provided)
+        if profile:
+            self.player_id = profile.player_id
+            self.player_name = profile.player_name
+            self.current_xp = profile.current_xp
+            self.total_xp = profile.total_xp
+            self.rank = profile.rank
+            self.highest_rank = profile.highest_rank
+            self.prestige = profile.prestige
+            self.seasons_played = profile.seasons_played
+            self.achievements = profile.achievements.copy()
+        else:
+            self.player_id = "guest"
+            self.player_name = "Guest"
+            self.current_xp = 0
+            self.total_xp = 0
+            self.rank = 0
+            self.highest_rank = 0
+            self.prestige = 0
+            self.seasons_played = 0
+            self.achievements = []
+
+        # Player position and physics
         self.x_pos = PLAYER_START_X
         self.y_pos = PLAYER_START_Y
         self.vel = 0
@@ -61,7 +104,244 @@ class Player:
 
         # Invulnerability tracking
         # Frames remaining of invulnerability after shield break
-        self.invulnerability_frames = 0
+        self.invulnerability_frames = 0  # FIXME edit this
+
+    # ========================== #
+    # ### Progression Logic ### #
+    # ========================== #
+
+    def get_current_rank(self) -> int:
+        """Get player's current rank based on total XP.
+
+        Returns:
+            int: Rank ID (0-7), where 1=Diamond (highest),
+                0=Unranked.
+        """
+        if self.total_xp == 0:
+            return 0
+
+        for rank_id in range(1, 8):
+            if self.total_xp >= RANKS[rank_id]["min_points"]:
+                return rank_id
+
+        return 7  # Default to Bamboo
+
+    def get_progress(self) -> Dict:
+        """Calculate current rank, XP toward next rank, progress %.
+
+        Returns:
+            dict: Contains current_rank, current_rank_name,
+                xp_in_rank, xp_to_next_rank, progress_percent,
+                next_rank.
+        """
+        current_rank = self.get_current_rank()
+        current_rank_name = RANKS[current_rank]["name"]
+
+        # Handle Unranked special case
+        if current_rank == 0:
+            return {
+                "current_rank": 0,
+                "current_rank_name": "Unranked",
+                "xp_in_rank": 0,
+                "xp_to_next_rank": 100,
+                "progress_percent": 0.0,
+                "next_rank": 7
+            }
+
+        # Handle Diamond (highest rank)
+        if current_rank == 1:
+            current_min = RANKS[1]["min_points"]
+            return {
+                "current_rank": current_rank,
+                "current_rank_name": current_rank_name,
+                "xp_in_rank": self.total_xp - current_min,
+                "xp_to_next_rank": 0,
+                "progress_percent": 100.0,
+                "next_rank": None
+            }
+
+        # All other ranks
+        current_min = RANKS[current_rank]["min_points"]
+        next_min = RANKS[current_rank - 1]["min_points"]
+
+        xp_in_rank = self.total_xp - current_min
+        xp_to_next = next_min - current_min
+        progress_percent = (xp_in_rank / xp_to_next) * 100
+
+        return {
+            "current_rank": current_rank,
+            "current_rank_name": current_rank_name,
+            "xp_in_rank": xp_in_rank,
+            "xp_to_next_rank": xp_to_next - xp_in_rank,
+            "progress_percent": min(progress_percent, 100.0),
+            "next_rank": current_rank - 1
+        }
+
+    def add_xp(self, xp_amount: int) -> Dict:
+        """Award XP and check for rank promotions.
+
+        Args:
+            xp_amount: XP to award (non-negative).
+
+        Returns:
+            dict: Contains xp_awarded, new_total_xp, old_rank,
+                new_rank, rank_up, rank_name.
+        """
+        old_rank = self.get_current_rank()
+        self.total_xp += xp_amount
+        self.current_xp += xp_amount
+        new_rank = self.get_current_rank()
+
+        rank_up = new_rank != old_rank and new_rank < old_rank
+
+        if new_rank != self.rank:
+            self.rank = new_rank
+            if new_rank > self.highest_rank:
+                self.highest_rank = new_rank
+
+        return {
+            "xp_awarded": xp_amount,
+            "new_total_xp": self.total_xp,
+            "old_rank": old_rank,
+            "new_rank": new_rank,
+            "rank_up": rank_up,
+            "rank_name": RANKS[new_rank]["name"]
+        }
+
+    def get_unlocks(self) -> List[str]:
+        """Get all unlocks available at current XP level.
+
+        Returns:
+            list: All feature/cosmetic unlocks available.
+        """
+        current_rank = self.get_current_rank()
+        unlocks = []
+
+        if current_rank == 0:
+            return []
+
+        for rank_id in range(current_rank, 7, 1):
+            unlocks.extend(RANKS[rank_id]["unlocks"])
+
+        unlocks.extend(RANKS[7]["unlocks"])
+
+        return list(set(unlocks))
+
+    def get_rank_up_info(
+        self,
+        old_rank: int,
+        new_rank: int
+    ) -> Dict:
+        """Get rank-up notification info.
+
+        Args:
+            old_rank: Previous rank ID.
+            new_rank: New rank ID.
+
+        Returns:
+            dict: Rank-up notification with unlocks.
+        """
+        from ranks import get_rank_unlocks
+
+        unlocked_features = get_rank_unlocks(new_rank)
+        rank_name = RANKS[new_rank]["name"]
+
+        notification = (
+            f"Rank up! You've been promoted to {rank_name}! "
+            f"You unlocked: {', '.join(unlocked_features)}"
+        )
+
+        return {
+            "promotion": True,
+            "rank_name": rank_name,
+            "unlocked_features": unlocked_features,
+            "notification": notification
+        }
+
+    def display_progress(self) -> str:
+        """Display player's rank, XP progress, and next rank info.
+
+        Returns:
+            str: Formatted progress display.
+        """
+        progress = self.get_progress()
+        current_rank = progress["current_rank"]
+        current_name = progress["current_rank_name"]
+
+        output = f"{'PLAYER STATS':^80}\n"
+        output += "=" * 80 + "\n"
+        output += f"Player ID: {self.player_id}\n"
+        output += f"Player: {self.player_name}\n"
+        output += f"Rank: {current_name} (Rank {current_rank})\n"
+        output += f"Total XP: {self.total_xp:,}\n"
+
+        if progress["next_rank"] is not None:
+            next_rank_name = RANKS[progress["next_rank"]]["name"]
+            next_min = RANKS[progress["next_rank"]]["min_points"]
+
+            output += f"Next Rank: {next_rank_name} ({next_min:,}+ XP)\n"
+
+            bar_length = 50
+            filled_length = int(
+                bar_length * progress["progress_percent"] / 100
+            )
+            bar = ("█" * filled_length +
+                   "░" * (bar_length - filled_length))
+
+            output += f"Progress: {bar} "
+            output += f"{progress['progress_percent']:.0f}% "
+            output += (f"({progress['xp_to_next_rank']:,} "
+                       f"XP to next)\n")
+        else:
+            output += "Next Rank: None (Maximum rank achieved!)\n"
+            output += "Progress: ██████████████████ 100%\n"
+
+        return output
+
+    def save(self, filename: str = None) -> bool:
+        """Save player progression to profile file.
+
+        Args:
+            filename: Path to save to. If None and profile exists,
+                uses default player_data/{player_id}.json
+
+        Returns:
+            bool: Success status. False if no profile.
+        """
+        if self.profile is None:
+            return False
+
+        # Pass current stats to save_to_file, which handles update_profile
+        return self.profile.save_to_file(filename, {
+            "current_xp": self.current_xp,
+            "total_xp": self.total_xp,
+            "rank": self.rank,
+            "highest_rank": self.highest_rank,
+            "achievements": self.achievements
+        })
+
+    def apply_unlocks(self) -> None:
+        """Process unlocks and apply them to gameplay.
+
+        This method checks what unlocks the player has and applies
+        relevant gameplay effects (e.g., shield tiers, XP multipliers).
+        """
+        unlocks = self.get_unlocks()
+
+        # TODO apply unlock effects based on unlocks list
+        # Apply shield upgrades from unlocks
+        if "shield_charge+1" in unlocks:
+            # This unlock allows max 3 shields instead of 2
+            # (Would need config change to support)
+            pass
+
+        if "shield_strength+1" in unlocks:
+            # Upgrade shield tier visuals/mechanics
+            # Already using tier system based on shield_charges
+            pass
+
+        # XP multipliers would be applied at award time
+        # (Not implemented in current add_xp, could be added)
 
     def _load_keypress_animation(self):
         """Load and cache all frames from the keypress animation webp."""
