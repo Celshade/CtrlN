@@ -1,10 +1,16 @@
 import json
+from pathlib import Path
+from typing import Dict, List
+
+# Import rank system
+from ranks import RANKS
 
 
 class Profile:
-    """Player profile with XP, rank, and achievement tracking.
+    """Data container for player progression tracking.
 
-    Stores player game statistics and progression data.
+    Stores player statistics and provides JSON serialization for
+    persistence. All progression logic is in the Player class.
     """
     # memory-efficient attribute storage
     __slots__ = ("player_id", "player_name", "current_xp", "total_xp",
@@ -110,3 +116,67 @@ class Profile:
         except FileNotFoundError as fe:
             raise FileNotFoundError(f"{filename} not found: {fe}") from fe
 
+    @classmethod
+    def load_by_id(cls, player_id: str) -> 'Profile':
+        """Load profile using standard player directory location.
+
+        Args:
+            player_id: Unique player identifier.
+
+        Returns:
+            Profile: New Profile instance loaded from file, or
+                default Unranked profile if not found.
+
+        Raises:
+            ValueError: If file exists but data is invalid.
+        """
+        data_dir = Path("player_data")
+        filename = str(data_dir / f"{player_id}.json")
+
+        if Path(filename).exists():
+            return cls.load_from_json(filename)
+
+        # Return new Unranked profile
+        return cls(
+            player_id=player_id,
+            player_name="Unknown",
+            current_xp=0,
+            total_xp=0,
+            rank=0
+        )
+
+    def save_to_file(self, filename: str = None) -> bool:
+        """Persist profile to JSON file.
+
+        Args:
+            filename: Path to save file. If None, uses default
+                pattern player_data/{player_id}.json
+
+        Returns:
+            bool: Success status.
+        """
+        try:
+            if filename is None:
+                data_dir = Path("player_data")
+                data_dir.mkdir(exist_ok=True)
+                filename = str(data_dir / f"{self.player_id}.json")
+
+            profile_data = {
+                "id": self.player_id,
+                "name": self.player_name,
+                "current_xp": self.current_xp,
+                "total_xp": self.total_xp,
+                "rank": self.rank,
+                "highest_rank": self.highest_rank,
+                "prestige": self.prestige,
+                "seasons_played": self.seasons_played,
+                "achievements": self.achievements
+            }
+
+            with open(filename, "w") as f:
+                json.dump(profile_data, f, indent=2)
+
+            return True
+        except (IOError, json.JSONDecodeError) as e:
+            print(f"Error saving profile: {e}")
+            return False
