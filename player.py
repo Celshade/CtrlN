@@ -311,14 +311,14 @@ class Player:
         if self.profile is None:
             return False
 
-        # Update profile with current stats
-        self.profile.current_xp = self.current_xp
-        self.profile.total_xp = self.total_xp
-        self.profile.rank = self.rank
-        self.profile.highest_rank = self.highest_rank
-        self.profile.achievements = self.achievements
-
-        return self.profile.save_to_file(filename)
+        # Pass current stats to save_to_file, which handles update_profile
+        return self.profile.save_to_file(filename, {
+            "current_xp": self.current_xp,
+            "total_xp": self.total_xp,
+            "rank": self.rank,
+            "highest_rank": self.highest_rank,
+            "achievements": self.achievements
+        })
 
     def apply_unlocks(self) -> None:
         """Process unlocks and apply them to gameplay.
