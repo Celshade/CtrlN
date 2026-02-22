@@ -254,17 +254,22 @@ class Profile:
             rank=0
         )
 
-    def save_to_file(self, filename: str = None) -> bool:
+    def save_to_file(self, filename: str = None, data: dict = None) -> bool:
         """Persist profile to JSON file.
 
         Args:
             filename: Path to save file. If None, uses default
                 pattern player_data/{player_id}.json
+            data: Optional dictionary of profile fields to update
+                before saving. If provided, calls update_profile(data).
 
         Returns:
             bool: Success status.
         """
         try:
+            if data is not None:
+                self.update_profile(data)
+
             if filename is None:
                 data_dir = Path("player_data")
                 data_dir.mkdir(exist_ok=True)
