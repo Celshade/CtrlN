@@ -54,6 +54,8 @@ class Player:
             self.prestige = 0
             self.seasons_played = 0
             self.achievements = []
+
+        # Player position and physics
         self.x_pos = PLAYER_START_X
         self.y_pos = PLAYER_START_Y
         self.vel = 0
@@ -102,7 +104,7 @@ class Player:
 
         # Invulnerability tracking
         # Frames remaining of invulnerability after shield break
-        self.invulnerability_frames = 0
+        self.invulnerability_frames = 0  # FIXME edit this
 
     # ========================== #
     # ### Progression Logic ### #
