@@ -3,8 +3,8 @@ import random
 import pygame
 from PIL import Image
 
-from player import Player
-from config import (
+from ..core.player import Player
+from ..config import (
     GROUND_Y, ORB_SIZE, OBJECT_SPEED, ORB_MIN_MARGIN, ORB_MAX_MARGIN, ORANGE,
     TREE_SIZE, OBJECT_SPEED, PERCHED_BIRD_SIZE
 )

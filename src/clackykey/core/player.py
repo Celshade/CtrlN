@@ -2,9 +2,9 @@ import pygame
 from PIL import Image
 from typing import Dict, List, Optional
 
-from profiles import Profile
-from ranks import RANKS
-from config import (
+from ..models.profiles import Profile
+from ..models.ranks import RANKS
+from ..config import (
     PLAYER_START_X, PLAYER_START_Y, PLAYER_SIZE,
     GRAVITY, KEY_POWER, GROUND_Y, FPS,
     SHIELD_INVULNERABILITY_FRAMES

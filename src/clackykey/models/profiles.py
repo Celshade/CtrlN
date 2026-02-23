@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, List
 
 # Import rank system
-from ranks import RANKS
+from .ranks import RANKS
 
 
 class Profile:
