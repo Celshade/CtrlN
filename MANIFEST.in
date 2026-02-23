@@ -1,0 +1,5 @@
+include README.md
+include COPYING
+recursive-include assets *
+recursive-include docs *
+recursive-include player_data *
