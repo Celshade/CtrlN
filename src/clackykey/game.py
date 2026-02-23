@@ -3,10 +3,10 @@ import random
 
 import pygame
 
-from ..systems.objects import Orb, Tree, BirdPerched
-from .player import Player
-from ..systems.counter import Counter
-from ..config import (
+from clackykey.objects import Orb, Tree, BirdPerched
+from clackykey.player import Player
+from clackykey.counter import Counter
+from clackykey.config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
     OBJECT_SPEED, ORB_SPAWN_RATE, ORB_SIZE,

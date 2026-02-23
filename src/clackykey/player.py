@@ -2,9 +2,9 @@ import pygame
 from PIL import Image
 from typing import Dict, List, Optional
 
-from ..models.profiles import Profile
-from ..models.ranks import RANKS
-from ..config import (
+from clackykey.profiles import Profile
+from clackykey.ranks import RANKS
+from clackykey.config import (
     PLAYER_START_X, PLAYER_START_Y, PLAYER_SIZE,
     GRAVITY, KEY_POWER, GROUND_Y, FPS,
     SHIELD_INVULNERABILITY_FRAMES
@@ -241,7 +241,7 @@ class Player:
         Returns:
             dict: Rank-up notification with unlocks.
         """
-        from ranks import get_rank_unlocks
+        from clackykey.ranks import get_rank_unlocks
 
         unlocked_features = get_rank_unlocks(new_rank)
         rank_name = RANKS[new_rank]["name"]

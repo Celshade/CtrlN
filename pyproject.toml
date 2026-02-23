@@ -7,7 +7,7 @@ name = "clackykey"
 version = "0.1.0"
 description = ""
 readme = "README.md"
-license = {text = "TBD"}
+license = {text = "GPL-3.0"}
 authors = [
     {name = "Celshade", email = "celshade@gmail.com"}
 ]
@@ -16,7 +16,7 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
     "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: TBD",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
