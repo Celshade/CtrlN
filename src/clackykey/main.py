@@ -5,7 +5,7 @@ import sys
 
 import pygame
 
-from game import Game
+from .core.game import Game
 
 
 # General NOTE: iirc, pygame counts from the top-down, along the y-axis.
