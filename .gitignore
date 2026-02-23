@@ -4,9 +4,6 @@ venv/*
 *__pycache__/*
 
 
-# ### Testing ### #
-test*
-
 # ### Development Resources ### #
 .vscode/*
 .temp/*
