@@ -1,6 +1,5 @@
 import pygame
 from PIL import Image
-from typing import Dict, List, Optional
 
 from profiles import Profile
 from ranks import RANKS
@@ -20,7 +19,7 @@ class Player:
     Manages visual representation, collision detection, shield mechanics,
     and integrates with player progression profile.
     """
-    def __init__(self, profile: Optional[Profile] = None) -> None:
+    def __init__(self, profile: Profile | None = None) -> None:
         """Initialize player entity.
 
         Args:
@@ -126,7 +125,7 @@ class Player:
 
         return 7  # Default to Bamboo
 
-    def get_progress(self) -> Dict:
+    def get_progress(self) -> dict:
         """Calculate current rank, XP toward next rank, progress %.
 
         Returns:
@@ -177,7 +176,7 @@ class Player:
             "next_rank": current_rank - 1
         }
 
-    def add_xp(self, xp_amount: int) -> Dict:
+    def add_xp(self, xp_amount: int) -> dict:
         """Award XP and check for rank promotions.
 
         Args:
@@ -208,7 +207,7 @@ class Player:
             "rank_name": RANKS[new_rank]["name"]
         }
 
-    def get_unlocks(self) -> List[str]:
+    def get_unlocks(self) -> list[str]:
         """Get all unlocks available at current XP level.
 
         Returns:
@@ -231,7 +230,7 @@ class Player:
         self,
         old_rank: int,
         new_rank: int
-    ) -> Dict:
+    ) -> dict:
         """Get rank-up notification info.
 
         Args:
@@ -241,7 +240,7 @@ class Player:
         Returns:
             dict: Rank-up notification with unlocks.
         """
-        from ranks import get_rank_unlocks
+        from clackykey.ranks import get_rank_unlocks
 
         unlocked_features = get_rank_unlocks(new_rank)
         rank_name = RANKS[new_rank]["name"]
