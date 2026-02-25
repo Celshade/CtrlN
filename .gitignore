@@ -3,10 +3,10 @@ venv/*
 *.pyc*
 *__pycache__/*
 
-
 # ### Development Resources ### #
 .vscode/*
 .temp/*
 BuildResources/*
 assets/*
 player_data/*
+tests/pygame_tests/*
