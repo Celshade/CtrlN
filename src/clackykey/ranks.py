@@ -3,9 +3,6 @@
 Defines rank progression tiers, XP thresholds, and feature unlocks.
 For player profile management, see profiles.py
 """
-
-from typing import List
-
 # XP Rank definitions with thresholds and unlocks
 # NOTE ranks reset every "season" (can be triggered manually or on a schedule)
 # NOTE "<color>_key", "role", "server_access" will persist even in season reset
@@ -53,7 +50,7 @@ RANKS = {
 }
 
 
-def get_rank_unlocks(rank: int) -> List[str]:
+def get_rank_unlocks(rank: int) -> list[str]:
     """Retrieve features/cosmetics unlocked at a given rank.
 
     Args:

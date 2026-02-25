@@ -1,11 +1,7 @@
 # ### Python ### #
 venv/*
-.pyc/*
-__pycache__/*
-
-
-# ### Testing ### #
-test*
+*.pyc*
+*__pycache__/*
 
 # ### Development Resources ### #
 .vscode/*
@@ -13,3 +9,4 @@ test*
 BuildResources/*
 assets/*
 player_data/*
+tests/pygame_tests/*
