@@ -14,7 +14,7 @@ class Profile:
     # memory-efficient attribute storage
     __slots__ = ("_player_id", "_player_name", "_current_xp", "_total_xp",
                  "_rank", "_highest_rank", "_prestige", "_seasons_played",
-                 "_achievements")
+                 "_games_played", "_achievements")
 
 # Getters and Setters with type validation
     @property
@@ -114,6 +114,18 @@ class Profile:
         self._seasons_played = value
 
     @property
+    def games_played(self) -> int:
+        """Get number of games played."""
+        return self._games_played
+
+    @games_played.setter
+    def games_played(self, value: int) -> None:
+        """Set number of games played with validation."""
+        if not isinstance(value, int) or value < 0:
+            raise ValueError("games_played must be a non-negative integer")
+        self._games_played = value
+
+    @property
     def achievements(self) -> list:
         """Get list of achievements."""
         return self._achievements
@@ -129,7 +141,8 @@ class Profile:
                  player_id: str, player_name: str,
                  current_xp: int, total_xp: int,
                  rank: int, highest_rank: int = 0, prestige: int = 0,
-                 seasons_played: int = 0, achievements: list = None):
+                 seasons_played: int = 0, games_played: int = 0,
+                 achievements: list = None):
         """Initialize a player profile with validation.
 
         Args:
@@ -141,6 +154,7 @@ class Profile:
             highest_rank: Best rank achieved (default=0).
             prestige: Prestige level (default=0).
             seasons_played: Number of completed seasons (default=0).
+            games_played: Total number of games played (default=0).
             achievements: List of achievement IDs (default=None=>[]).
 
         Raises:
@@ -165,6 +179,8 @@ class Profile:
             raise ValueError("prestige must be a non-negative integer")
         if not isinstance(seasons_played, int) or seasons_played < 0:
             raise ValueError("seasons_played must be a non-negative integer")
+        if not isinstance(games_played, int) or games_played < 0:
+            raise ValueError("games_played must be a non-negative integer")
         if achievements is None:
             achievements = []
         elif not isinstance(achievements, list):
@@ -178,6 +194,7 @@ class Profile:
         self.highest_rank = highest_rank
         self.prestige = prestige
         self.seasons_played = seasons_played
+        self.games_played = games_played
         self.achievements = achievements
 
     @classmethod
@@ -213,6 +230,7 @@ class Profile:
                 highest_rank=data.get("highest_rank", 0),
                 prestige=data.get("prestige", 0),
                 seasons_played=data.get("seasons_played", 0),
+                games_played=data.get("games_played", 0),
                 achievements=data.get("achievements", [])
             )
         except KeyError as ke:
@@ -283,6 +301,7 @@ class Profile:
                 "highest_rank": self.highest_rank,
                 "prestige": self.prestige,
                 "seasons_played": self.seasons_played,
+                "games_played": self.games_played,
                 "achievements": self.achievements
             }
 
