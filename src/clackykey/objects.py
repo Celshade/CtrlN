@@ -71,6 +71,7 @@ class BirdPerched:
 
         self.tree = tree
         self.scored = False
+        self.is_red = False  # Set to True for red variant (perched only)
 
         # 33% chance to start flying
         self.is_flying = random.random() < 0.33
@@ -95,8 +96,8 @@ class BirdPerched:
         else:
             # Perched state - original behavior
             # 50% chance to spawn a red bird instead of normal
-            is_red = random.random() < 0.5
-            bird_filename = "assets/BirdPerchedRed.png" if is_red else "assets/BirdPerched.png"
+            self.is_red = random.random() < 0.5
+            bird_filename = "assets/BirdPerchedRed.png" if self.is_red else "assets/BirdPerched.png"
 
             # Load and scale the perched bird image
             try:

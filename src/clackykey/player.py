@@ -440,8 +440,12 @@ class Player:
         """Check if player is currently invulnerable after shield break."""
         return self.invulnerability_frames > 0
 
-    def update_shields(self, score) -> None:
-        """Grant new shields based on score threshold."""
+    def update_shields(self, score) -> bool:
+        """Grant new shields based on score threshold.
+
+        Returns:
+            bool: True if a new shield charge was granted this call.
+        """
         # Grant a new shield when reaching next threshold (capped at 2)
         if score >= self.next_shield_threshold and self.shield_charges < 2:
             self.shield_charges += 1
@@ -460,6 +464,8 @@ class Player:
                     self.shield_animation_frame = 0
                     self.playing_shield_animation = False
                     self.playing_shield_animation_tier2 = True
+            return True
+        return False
 
     def destroy_shield(self) -> None:
         """Destroy the shield when hit."""
