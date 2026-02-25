@@ -19,12 +19,13 @@ class Player:
     Manages visual representation, collision detection, shield mechanics,
     and integrates with player progression profile.
     """
-    def __init__(self, profile: Profile | None = None) -> None:
+    def __init__(self, profile: Profile | None = None,
+                 asset_path: str = "assets/player.png") -> None:
         """Initialize player entity.
 
         Args:
-            profile: Optional Profile instance for persistence. If
-                provided, player stats are initialized from profile.
+            profile:    Optional Profile for XP/rank persistence.
+            asset_path: Path to the sprite image used for this character.
         """
         self.profile = profile
         self.x_pos = PLAYER_START_X
@@ -61,7 +62,7 @@ class Player:
         self.size = PLAYER_SIZE
 
         # Load player sprite
-        self.image = pygame.image.load("assets/player.png")
+        self.image = pygame.image.load(asset_path)
         self.image = pygame.transform.scale(self.image, (self.size, self.size))
         self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
         self.mask = pygame.mask.from_surface(self.image)
