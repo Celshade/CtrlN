@@ -17,6 +17,7 @@ def sample_profile():
         rank=2,
         highest_rank=3,
         prestige=0,
+        games_played=0,
         seasons_played=1,
         achievements=["ach1", "ach2"]
     )
