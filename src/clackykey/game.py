@@ -4,6 +4,7 @@ import random
 import pygame
 
 from achievements import Achievements
+from background import Background
 from objects import Orb, Tree, BirdPerched
 from player import Player
 from profiles import Profile
@@ -11,7 +12,7 @@ from counter import Counter
 from config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
-    OBJECT_SPEED, ORB_SPAWN_RATE, ORB_SIZE,
+    ORB_SPAWN_RATE, ORB_SIZE,
     TREE_SPAWN_RATE, TREE_SPACING,
     GROUND_Y, PLAYER_SIZE,
     BLACK, WHITE, RED, PERCHED_BIRD_SPAWN_CHANCE,
@@ -80,91 +81,8 @@ class Game:
         self.shield_explanation_frames = 0
         self.shield_explanation_shown = False
 
-        # Load background layers with parallax support
-        # Format: {"image": Surface, "speed": float, "offset": int}
-        self.bg_layers = [
-            {
-                "name": "sky_and_grass",
-                "image": pygame.transform.scale(
-                    pygame.image.load("assets/sky_and_grass.png"),
-                    (WINDOW_WIDTH, WINDOW_HEIGHT)
-                ),
-                "speed": 0.0,  # Static - no parallax
-                "offset": 0
-            },
-            {
-                "name": "big_clouds",
-                "image": pygame.transform.scale(
-                    pygame.image.load("assets/big_clouds.png"),
-                    (WINDOW_WIDTH, WINDOW_HEIGHT)
-                ),
-                "speed": 0.025,
-                "offset": 0
-            },
-            {
-                "name": "mountains",
-                "image": pygame.transform.scale(
-                    pygame.image.load("assets/mountains.png"),
-                    (WINDOW_WIDTH, WINDOW_HEIGHT)
-                ),
-                "speed": 0.0,  # Static - no parallax
-                "offset": 0
-            },
-            {
-                "name": "little_clouds",
-                "image": pygame.transform.scale(
-                    pygame.image.load("assets/little_clouds.png"),
-                    (WINDOW_WIDTH, WINDOW_HEIGHT)
-                ),
-                "speed": 0.05,
-                "offset": 0
-            },
-            {
-                "name": "background",
-                "image": pygame.transform.scale(
-                    pygame.image.load("assets/background.png"),
-                    (WINDOW_WIDTH, WINDOW_HEIGHT)
-                ),
-                "speed": 0.04,
-                "offset": 0
-            },
-            {
-                "name": "middleground_back",
-                "image": pygame.transform.scale(
-                    pygame.image.load("assets/middleground_back.png"),
-                    (WINDOW_WIDTH, WINDOW_HEIGHT)
-                ),
-                "speed": 0.0625,
-                "offset": 0
-            },
-            {
-                "name": "middleground_middle",
-                "image": pygame.transform.scale(
-                    pygame.image.load("assets/middleground_middle.png"),
-                    (WINDOW_WIDTH, WINDOW_HEIGHT)
-                ),
-                "speed": 0.08,
-                "offset": 0
-            },
-            {
-                "name": "middleground_front",
-                "image": pygame.transform.scale(
-                    pygame.image.load("assets/middleground_front.png"),
-                    (WINDOW_WIDTH, WINDOW_HEIGHT)
-                ),
-                "speed": 0.2,
-                "offset": 0
-            },
-            {
-                "name": "ground",
-                "image": pygame.transform.scale(
-                    pygame.image.load("assets/ground.png"),
-                    (WINDOW_WIDTH, WINDOW_HEIGHT)
-                ),
-                "speed": 1.0,
-                "offset": 0
-            }
-        ]
+        # Load background
+        self.background = Background()
 
     def handle_gamestate(self) -> None:
         if self.state == GameState.MENU:
@@ -213,8 +131,7 @@ class Game:
         self.tree_timer = 0
         self.perched_birds = []
         # Reset parallax offsets for all layers
-        for layer in self.bg_layers:
-            layer["offset"] = 0
+        self.background.reset()
 
         # Initialize tutorial
         self.tutorial_active = True
@@ -286,12 +203,7 @@ class Game:
         self.player.update()  # Update the Player
 
         # Update parallax background layers
-        for layer in self.bg_layers:
-            if layer["speed"] > 0:  # Only update if not static
-                layer["offset"] += OBJECT_SPEED * layer["speed"]
-                # Wrap the layer offset for seamless scrolling
-                if layer["offset"] < -WINDOW_WIDTH:
-                    layer["offset"] += WINDOW_WIDTH
+        self.background.update()
 
         # Spawn orbs (1-3 at a time with minimum spacing from other orbs)
         self.orb_spawn_rate = self._get_spawn_rate(object_type="orb",
@@ -495,15 +407,7 @@ class Game:
 
     def draw(self) -> None:
         # Draw background layers in order from back to front
-        for layer in self.bg_layers:
-            offset = int(layer["offset"])
-            # Static layers only need to be drawn once
-            if layer["speed"] == 0.0:
-                self.screen.blit(layer["image"], (0, 0))
-            else:
-                # Parallax layers - draw with wrapping for seamless scrolling
-                self.screen.blit(layer["image"], (offset, 0))
-                self.screen.blit(layer["image"], (offset + WINDOW_WIDTH, 0))
+        self.background.draw(self.screen)
 
         # Draw orbs
         for orb in self.orbs:
