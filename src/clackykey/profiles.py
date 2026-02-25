@@ -14,7 +14,7 @@ class Profile:
     # memory-efficient attribute storage
     __slots__ = ("_player_id", "_player_name", "_current_xp", "_total_xp",
                  "_rank", "_highest_rank", "_prestige", "_seasons_played",
-                 "_games_played", "_achievements")
+                 "_games_played", "_achievements", "_achievement_stats")
 
 # Getters and Setters with type validation
     @property
@@ -137,12 +137,25 @@ class Profile:
             raise ValueError("achievements must be a list")
         self._achievements = value
 
+    @property
+    def achievement_stats(self) -> dict:
+        """Get lifetime achievement stat counters."""
+        return self._achievement_stats
+
+    @achievement_stats.setter
+    def achievement_stats(self, value: dict) -> None:
+        """Set achievement stats with validation."""
+        if not isinstance(value, dict):
+            raise ValueError("achievement_stats must be a dict")
+        self._achievement_stats = value
+
     def __init__(self,
                  player_id: str, player_name: str,
                  current_xp: int, total_xp: int,
                  rank: int, highest_rank: int = 0, prestige: int = 0,
                  seasons_played: int = 0, games_played: int = 0,
-                 achievements: list = None):
+                 achievements: list = None,
+                 achievement_stats: dict = None):
         """Initialize a player profile with validation.
 
         Args:
@@ -156,6 +169,8 @@ class Profile:
             seasons_played: Number of completed seasons (default=0).
             games_played: Total number of games played (default=0).
             achievements: List of achievement IDs (default=None=>[]).
+            achievement_stats: Lifetime stat counters for achievements
+                (default=None=>{}).
 
         Raises:
             ValueError: If any argument fails type or value validation.
@@ -185,6 +200,10 @@ class Profile:
             achievements = []
         elif not isinstance(achievements, list):
             raise ValueError("achievements must be a list")
+        if achievement_stats is None:
+            achievement_stats = {}
+        elif not isinstance(achievement_stats, dict):
+            raise ValueError("achievement_stats must be a dict")
 
         self.player_id = player_id
         self.player_name = player_name
@@ -196,6 +215,7 @@ class Profile:
         self.seasons_played = seasons_played
         self.games_played = games_played
         self.achievements = achievements
+        self.achievement_stats = achievement_stats
 
     @classmethod
     def load_from_json(cls, filename: str) -> 'Profile':
@@ -231,7 +251,8 @@ class Profile:
                 prestige=data.get("prestige", 0),
                 seasons_played=data.get("seasons_played", 0),
                 games_played=data.get("games_played", 0),
-                achievements=data.get("achievements", [])
+                achievements=data.get("achievements", []),
+                achievement_stats=data.get("achievement_stats", {})
             )
         except KeyError as ke:
             raise ValueError(f"Missing required field: {ke}") from ke
@@ -302,7 +323,8 @@ class Profile:
                 "prestige": self.prestige,
                 "seasons_played": self.seasons_played,
                 "games_played": self.games_played,
-                "achievements": self.achievements
+                "achievements": self.achievements,
+                "achievement_stats": self.achievement_stats
             }
 
             with open(filename, "w") as f:
