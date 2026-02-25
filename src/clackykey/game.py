@@ -3,9 +3,13 @@ import random
 
 import pygame
 
+from achievements import Achievements
 from objects import Orb, Tree, BirdPerched
 from player import Player
 from counter import Counter
+
+# Frames to display each achievement notification banner
+NOTIFICATION_DURATION = 180  # ~3 seconds at 60 FPS
 from config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
@@ -57,6 +61,12 @@ class Game:
         # spawn rates
         self.orb_spawn_rate = None
         self.tree_spawn_rate = None
+
+        # Achievement tracker (no profile in this session)
+        self.achievements = Achievements()
+        self.shield_used_this_game = False
+        self.notification_queue: list[str] = []
+        self.notification_frames = 0
 
         # Tutorial tracking
         self.tutorial_active = False
@@ -189,6 +199,7 @@ class Game:
         # Reset game vars
         self.state = GameState.PLAYING
         self.score = 0
+        self.shield_used_this_game = False
         self.counter = Counter()
         self.player = Player()
         self.orbs = []
@@ -318,6 +329,7 @@ class Game:
                 orb.scored = True
                 self.score += 1
                 self.counter.update_score(self.score)
+                self._notify(self.achievements.increment("yellow_birds_dodged"))
 
         # Update trees
         for tree in self.trees:
@@ -330,12 +342,15 @@ class Game:
                 bird.scored = True
                 self.score += 1
                 self.counter.update_score(self.score)
+                stat = "red_birds_dodged" if bird.is_red else "yellow_birds_dodged"
+                self._notify(self.achievements.increment(stat))
 
         # Update counter animations
         self.counter.update()
 
         # Check for shield earnings based on score (triggers animations)
-        self.player.update_shields(self.score)
+        if self.player.update_shields(self.score):
+            self._notify(self.achievements.increment("shields_regenerated"))
 
         # End tutorial phase when score reaches threshold
         if self.tutorial_active and self.score >= TUTORIAL_DURATION:
@@ -358,6 +373,8 @@ class Game:
             if orb.collides_with(self.player):
                 if self.player.has_shield():
                     self.player.destroy_shield()
+                    self.shield_used_this_game = True
+                    self._notify(self.achievements.increment("shields_used"))
                     orb_to_remove = orb  # Mark orb for removal
                     break
                 elif self.player.is_invulnerable():
@@ -378,12 +395,16 @@ class Game:
             if tree.collides_with(self.player):
                 if self.player.has_shield():
                     self.player.destroy_shield()
+                    self.shield_used_this_game = True
+                    self._notify(self.achievements.increment("shields_used"))
+                    self._notify(self.achievements.increment("trees_hit"))
                     tree_to_remove = tree  # Mark tree for removal
                     break
                 elif self.player.is_invulnerable():
                     # Skip collision during invulnerability period
                     break
                 else:
+                    self._notify(self.achievements.increment("trees_hit"))
                     self.end_game()
                     return
 
@@ -396,14 +417,19 @@ class Game:
         bird_to_remove = None
         for bird in self.perched_birds:
             if bird.collides_with(self.player):
+                perched_stat = "red_perched_hit" if bird.is_red else "yellow_perched_hit"
                 if self.player.has_shield():
                     self.player.destroy_shield()
+                    self.shield_used_this_game = True
+                    self._notify(self.achievements.increment("shields_used"))
+                    self._notify(self.achievements.increment(perched_stat))
                     bird_to_remove = bird  # Mark bird for removal
                     break
                 elif self.player.is_invulnerable():
                     # Skip collision during invulnerability period
                     break
                 else:
+                    self._notify(self.achievements.increment(perched_stat))
                     self.end_game()
                     return
 
@@ -413,8 +439,15 @@ class Game:
             return
 
         if self.player.is_dead():
+            # Track ground vs ceiling crash
+            if self.player.y_pos + self.player.size >= GROUND_Y:
+                self._notify(self.achievements.increment("ground_crashes"))
+            else:
+                self._notify(self.achievements.increment("ceiling_crashes"))
             if self.player.has_shield():
                 self.player.destroy_shield()
+                self.shield_used_this_game = True
+                self._notify(self.achievements.increment("shields_used"))
                 # Clamp player position back in bounds
                 self.player.y_pos = max(0, min(self.player.y_pos,
                                                GROUND_Y - PLAYER_SIZE))
@@ -435,6 +468,15 @@ class Game:
         self.state = GameState.GAME_OVER
         if self.score > self.high_score:
             self.high_score = self.score
+        # Achievement checks at game-over
+        self._notify(self.achievements.increment("games_played"))
+        self._notify(self.achievements.check_game_score(
+            self.score, self.shield_used_this_game
+        ))
+
+    def _notify(self, newly_unlocked: list[str]) -> None:
+        """Push newly unlocked achievement IDs onto the notification queue."""
+        self.notification_queue.extend(newly_unlocked)
 
     def draw(self) -> None:
         # Draw background layers in order from back to front
@@ -476,6 +518,9 @@ class Game:
             self.draw_tutorial()
         elif self.state == GameState.GAME_OVER:
             self.draw_game_over()
+
+        # Draw achievement notification banner (shown in any state)
+        self.draw_achievement_notification()
 
         # Flush display
         pygame.display.flip()
@@ -590,6 +635,37 @@ class Game:
                 YELLOW
             )
             self.screen.blit(progress_text, (10, WINDOW_HEIGHT - 50))
+
+    def draw_achievement_notification(self) -> None:
+        """Render the topmost queued achievement banner, if any."""
+        if not self.notification_queue:
+            return
+
+        self.notification_frames += 1
+        if self.notification_frames > NOTIFICATION_DURATION:
+            self.notification_queue.pop(0)
+            self.notification_frames = 0
+            if not self.notification_queue:
+                return
+
+        aid = self.notification_queue[0]
+        from achievements import ACHIEVEMENT_REGISTRY
+        entry = ACHIEVEMENT_REGISTRY.get(aid)
+        if entry is None:
+            return
+
+        label = f"Achievement unlocked: {entry.name}"
+        text_surf = self.font_tutorial.render(label, True, BLACK)
+        padding = 12
+        banner_w = text_surf.get_width() + padding * 2
+        banner_h = text_surf.get_height() + padding * 2
+        banner_x = WINDOW_WIDTH // 2 - banner_w // 2
+        banner_y = 20
+
+        banner = pygame.Surface((banner_w, banner_h), pygame.SRCALPHA)
+        banner.fill((255, 215, 0, 210))  # gold, semi-transparent
+        self.screen.blit(banner, (banner_x, banner_y))
+        self.screen.blit(text_surf, (banner_x + padding, banner_y + padding))
 
     def run(self) -> None:
         print("Game loop starting...\n")
