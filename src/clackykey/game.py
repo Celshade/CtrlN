@@ -6,10 +6,8 @@ import pygame
 from achievements import Achievements
 from objects import Orb, Tree, BirdPerched
 from player import Player
+from profiles import Profile
 from counter import Counter
-
-# Frames to display each achievement notification banner
-NOTIFICATION_DURATION = 180  # ~3 seconds at 60 FPS
 from config import (
     GameState, FPS, SCALE,
     WINDOW_WIDTH, WINDOW_HEIGHT,
@@ -21,12 +19,15 @@ from config import (
     SHIELD_EXPLANATION_PAUSE_FRAMES, MIN_SPAWN_GAP
 )
 
+# Frames to display each achievement notification banner
+NOTIFICATION_DURATION = 180  # ~3 seconds at 60 FPS
+
 
 # =================== #
 # ### GAME ENGINE ### #
 # =================== #
 class Game:
-    def __init__(self) -> None:
+    def __init__(self, player_id: str = "player1") -> None:
         print("Creating window...")
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT),
                                               pygame.SHOWN)
@@ -62,8 +63,12 @@ class Game:
         self.orb_spawn_rate = None
         self.tree_spawn_rate = None
 
-        # Achievement tracker (no profile in this session)
-        self.achievements = Achievements()
+        # Load player profile and init achievement tracker from it
+        self.profile = Profile.load_by_id(player_id)
+        self.achievements = Achievements(
+            unlocked=self.profile.achievements,
+            stats=self.profile.achievement_stats
+        )
         self.shield_used_this_game = False
         self.notification_queue: list[str] = []
         self.notification_frames = 0
@@ -473,10 +478,20 @@ class Game:
         self._notify(self.achievements.check_game_score(
             self.score, self.shield_used_this_game
         ))
+        # Sync achievements back to profile and persist
+        self._save_profile()
 
     def _notify(self, newly_unlocked: list[str]) -> None:
         """Push newly unlocked achievement IDs onto the notification queue."""
         self.notification_queue.extend(newly_unlocked)
+
+    def _save_profile(self) -> None:
+        """Sync achievement data back to the profile and write to disk."""
+        self.profile.achievements = self.achievements.to_list()
+        self.profile.achievement_stats = self.achievements.stats
+        self.profile.games_played = self.achievements.stats.get("games_played",
+                                                                 self.profile.games_played)
+        self.profile.save_to_file()
 
     def draw(self) -> None:
         # Draw background layers in order from back to front
@@ -690,5 +705,6 @@ class Game:
                 print(debug_str)
 
         print("\nShutting down...")
+        self._save_profile()
         pygame.quit()
         sys.exit()
