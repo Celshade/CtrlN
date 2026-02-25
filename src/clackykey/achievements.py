@@ -363,3 +363,158 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         threshold=500,
     ),
 }
+
+
+# Default lifetime stat counters — all keys that stat-based achievements use
+_DEFAULT_STATS: dict[str, int] = {
+    "yellow_birds_dodged": 0,
+    "yellow_perched_hit":  0,
+    "red_birds_dodged":    0,
+    "red_perched_hit":     0,
+    "trees_hit":           0,
+    "ground_crashes":      0,
+    "ceiling_crashes":     0,
+    "shields_regenerated": 0,
+    "shields_used":        0,
+    "games_played":        0,
+}
+
+
+class Achievements:
+    """Tracks unlocked achievements and lifetime stats for a player.
+
+    Intended to be instantiated once per player session and kept in sync
+    with their Profile. All methods that can unlock achievements return
+    a list of newly-unlocked achievement IDs so callers can queue
+    notifications.
+    """
+
+    def __init__(self,
+                 unlocked: list[str] | None = None,
+                 stats: dict[str, int] | None = None) -> None:
+        """Initialize achievement tracker.
+
+        Args:
+            unlocked: List of already-earned achievement IDs (from
+                Profile). Defaults to empty.
+            stats: Persisted lifetime stat counters (from Profile).
+                Missing keys are filled with defaults.
+        """
+        self.unlocked: set[str] = set(unlocked or [])
+        self.stats: dict[str, int] = {**_DEFAULT_STATS, **(stats or {})}
+
+    # ------------------------------------------------------------------ #
+    # Public API                                                          #
+    # ------------------------------------------------------------------ #
+
+    def increment(self, stat: str, amount: int = 1) -> list[str]:
+        """Increment a lifetime stat counter and check for new unlocks.
+
+        Args:
+            stat: Key in self.stats to increment.
+            amount: Amount to add (default 1).
+
+        Returns:
+            List of newly-unlocked achievement IDs (may be empty).
+        """
+        self.stats[stat] = self.stats.get(stat, 0) + amount
+        return self._check_stat_achievements(stat)
+
+    # FIXME I think this needs to be refactored for achievements that can be
+    # unlocked mid game (e.g. hit 10 points without using a shield but game
+    # isn't over yet and they use a shield charge later on)
+    def check_game_score(self, score: int, shield_used: bool) -> list[str]:
+        """Check single-game score achievements at game-over.
+
+        Checks both ``game_score`` achievements (score milestones) and
+        ``no_shield`` achievements (score milestones without using a
+        shield this game).
+
+        Args:
+            score: Final score for the game just ended.
+            shield_used: Whether the player used a shield charge this game.
+
+        Returns:
+            List of newly-unlocked achievement IDs (may be empty).
+        """
+        newly_unlocked = []
+        for aid, entry in ACHIEVEMENT_REGISTRY.items():
+            if aid in self.unlocked:
+                continue
+            if entry.kind == "game_score" and score >= entry.threshold:
+                self.unlocked.add(aid)
+                newly_unlocked.append(aid)
+            elif (entry.kind == "no_shield"
+                  and not shield_used
+                  and score >= entry.threshold):
+                self.unlocked.add(aid)
+                newly_unlocked.append(aid)
+        return newly_unlocked
+
+    def check_rank(self, rank_id: int) -> list[str]:
+        """Check rank achievements after a rank change.
+
+        Args:
+            rank_id: The player's new rank ID (1=Diamond … 7=Bamboo).
+
+        Returns:
+            List of newly-unlocked achievement IDs (may be empty).
+        """
+        newly_unlocked = []
+        for aid, entry in ACHIEVEMENT_REGISTRY.items():
+            if aid in self.unlocked:
+                continue
+            # threshold stores the required rank_id; lower id = higher rank,
+            # so unlock when the player's rank_id <= the achievement threshold
+            if entry.kind == "rank" and rank_id <= entry.threshold:
+                self.unlocked.add(aid)
+                newly_unlocked.append(aid)
+        return newly_unlocked
+
+    def unlock(self, achievement_id: str) -> list[str]:
+        """Manually unlock a specific achievement (store / manual types).
+
+        Args:
+            achievement_id: Registry key for the achievement to unlock.
+
+        Returns:
+            List containing the ID if newly unlocked, else empty list.
+        """
+        if (achievement_id in ACHIEVEMENT_REGISTRY
+                and achievement_id not in self.unlocked):
+            self.unlocked.add(achievement_id)
+            return [achievement_id]
+        return []
+
+    def to_list(self) -> list[str]:
+        """Serialize unlocked set for persistence in Profile.
+
+        Returns:
+            Sorted list of unlocked achievement IDs.
+        """
+        return sorted(self.unlocked)
+
+    # ------------------------------------------------------------------ #
+    # Internal helpers                                                    #
+    # ------------------------------------------------------------------ #
+
+    def _check_stat_achievements(self, stat: str) -> list[str]:
+        """Check all stat-type achievements tied to the given stat key.
+
+        Args:
+            stat: The stat key that was just incremented.
+
+        Returns:
+            List of newly-unlocked achievement IDs (may be empty).
+        """
+        current = self.stats[stat]
+        newly_unlocked = []
+        for aid, entry in ACHIEVEMENT_REGISTRY.items():
+            if aid in self.unlocked:
+                continue
+            if (entry.kind == "stat"
+                    and entry.stat_key == stat
+                    and current >= entry.threshold):
+                self.unlocked.add(aid)
+                newly_unlocked.append(aid)
+        return newly_unlocked
