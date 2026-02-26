@@ -1,3 +1,4 @@
+from datetime import date, datetime, timezone
 from typing import NamedTuple
 
 
@@ -7,7 +8,7 @@ from typing import NamedTuple
 #   "no_shield"  - reach score X in one game without using a shield
 #   "rank"       - reach a specific rank
 #   "store"      - triggered by a store/upgrade event
-#   "manual"     - checked explicitly (prestige, 3rd-charge shield deploy, etc.)
+#   "manual"     - checked explicitly (3rd-charge shield deploy, etc.)
 #
 # NOTE: Thresholds for #67-75 (stat-based combat events) are marked TODO and
 #       should be tuned once playtesting data is available.
@@ -409,8 +410,11 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
 }
 
 
-# Default lifetime stat counters — all keys that stat-based achievements use
-_DEFAULT_STATS: dict[str, int] = {
+# Default lifetime stat counters — all keys that stat-based achievements use.
+# Integer counters are checked by achievement thresholds.
+# "last_played" is an ISO-8601 UTC date string ("YYYY-MM-DD") or "" if never
+# recorded; it is managed exclusively by record_play().
+_DEFAULT_STATS: dict[str, int | str] = {
     "yellow_birds_dodged": 0,
     "yellow_perched_hit":  0,
     "red_birds_dodged":    0,
@@ -422,6 +426,7 @@ _DEFAULT_STATS: dict[str, int] = {
     "shields_used":        0,
     "games_played":        0,
     "daily_streak":        0,
+    "last_played":         "",   # ISO UTC date of last save(); "" = never
 }
 
 
@@ -446,11 +451,50 @@ class Achievements:
                 Missing keys are filled with defaults.
         """
         self.unlocked: set[str] = set(unlocked or [])
-        self.stats: dict[str, int] = {**_DEFAULT_STATS, **(stats or {})}
+        self.stats: dict[str, int | str] = {**_DEFAULT_STATS, **(stats or {})}
 
     # ------------------------------------------------------------------ #
     # Public API                                                          #
     # ------------------------------------------------------------------ #
+
+    def record_play(self) -> list[str]:
+        """Update ``last_played`` and advance ``daily_streak`` if applicable.
+
+        Call this once per session when the profile is saved (e.g. game-over).
+        Day boundaries are determined in UTC.  Rules:
+
+        * Same UTC day as last call → timestamp refreshed, streak unchanged.
+        * Next consecutive UTC day   → streak incremented by 1.
+        * Gap of 2+ days             → streak reset to 1.
+        * Never called before        → streak set to 1.
+
+        Returns:
+            List of newly-unlocked achievement IDs (may be empty).
+        """
+        today = datetime.now(timezone.utc).date()
+        last_raw = self.stats.get("last_played", "")
+
+        if last_raw:
+            last_date = date.fromisoformat(str(last_raw))
+            delta = (today - last_date).days
+            if delta == 0:
+                # Same day — refresh timestamp, no streak change
+                self.stats["last_played"] = today.isoformat()
+                return []
+            elif delta == 1:
+                # Consecutive day — advance streak
+                self.stats["daily_streak"] = (
+                    int(self.stats.get("daily_streak", 0)) + 1
+                )
+            else:
+                # Streak broken — reset
+                self.stats["daily_streak"] = 1
+        else:
+            # First recorded play
+            self.stats["daily_streak"] = 1
+
+        self.stats["last_played"] = today.isoformat()
+        return self._check_stat_achievements("daily_streak")
 
     def increment(self, stat: str, amount: int = 1) -> list[str]:
         """Increment a lifetime stat counter and check for new unlocks.
