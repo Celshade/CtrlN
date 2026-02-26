@@ -217,18 +217,9 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
     # ------------------------------------------------------------------ #
     # Progression (#92)                                                  #
     # ------------------------------------------------------------------ #
-    # #92
-    "prestige": Achievement(
-        name="Beyond the Top",
-        description="Achieve prestige",
-        kind="manual",
-        stat_key=None,
-        threshold=1,
-    ),
-
-    # ------------------------------------------------------------------ #
-    # Rank achievements (#93-97)                                         #
-    # rank IDs: 5=Bronze, 4=Silver, 3=Gold, 2=Platinum, 1=Diamond        #
+    # Rank achievements (#93-98)                                         #
+    # rank IDs: 5=Bronze, 4=Silver, 3=Gold, 2=Platinum, 1=Diamond,       #
+    #           0=Prestige                                               #
     # ------------------------------------------------------------------ #
     # #93
     "reach_bronze": Achievement(
@@ -270,11 +261,19 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=1,
     ),
+    # #98
+    "reach_prestige": Achievement(
+        name="Beyond the Top",
+        description="Reach Prestige rank",
+        kind="rank",
+        stat_key=None,
+        threshold=0,
+    ),
 
     # ------------------------------------------------------------------ #
-    # Store / Energy (#98-100)                                           #
+    # Store / Energy (#99-101)                                           #
     # ------------------------------------------------------------------ #
-    # #98
+    # #99
     "top_off_energy": Achievement(
         name="Full Tank",
         description="Top off energy",
@@ -300,9 +299,9 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
     ),
 
     # ------------------------------------------------------------------ #
-    # Single-game events (#101)                                          #
+    # Single-game events (#102)                                          #
     # ------------------------------------------------------------------ #
-    # #101
+    # #102
     "active_shield_3rd_charge": Achievement(
         name="Triple Threat",
         description="Deploy an active shield using the 3rd charge",
@@ -312,9 +311,9 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
     ),
 
     # ------------------------------------------------------------------ #
-    # Single-game score milestones (#102-107)                            #
+    # Single-game score milestones (#103-108)                            #
     # ------------------------------------------------------------------ #
-    # #102
+    # #103
     "score_50_game": Achievement(
         name="Half Century",
         description="Reach 50 points in one game",
@@ -322,7 +321,7 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=50,
     ),
-    # #103
+    # #104
     "score_100_game": Achievement(
         name="Century",
         description="Reach 100 points in one game",
@@ -330,7 +329,7 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=100,
     ),
-    # #104
+    # #105
     "score_200_game": Achievement(
         name="Double Century",
         description="Reach 200 points in one game",
@@ -338,7 +337,7 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=200,
     ),
-    # #105
+    # #106
     "score_300_game": Achievement(
         name="Triple Century",
         description="Reach 300 points in one game",
@@ -346,7 +345,7 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=300,
     ),
-    # #106
+    # #107
     "score_400_game": Achievement(
         name="Quadruple Century",
         description="Reach 400 points in one game",
@@ -354,13 +353,58 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=400,
     ),
-    # #107
+    # #108
     "score_500_game": Achievement(
         name="Quintuple Century",
         description="Reach 500 points in one game",
         kind="game_score",
         stat_key=None,
         threshold=500,
+    ),
+
+    # ------------------------------------------------------------------ #
+    # Daily streak (#109-113)                                            #
+    # Consecutive days with at least one game played                     #
+    # ------------------------------------------------------------------ #
+    # #109
+    "daily_streak_2": Achievement(
+        name="Two-Day Streak",
+        description="Play at least one game per day for 2 consecutive days",
+        kind="stat",
+        stat_key="daily_streak",
+        threshold=2,
+    ),
+    # #110
+    "daily_streak_5": Achievement(
+        name="Five-Day Streak",
+        description="Play at least one game per day for 5 consecutive days",
+        kind="stat",
+        stat_key="daily_streak",
+        threshold=5,
+    ),
+    # #111
+    "daily_streak_10": Achievement(
+        name="Ten-Day Streak",
+        description="Play at least one game per day for 10 consecutive days",
+        kind="stat",
+        stat_key="daily_streak",
+        threshold=10,
+    ),
+    # #112
+    "daily_streak_20": Achievement(
+        name="Twenty-Day Streak",
+        description="Play at least one game per day for 20 consecutive days",
+        kind="stat",
+        stat_key="daily_streak",
+        threshold=20,
+    ),
+    # #113
+    "daily_streak_30": Achievement(
+        name="Thirty-Day Streak",
+        description="Play at least one game per day for 30 consecutive days",
+        kind="stat",
+        stat_key="daily_streak",
+        threshold=30,
     ),
 }
 
@@ -377,6 +421,7 @@ _DEFAULT_STATS: dict[str, int] = {
     "shields_regenerated": 0,
     "shields_used":        0,
     "games_played":        0,
+    "daily_streak":        0,
 }
 
 
