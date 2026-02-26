@@ -34,7 +34,7 @@ _FONT_HINT    = 18
 # ====================== #
 # ### Character data ### #
 # ====================== #
-class CharacterDef(NamedTuple):
+class Character(NamedTuple):
     """Immutable descriptor for a selectable character."""
     id: str
     name: str
@@ -43,13 +43,32 @@ class CharacterDef(NamedTuple):
 
 
 # NOTE Add new entries here to extend the roster - they'll appear automatically.
-CHARACTER_ROSTER: list[CharacterDef] = [
-    CharacterDef(
-        id="default",
-        name="Clacky",
+CHARACTER_ROSTER: list[Character] = [
+    Character(
+        id="default0",
+        name="Clacky0",
         asset_path="assets/player.png",
         description="The original Clacky Key",
     ),
+    Character(
+        id="default1",
+        name="Clacky1",
+        asset_path="assets/player.png",
+        description="The original Clacky Key",
+    ),
+    Character(
+        id="default2",
+        name="Clacky2",
+        asset_path="assets/player.png",
+        description="The original Clacky Key",
+    ),
+    Character(
+        id="default3",
+        name="Clacky3",
+        asset_path="assets/player.png",
+        description="The original Clacky Key",
+    )
+    # NOTE 4 max for current layout, but can be increased by adjusting cards
 ]
 
 
@@ -76,7 +95,7 @@ class CharacterSelect:
             self._previews.append(img)
 
     # ------------------------------------------------------------------ #
-    # Navigation                                                           #
+    # Navigation                                                         #
     # ------------------------------------------------------------------ #
 
     def navigate(self, direction: int) -> None:
@@ -86,12 +105,12 @@ class CharacterSelect:
         )
 
     @property
-    def selected(self) -> CharacterDef:
-        """Return the currently highlighted CharacterDef."""
+    def selected(self) -> Character:
+        """Return the currently highlighted Character."""
         return CHARACTER_ROSTER[self.selected_index]
 
     # ------------------------------------------------------------------ #
-    # Hit-testing                                                          #
+    # Hit-testing                                                        #
     # ------------------------------------------------------------------ #
 
     def is_play_clicked(self, pos: tuple[int, int]) -> bool:
@@ -101,7 +120,7 @@ class CharacterSelect:
         return self._play_button_rect.collidepoint(pos)
 
     # ------------------------------------------------------------------ #
-    # Drawing                                                              #
+    # Drawing                                                            #
     # ------------------------------------------------------------------ #
 
     def draw(self, screen: pygame.Surface) -> None:
