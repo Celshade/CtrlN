@@ -5,7 +5,7 @@ For player profile management, see profiles.py
 """
 # XP Rank definitions with thresholds and unlocks
 # NOTE ranks reset every "season" (can be triggered manually or on a schedule)
-# NOTE "<color>_key", "role", "server_access" will persist even in season reset
+# NOTE "<color>_key", and "role" (highest rank) will persist across seasons
 RANKS = {
     -1: {
         "name": "Unranked",
