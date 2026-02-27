@@ -22,6 +22,7 @@ RANKS = {
         "name": "Diamond",
         "min_points": 10000,
         # NOTE stabilizers cause "cieling" bounce instead of damage
+        # NOTE "server_access" grants keybound perms for the current season
         "unlocks": ["role", "server_access", "shield_stabilizers"]
     },
     2: {
