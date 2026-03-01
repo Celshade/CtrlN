@@ -66,6 +66,7 @@ ORANGE = (255, 165, 0)
 
 # NOTE: Breakout into a types module if we generate more than one state/type
 class GameState(Enum):
+    CHARACTER_SELECT = 0
     MENU = 1
     PLAYING = 2
     GAME_OVER = 3

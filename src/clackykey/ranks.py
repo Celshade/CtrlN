@@ -5,37 +5,53 @@ For player profile management, see profiles.py
 """
 # XP Rank definitions with thresholds and unlocks
 # NOTE ranks reset every "season" (can be triggered manually or on a schedule)
-# NOTE "<color>_key", "role", "server_access" will persist even in season reset
+# NOTE "<color>_key", and "role" (highest rank) will persist across seasons
 RANKS = {
-    0: {
+    -1: {
         "name": "Unranked",
         "min_points": None,
-        "unlocks": ["basic_access"]
+        # NOTE single [blue] shield, basic thrusters, visible xp/rank
+        "unlocks": ["basic_shield", "thrusters", "basic_intel"]
+    },
+    0: {
+        "name": "Prestige",
+        "min_points": 15000,
+        "unlocks": ["prestige"]
     },
     1: {
         "name": "Diamond",
         "min_points": 10000,
-        "unlocks": ["role", "server_access", "prestige", "shield_stabilizers"]
+        # NOTE stabilizers cause "cieling" bounce instead of damage
+        # NOTE "server_access" grants keybound perms for the current season
+        "unlocks": ["role", "server_access", "shield_stabilizers"]
     },
     2: {
         "name": "Platinum",
         "min_points": 7500,
-        "unlocks": ["role", "shield_strength+1"]
+        # NOTE basic_shield=5 point charge; charge+1=10 point charge; +2=15 pt
+        # NOTE shield_charge+2 => orange shield
+        "unlocks": ["role", "shield_charge+2"]
     },
     3: {
         "name": "Gold",
         "min_points": 5000,
-        "unlocks": ["role", "gold_key", "shield_boost+1", "xp_boost+5%"]
+        # TODO move +5% xp to achievement
+        # NOTE agility_boost grants x-amount of bonus xp every 50 points
+        # without taking damage
+        "unlocks": ["role", "agility_boost"]
     },
     4: {
         "name": "Silver",
         "min_points": 3000,
-        "unlocks": ["role", "silver_key", "leaderboard_access", "xp_boost+2%"]
+        # TODO move +2% xp to achievement
+        "unlocks": ["role", "leaderboard_access"]
     },
     5: {
         "name": "Bronze",
         "min_points": 1500,
-        "unlocks": ["role", "shield_charge+1", "game_stats"]
+        # NOTE shield_charge+1 => purple shield
+        # TODO profile should allow access to full profile statistics
+        "unlocks": ["role", "shield_charge+1", "profile"]
     },
     6: {
         "name": "Iron",
@@ -54,7 +70,7 @@ def get_rank_unlocks(rank: int) -> list[str]:
     """Retrieve features/cosmetics unlocked at a given rank.
 
     Args:
-        rank: Rank ID (0-7)
+        rank: Rank ID (-1 for Unranked, 0-7)
 
     Returns:
         list: Feature names unlocked at this rank
@@ -77,12 +93,15 @@ def display_rank_progression() -> str:
     output += f"{'XP to Next':<12}\n"
     output += "-" * 80 + "\n"
 
-    rank_order = [1, 2, 3, 4, 5, 6, 7, 0]
+    rank_order = [0, 1, 2, 3, 4, 5, 6, 7, -1]
 
     for rank_id in rank_order:
-        if rank_id == 0:
-            output += f"{'0':<15} {'Unranked':<15} {'N/A':<12} "
+        if rank_id == -1:
+            output += f"{'-1':<15} {'Unranked':<15} {'N/A':<12} "
             output += f"{'0':<12}\n"
+        elif rank_id == 0:
+            output += f"{'0':<15} {'Prestige':<15} {'15,000':<12} "
+            output += f"{'—':<12}\n"
         elif rank_id == 1:
             output += f"{'1':<15} {'Diamond':<15} {'10,000':<12} "
             output += f"{'—':<12}\n"

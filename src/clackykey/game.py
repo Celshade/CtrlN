@@ -4,6 +4,7 @@ import pygame
 
 from achievements import Achievements
 from background import Background
+from character_select import CharacterSelect, CHARACTER_ROSTER
 from player import Player
 from profiles import Profile
 from counter import Counter
@@ -31,7 +32,7 @@ class Game:
         self.clock = pygame.time.Clock()  # init game clock
 
         # Menu and scoring
-        self.state = GameState.MENU
+        self.state = GameState.CHARACTER_SELECT
         self.score = 0
         self.high_score = 0
 
@@ -42,6 +43,8 @@ class Game:
         self.spawner = Spawner()
         self.ui = UI()
         self.tutorial = Tutorial()
+        self.char_select = CharacterSelect()
+        self.selected_character = CHARACTER_ROSTER[0]
 
         # Load player profile and init achievement tracker from it
         self.profile = Profile.load_by_id(player_id)
@@ -66,19 +69,33 @@ class Game:
 
     def handle_events(self) -> bool:
         for event in pygame.event.get():
-            # Handle quit
             if event.type == pygame.QUIT:
                 return False
             elif event.type == pygame.KEYDOWN:
-                # Handle escape
                 if event.key == pygame.K_ESCAPE:
                     return False
-                # Handle keyboard movement
+                elif self.state == GameState.CHARACTER_SELECT:
+                    if event.key == pygame.K_LEFT:
+                        self.char_select.navigate(-1)
+                    elif event.key == pygame.K_RIGHT:
+                        self.char_select.navigate(1)
+                    elif event.key == pygame.K_UP:
+                        self.char_select.navigate_row(-1)
+                    elif event.key == pygame.K_DOWN:
+                        self.char_select.navigate_row(1)
+                    elif event.key in (pygame.K_SPACE, pygame.K_RETURN):
+                        self._confirm_character()
                 elif event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                     self.handle_gamestate()
-            # Handle mouse movement
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                self.handle_gamestate()
+                if self.state == GameState.CHARACTER_SELECT:
+                    slot = self.char_select.icon_slot_at(event.pos)
+                    if slot is not None:
+                        self.char_select.selected_index = slot
+                    elif self.char_select.is_play_clicked(event.pos):
+                        self._confirm_character()
+                else:
+                    self.handle_gamestate()
         return True
 
     def restart_game(self) -> None:
@@ -86,10 +103,15 @@ class Game:
         self.score = 0
         self.shield_used_this_game = False
         self.counter = Counter()
-        self.player = Player()
+        self.player = Player(asset_path=self.selected_character.asset_path)
         self.background.reset()
         self.spawner.reset()
         self.tutorial.reset()
+
+    def _confirm_character(self) -> None:
+        """Lock in the highlighted character and start the game."""
+        self.selected_character = self.char_select.selected
+        self.restart_game()
 
 
 
@@ -225,6 +247,7 @@ class Game:
         if self.score > self.high_score:
             self.high_score = self.score
         # Achievement checks at game-over
+        self._notify(self.achievements.record_play())
         self._notify(self.achievements.increment("games_played"))
         self._notify(self.achievements.check_game_score(
             self.score, self.shield_used_this_game
@@ -246,6 +269,12 @@ class Game:
 
     def draw(self) -> None:
         self.background.draw(self.screen)
+
+        if self.state == GameState.CHARACTER_SELECT:
+            self.char_select.draw(self.screen)
+            pygame.display.flip()
+            return
+
         self.spawner.draw(self.screen)
         self.player.draw(self.screen, self.score)
 
@@ -257,7 +286,7 @@ class Game:
         elif self.state == GameState.GAME_OVER:
             self.ui.draw_game_over(self.screen, self.score, self.high_score)
 
-        # Achievement notification banner (shown in any state)
+        # Achievement notification banner (shown in any non-select state)
         self.notification_frames = self.ui.draw_achievement_notification(
             self.screen, self.notification_queue, self.notification_frames
         )
