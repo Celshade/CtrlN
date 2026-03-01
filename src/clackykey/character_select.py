@@ -62,103 +62,48 @@ class Character(NamedTuple):
     locked: bool = False     # if True: greyed out and unselectable
 
 
+# Shared placeholder assets; swap per-entry once unique assets exist.
+_DEFAULT_ASSET   = "assets/player.png"
+_DEFAULT_PREVIEW = "assets/key_bounce.webP"
+
+
+def _char(
+    cid: str,
+    name: str,
+    locked: bool = False,
+    asset_path: str = _DEFAULT_ASSET,
+    preview_path: str = _DEFAULT_PREVIEW,
+) -> Character:
+    """Convenience constructor that fills in shared asset defaults."""
+    return Character(
+        id=cid,
+        name=name,
+        asset_path=asset_path,
+        preview_path=preview_path,
+        locked=locked,
+    )
+
+
 # NOTE: Add new entries here; the grid expands automatically up to 15 slots.
 # Characters with locked=True show a padlock overlay and cannot be selected.
 CHARACTER_ROSTER: list[Character] = [
-    Character(
-        id="black",
-        name="Black",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-    ),
-    Character(
-        id="grey",
-        name="Grey",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-    ),
-    Character(
-        id="dark_green",
-        name="Dark Green",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-    ),
-    Character(
-        id="dark_blue",
-        name="Dark Blue",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-    ),
-    Character(
-        id="red",
-        name="Red",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-    ),
+    # fmt: off
+    _char("black",      "Black"),
+    _char("grey",       "Grey"),
+    _char("dark_green", "Dark Green"),
+    _char("dark_blue",  "Dark Blue"),
+    _char("red",        "Red"),
     # --- locked below this line ---
-    Character(
-        id="yellow",
-        name="Yellow",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-        locked=True,
-    ),
-    Character(
-        id="purple",
-        name="Purple",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-        locked=True,
-    ),
-    Character(
-        id="green",
-        name="Green",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-        locked=True,
-    ),
-    Character(
-        id="orange",
-        name="Orange",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-        locked=True,
-    ),
-    Character(
-        id="white",
-        name="White",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-        locked=True,
-    ),
-    Character(
-        id="aqua",
-        name="Aqua",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-        locked=True,
-    ),
-    Character(
-        id="sunset",
-        name="Sunset",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-        locked=True,
-    ),
-    Character(
-        id="silver",
-        name="Silver",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-        locked=True,
-    ),
-    Character(
-        id="gold",
-        name="Gold",
-        asset_path="assets/player.png",
-        preview_path="assets/key_bounce.webP",
-        locked=True,
-    ),
+    _char("yellow",  "Yellow",  locked=True),
+    _char("purple",  "Purple",  locked=True),
+    _char("green",   "Green",   locked=True),
+    _char("orange",  "Orange",  locked=True),
+    _char("white",   "White",   locked=True),
+    _char("aqua",    "Aqua",    locked=True),
+    _char("sunset",  "Sunset",  locked=True),
+    _char("silver",  "Silver",  locked=True),
+    _char("gold",    "Gold",    locked=True),
+    # fmt: on
 ]
 
 
@@ -186,7 +131,6 @@ class CharacterSelect:
         self._font_hint  = pygame.font.Font(None, _FONT_HINT)
 
         self.selected_index: int = 0
-        self._play_button_rect: pygame.Rect | None = None
         self._icon_rects: list[pygame.Rect] = []
 
         preview_path = CHARACTER_ROSTER[0].preview_path
@@ -221,8 +165,14 @@ class CharacterSelect:
         )
         self._lock_surf = _lock_font.render("\U0001f512", True, WHITE)
 
-        # Pre-compute icon rects (layout is fixed).
+        # Pre-compute all static layout rects (window size never changes).
         self._build_icon_rects()
+        self._card_rect: pygame.Rect = self._featured_rect()
+        btn_x = self._card_rect.x + (_CARD_W - _BTN_W) // 2
+        btn_y = self._card_rect.bottom - _BTN_H - 10
+        self._play_button_rect: pygame.Rect = pygame.Rect(
+            btn_x, btn_y, _BTN_W, _BTN_H
+        )
 
     # ------------------------------------------------------------------ #
     # Asset loading                                                      #
@@ -311,25 +261,23 @@ class CharacterSelect:
     # Navigation                                                         #
     # ------------------------------------------------------------------ #
 
-    def navigate(self, direction: int) -> None:
-        """Move selection by *direction* slots (±1), skipping locked entries."""
+    def _navigate_by(self, step: int) -> None:
+        """Advance selection by *step* slots, wrapping; skips locked entries."""
         n = len(CHARACTER_ROSTER)
-        idx = (self.selected_index + direction) % n
+        idx = (self.selected_index + step) % n
         for _ in range(n):
             if not CHARACTER_ROSTER[idx].locked:
                 self.selected_index = idx
                 return
-            idx = (idx + direction) % n
+            idx = (idx + step) % n
+
+    def navigate(self, direction: int) -> None:
+        """Move selection left (-1) or right (+1), skipping locked entries."""
+        self._navigate_by(direction)
 
     def navigate_row(self, direction: int) -> None:
-        """Move up (-1) or down (+1) by one grid row, skipping locked entries."""
-        n = len(CHARACTER_ROSTER)
-        idx = (self.selected_index + direction * _GRID_COLS) % n
-        for _ in range(n):
-            if not CHARACTER_ROSTER[idx].locked:
-                self.selected_index = idx
-                return
-            idx = (idx + direction * _GRID_COLS) % n
+        """Move up (-1) or down (+1) by one grid row; skips locked entries."""
+        self._navigate_by(direction * _GRID_COLS)
 
     @property
     def selected(self) -> Character:
@@ -342,8 +290,6 @@ class CharacterSelect:
 
     def is_play_clicked(self, pos: tuple[int, int]) -> bool:
         """Return True if *pos* is inside the Play button."""
-        if self._play_button_rect is None:
-            return False
         return self._play_button_rect.collidepoint(pos)
 
     def icon_slot_at(self, pos: tuple[int, int]) -> int | None:
@@ -436,7 +382,9 @@ class CharacterSelect:
         #     True,
         #     (60, 60, 60),
         # )
-        # hint_y = GROUND_Y + (WINDOW_HEIGHT - GROUND_Y - hint.get_height()) // 2
+        # hint_y = (
+        #     GROUND_Y + (WINDOW_HEIGHT - GROUND_Y - hint.get_height()) // 2
+        # )
         # screen.blit(hint, (WINDOW_WIDTH // 2 - hint.get_width() // 2, hint_y))
 
     def _draw_featured_card(
@@ -445,7 +393,7 @@ class CharacterSelect:
         mouse_pos: tuple[int, int],
     ) -> None:
         """Draw the large featured card in the right panel."""
-        card_rect = self._featured_rect()
+        card_rect = self._card_rect
 
         pygame.draw.rect(screen, _CARD_BG, card_rect, border_radius=10)
         pygame.draw.rect(
@@ -471,9 +419,6 @@ class CharacterSelect:
         )
 
         # Play button
-        btn_x = card_rect.x + (_CARD_W - _BTN_W) // 2
-        btn_y = card_rect.bottom - _BTN_H - 10
-        self._play_button_rect = pygame.Rect(btn_x, btn_y, _BTN_W, _BTN_H)
         btn_col = (
             _BTN_HOVER
             if self._play_button_rect.collidepoint(mouse_pos)
@@ -484,6 +429,6 @@ class CharacterSelect:
         )
         btn_surf = self._font_btn.render("Play", True, WHITE)
         screen.blit(btn_surf, (
-            btn_x + (_BTN_W - btn_surf.get_width()) // 2,
-            btn_y + (_BTN_H - btn_surf.get_height()) // 2,
+            self._play_button_rect.x + (_BTN_W - btn_surf.get_width()) // 2,
+            self._play_button_rect.y + (_BTN_H - btn_surf.get_height()) // 2,
         ))
