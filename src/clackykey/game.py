@@ -79,13 +79,20 @@ class Game:
                         self.char_select.navigate(-1)
                     elif event.key == pygame.K_RIGHT:
                         self.char_select.navigate(1)
+                    elif event.key == pygame.K_UP:
+                        self.char_select.navigate_row(-1)
+                    elif event.key == pygame.K_DOWN:
+                        self.char_select.navigate_row(1)
                     elif event.key in (pygame.K_SPACE, pygame.K_RETURN):
                         self._confirm_character()
                 elif event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                     self.handle_gamestate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if self.state == GameState.CHARACTER_SELECT:
-                    if self.char_select.is_play_clicked(event.pos):
+                    slot = self.char_select.icon_slot_at(event.pos)
+                    if slot is not None:
+                        self.char_select.selected_index = slot
+                    elif self.char_select.is_play_clicked(event.pos):
                         self._confirm_character()
                 else:
                     self.handle_gamestate()
