@@ -240,6 +240,7 @@ class Game:
         if self.score > self.high_score:
             self.high_score = self.score
         # Achievement checks at game-over
+        self._notify(self.achievements.record_play())
         self._notify(self.achievements.increment("games_played"))
         self._notify(self.achievements.check_game_score(
             self.score, self.shield_used_this_game
