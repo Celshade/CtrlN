@@ -1,6 +1,7 @@
 from typing import NamedTuple
 
 import pygame
+from PIL import Image
 
 from config import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE, BLACK, WHITE, YELLOW
 
@@ -8,6 +9,8 @@ from config import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE, BLACK, WHITE, YELLOW
 # ----------------------------------------- #
 # Layout constants (tuned for 890×400 px)   #
 # ----------------------------------------- #
+_ANIM_SPEED   = 4    # advance webP frame every N draw calls
+_FRAME_MS     = 80   # milliseconds per animation frame (~12.5 fps)
 _CARD_W       = 200
 _CARD_H       = 270
 _PREVIEW_SIZE = 150   # square preview image
@@ -38,7 +41,8 @@ class Character(NamedTuple):
     """Immutable descriptor for a selectable character."""
     id: str
     name: str
-    asset_path: str
+    asset_path: str          # sprite used by the Player class in-game
+    preview_path: str = ""   # animated preview shown on the select screen
     description: str = ""
 
 
@@ -48,24 +52,28 @@ CHARACTER_ROSTER: list[Character] = [
         id="default0",
         name="Clacky0",
         asset_path="assets/player.png",
+        preview_path="assets/key_bounce.webP",
         description="The original Clacky Key",
     ),
     Character(
         id="default1",
         name="Clacky1",
         asset_path="assets/player.png",
+        preview_path="assets/key_bounce.webP",
         description="The original Clacky Key",
     ),
     Character(
         id="default2",
         name="Clacky2",
         asset_path="assets/player.png",
+        preview_path="assets/key_bounce.webP",
         description="The original Clacky Key",
     ),
     Character(
         id="default3",
         name="Clacky3",
         asset_path="assets/player.png",
+        preview_path="assets/key_bounce.webP",
         description="The original Clacky Key",
     )
     # NOTE 4 max for current layout, but can be increased by adjusting cards
@@ -78,6 +86,9 @@ CHARACTER_ROSTER: list[Character] = [
 class CharacterSelect:
     """Renders the character selection screen and tracks current selection."""
 
+    # Class-level cache: path -> decoded frames, shared across all instances.
+    _frame_cache: dict[str, list[pygame.Surface]] = {}
+
     def __init__(self) -> None:
         self._font_title = pygame.font.Font(None, _FONT_TITLE)
         self._font_name  = pygame.font.Font(None, _FONT_NAME)
@@ -85,14 +96,46 @@ class CharacterSelect:
         self._font_hint  = pygame.font.Font(None, _FONT_HINT)
 
         self.selected_index: int = 0
-        self._previews: list[pygame.Surface] = []
         self._play_button_rect: pygame.Rect | None = None
 
-        # Pre-load and scale all preview images once.
-        for char in CHARACTER_ROSTER:
-            img = pygame.image.load(char.asset_path).convert_alpha()
-            img = pygame.transform.scale(img, (_PREVIEW_SIZE, _PREVIEW_SIZE))
-            self._previews.append(img)
+        # Load webP preview frames once (shared across all cards — same asset).
+        self._preview_frames: list[pygame.Surface] = self._load_webp_frames(
+            CHARACTER_ROSTER[0].preview_path
+        )
+        self._anim_frame: int = 0
+        self._anim_tick: int = 0
+        self._last_frame_time: int = 0  # ms timestamp of last frame advance
+
+    # ------------------------------------------------------------------ #
+    # Asset loading                                                      #
+    # ------------------------------------------------------------------ #
+
+    def _load_webp_frames(self, path: str) -> list[pygame.Surface]:
+        """Load all frames from an animated webP using PIL (matches player.py).
+        Results are cached at the class level so decoding only happens once."""
+        if path in CharacterSelect._frame_cache:
+            return CharacterSelect._frame_cache[path]
+        frames: list[pygame.Surface] = []
+        try:
+            pil_image = Image.open(path)
+            try:
+                while True:
+                    frame = pil_image.convert("RGBA")
+                    frame = frame.resize(
+                        (_PREVIEW_SIZE, _PREVIEW_SIZE),
+                        Image.Resampling.LANCZOS,
+                    )
+                    pygame_frame = pygame.image.fromstring(
+                        frame.tobytes(), frame.size, frame.mode
+                    )
+                    frames.append(pygame_frame)
+                    pil_image.seek(pil_image.tell() + 1)
+            except EOFError:
+                pass  # end of frames
+        except Exception as e:
+            print(f"Warning: Could not load character preview '{path}': {e}")
+        CharacterSelect._frame_cache[path] = frames
+        return frames
 
     # ------------------------------------------------------------------ #
     # Navigation                                                         #
@@ -138,6 +181,13 @@ class CharacterSelect:
 
         mouse_pos = pygame.mouse.get_pos()
 
+        # Advance animation frame.
+        if self._preview_frames:
+            now = pygame.time.get_ticks()
+            if now - self._last_frame_time >= _FRAME_MS:
+                self._last_frame_time = now
+                self._anim_frame = (self._anim_frame + 1) % len(self._preview_frames)
+
         for i, char in enumerate(CHARACTER_ROSTER):
             card_x = start_x + i * (_CARD_W + _GAP)
             card_rect = pygame.Rect(card_x, start_y, _CARD_W, _CARD_H)
@@ -154,7 +204,8 @@ class CharacterSelect:
             # Preview image (centred horizontally, 10 px padding from card top)
             img_x = card_x + (_CARD_W - _PREVIEW_SIZE) // 2
             img_y = start_y + 10
-            screen.blit(self._previews[i], (img_x, img_y))
+            if self._preview_frames:
+                screen.blit(self._preview_frames[self._anim_frame], (img_x, img_y))
 
             # Character name
             name_surf = self._font_name.render(char.name, True, BLACK)
