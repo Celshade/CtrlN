@@ -1,3 +1,4 @@
+from datetime import date, datetime, timezone
 from typing import NamedTuple
 
 
@@ -7,7 +8,7 @@ from typing import NamedTuple
 #   "no_shield"  - reach score X in one game without using a shield
 #   "rank"       - reach a specific rank
 #   "store"      - triggered by a store/upgrade event
-#   "manual"     - checked explicitly (prestige, 3rd-charge shield deploy, etc.)
+#   "manual"     - checked explicitly (3rd-charge shield deploy, etc.)
 #
 # NOTE: Thresholds for #67-75 (stat-based combat events) are marked TODO and
 #       should be tuned once playtesting data is available.
@@ -217,18 +218,9 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
     # ------------------------------------------------------------------ #
     # Progression (#92)                                                  #
     # ------------------------------------------------------------------ #
-    # #92
-    "prestige": Achievement(
-        name="Beyond the Top",
-        description="Achieve prestige",
-        kind="manual",
-        stat_key=None,
-        threshold=1,
-    ),
-
-    # ------------------------------------------------------------------ #
-    # Rank achievements (#93-97)                                         #
-    # rank IDs: 5=Bronze, 4=Silver, 3=Gold, 2=Platinum, 1=Diamond        #
+    # Rank achievements (#93-98)                                         #
+    # rank IDs: 5=Bronze, 4=Silver, 3=Gold, 2=Platinum, 1=Diamond,       #
+    #           0=Prestige                                               #
     # ------------------------------------------------------------------ #
     # #93
     "reach_bronze": Achievement(
@@ -270,11 +262,19 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=1,
     ),
+    # #98
+    "reach_prestige": Achievement(
+        name="Beyond the Top",
+        description="Reach Prestige rank",
+        kind="rank",
+        stat_key=None,
+        threshold=0,
+    ),
 
     # ------------------------------------------------------------------ #
-    # Store / Energy (#98-100)                                           #
+    # Store / Energy (#99-101)                                           #
     # ------------------------------------------------------------------ #
-    # #98
+    # #99
     "top_off_energy": Achievement(
         name="Full Tank",
         description="Top off energy",
@@ -300,9 +300,9 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
     ),
 
     # ------------------------------------------------------------------ #
-    # Single-game events (#101)                                          #
+    # Single-game events (#102)                                          #
     # ------------------------------------------------------------------ #
-    # #101
+    # #102
     "active_shield_3rd_charge": Achievement(
         name="Triple Threat",
         description="Deploy an active shield using the 3rd charge",
@@ -312,9 +312,9 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
     ),
 
     # ------------------------------------------------------------------ #
-    # Single-game score milestones (#102-107)                            #
+    # Single-game score milestones (#103-108)                            #
     # ------------------------------------------------------------------ #
-    # #102
+    # #103
     "score_50_game": Achievement(
         name="Half Century",
         description="Reach 50 points in one game",
@@ -322,7 +322,7 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=50,
     ),
-    # #103
+    # #104
     "score_100_game": Achievement(
         name="Century",
         description="Reach 100 points in one game",
@@ -330,7 +330,7 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=100,
     ),
-    # #104
+    # #105
     "score_200_game": Achievement(
         name="Double Century",
         description="Reach 200 points in one game",
@@ -338,7 +338,7 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=200,
     ),
-    # #105
+    # #106
     "score_300_game": Achievement(
         name="Triple Century",
         description="Reach 300 points in one game",
@@ -346,7 +346,7 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=300,
     ),
-    # #106
+    # #107
     "score_400_game": Achievement(
         name="Quadruple Century",
         description="Reach 400 points in one game",
@@ -354,7 +354,7 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=400,
     ),
-    # #107
+    # #108
     "score_500_game": Achievement(
         name="Quintuple Century",
         description="Reach 500 points in one game",
@@ -362,11 +362,59 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=500,
     ),
+
+    # ------------------------------------------------------------------ #
+    # Daily streak (#109-113)                                            #
+    # Consecutive days with at least one game played                     #
+    # ------------------------------------------------------------------ #
+    # #109
+    "daily_streak_2": Achievement(
+        name="Two-Day Streak",
+        description="Play at least one game per day for 2 consecutive days",
+        kind="stat",
+        stat_key="daily_streak",
+        threshold=2,
+    ),
+    # #110
+    "daily_streak_5": Achievement(
+        name="Five-Day Streak",
+        description="Play at least one game per day for 5 consecutive days",
+        kind="stat",
+        stat_key="daily_streak",
+        threshold=5,
+    ),
+    # #111
+    "daily_streak_10": Achievement(
+        name="Ten-Day Streak",
+        description="Play at least one game per day for 10 consecutive days",
+        kind="stat",
+        stat_key="daily_streak",
+        threshold=10,
+    ),
+    # #112
+    "daily_streak_20": Achievement(
+        name="Twenty-Day Streak",
+        description="Play at least one game per day for 20 consecutive days",
+        kind="stat",
+        stat_key="daily_streak",
+        threshold=20,
+    ),
+    # #113
+    "daily_streak_30": Achievement(
+        name="Thirty-Day Streak",
+        description="Play at least one game per day for 30 consecutive days",
+        kind="stat",
+        stat_key="daily_streak",
+        threshold=30,
+    ),
 }
 
 
-# Default lifetime stat counters — all keys that stat-based achievements use
-_DEFAULT_STATS: dict[str, int] = {
+# Default lifetime stat counters — all keys that stat-based achievements use.
+# Integer counters are checked by achievement thresholds.
+# "last_played" is an ISO-8601 UTC date string ("YYYY-MM-DD") or "" if never
+# recorded; it is managed exclusively by record_play().
+_DEFAULT_STATS: dict[str, int | str] = {
     "yellow_birds_dodged": 0,
     "yellow_perched_hit":  0,
     "red_birds_dodged":    0,
@@ -377,6 +425,8 @@ _DEFAULT_STATS: dict[str, int] = {
     "shields_regenerated": 0,
     "shields_used":        0,
     "games_played":        0,
+    "daily_streak":        0,
+    "last_played":         "",   # ISO UTC date of last save(); "" = never
 }
 
 
@@ -401,11 +451,50 @@ class Achievements:
                 Missing keys are filled with defaults.
         """
         self.unlocked: set[str] = set(unlocked or [])
-        self.stats: dict[str, int] = {**_DEFAULT_STATS, **(stats or {})}
+        self.stats: dict[str, int | str] = {**_DEFAULT_STATS, **(stats or {})}
 
     # ------------------------------------------------------------------ #
     # Public API                                                          #
     # ------------------------------------------------------------------ #
+
+    def record_play(self) -> list[str]:
+        """Update ``last_played`` and advance ``daily_streak`` if applicable.
+
+        Call this once per session when the profile is saved (e.g. game-over).
+        Day boundaries are determined in UTC.  Rules:
+
+        * Same UTC day as last call → timestamp refreshed, streak unchanged.
+        * Next consecutive UTC day   → streak incremented by 1.
+        * Gap of 2+ days             → streak reset to 1.
+        * Never called before        → streak set to 1.
+
+        Returns:
+            List of newly-unlocked achievement IDs (may be empty).
+        """
+        today = datetime.now(timezone.utc).date()
+        last_raw = self.stats.get("last_played", "")
+
+        if last_raw:
+            last_date = date.fromisoformat(str(last_raw))
+            delta = (today - last_date).days
+            if delta == 0:
+                # Same day — refresh timestamp, no streak change
+                self.stats["last_played"] = today.isoformat()
+                return []
+            elif delta == 1:
+                # Consecutive day — advance streak
+                self.stats["daily_streak"] = (
+                    int(self.stats.get("daily_streak", 0)) + 1
+                )
+            else:
+                # Streak broken — reset
+                self.stats["daily_streak"] = 1
+        else:
+            # First recorded play
+            self.stats["daily_streak"] = 1
+
+        self.stats["last_played"] = today.isoformat()
+        return self._check_stat_achievements("daily_streak")
 
     def increment(self, stat: str, amount: int = 1) -> list[str]:
         """Increment a lifetime stat counter and check for new unlocks.
