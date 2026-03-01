@@ -10,7 +10,7 @@ from config import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE, BLACK, WHITE, YELLOW
 # Layout constants (tuned for 890×400 px)   #
 # ----------------------------------------- #
 _ANIM_SPEED   = 4    # advance webP frame every N draw calls
-_FRAME_MS     = 80   # milliseconds per animation frame (~12.5 fps)
+_FRAME_MS     = 60   # milliseconds per animation frame (~12.5 fps)
 _CARD_W       = 200
 _CARD_H       = 270
 _PREVIEW_SIZE = 150   # square preview image
