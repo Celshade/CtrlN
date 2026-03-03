@@ -69,6 +69,9 @@ class Player:
 
         # Load keypress animation frames once at initialization
         self.keypress_animation_frames = self._load_keypress_animation()
+        self.thruster_frames = self._load_animation_frames(
+            "assets/thruster_fx.webP"
+        )
         self.animation_frame = 0
         self.playing_animation = False
 
@@ -85,12 +88,12 @@ class Player:
 
         # Load shield charge animation frames
         self.shield_charge_animation_frames = (
-            self._load_shield_charge_animation(
+            self._load_animation_frames(
                 "assets/shield_fx3.2.webP"
             )
         )
         self.shield_charge_animation_frames_tier2 = (
-            self._load_shield_charge_animation(
+            self._load_animation_frames(
                 "assets/shield_fx3.4.webP"
             )
         )
@@ -347,7 +350,7 @@ class Player:
         """Load and cache all frames from the keypress animation webp."""
         frames = []
         try:
-            pil_image = Image.open("assets/keypress_thruster_fx.webP")
+            pil_image = Image.open("assets/keypress.webP")
 
             try:
                 while True:
@@ -365,11 +368,10 @@ class Player:
             print(f"Warning: Could not load keypress animation: {e}")
         return frames
 
-    def _load_shield_charge_animation(self, filepath=None):
-        """Load shield charge animation from given filepath."""
+    def _load_animation_frames(self, filepath=None):
+        """Load and scale all frames from an animated image at *filepath*."""
         if filepath is None:
             filepath = "assets/shield_key_fx3.2.webP"
-        """Load and cache all frames from the shield charge animation webp."""
         frames = []
         try:
             pil_image = Image.open(filepath)
@@ -387,11 +389,7 @@ class Player:
             except EOFError:
                 pass  # End of frames
         except Exception as e:
-            msg = (
-                f"Warning: Could not load shield charge animation "
-                f"from {filepath}: {e}"
-            )
-            print(msg)
+            print(f"Warning: Could not load animation from {filepath}: {e}")
         return frames
 
     def update(self) -> None:
@@ -488,6 +486,14 @@ class Player:
                 center=(self.rect.centerx, self.rect.centery)
             )
             screen.blit(current_frame, anim_rect)
+            if self.thruster_frames:
+                thruster_frame = self.thruster_frames[
+                    self.animation_frame % len(self.thruster_frames)
+                ]
+                thruster_rect = thruster_frame.get_rect(
+                    center=(self.rect.centerx, self.rect.centery)
+                )
+                screen.blit(thruster_frame, thruster_rect)
         else:
             screen.blit(self.image, self.rect)
 
