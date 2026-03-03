@@ -1,7 +1,15 @@
 """Shared pytest configuration and fixtures."""
 
-import pytest
 import sys
+from pathlib import Path
+
+import pytest
+
+# Source modules use bare imports (e.g. `from ranks import RANKS`) that
+# require src/clackykey itself to be on sys.path in addition to src/.
+_PKG_DIR = Path(__file__).parent.parent / "src" / "clackykey"
+if str(_PKG_DIR) not in sys.path:
+    sys.path.insert(0, str(_PKG_DIR))
 
 
 @pytest.fixture
