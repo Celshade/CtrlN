@@ -256,10 +256,10 @@ class Profile:
             )
         except KeyError as ke:
             raise ValueError(f"Missing required field: {ke}") from ke
-        except ValueError as ve:
-            raise ValueError(f"Invalid profile data: {ve}") from ve
         except json.JSONDecodeError as je:
             raise ValueError(f"Malformed JSON in {filename}: {je}") from je
+        except ValueError as ve:
+            raise ValueError(f"Invalid profile data: {ve}") from ve
         except FileNotFoundError as fe:
             raise FileNotFoundError(f"{filename} not found: {fe}") from fe
 
