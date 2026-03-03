@@ -88,21 +88,21 @@ def _char(
 # Characters with locked=True show a padlock overlay and cannot be selected.
 CHARACTER_ROSTER: list[Character] = [
     # fmt: off
-    _char("black",      "Black"),
-    _char("grey",       "Grey"),
-    _char("dark_green", "Dark Green"),
-    _char("dark_blue",  "Dark Blue"),
-    _char("red",        "Red"),
+    _char("black",      "Black",      asset_path="assets/player_black.png",      preview_path="assets/key_bounce_black.webP"),
+    _char("grey",       "Grey",       asset_path="assets/player_grey.png",       preview_path="assets/key_bounce_grey.webP"),
+    _char("dark_green", "Dark Green", asset_path="assets/player_dgreen.png", preview_path="assets/key_bounce_dgreen.webP"),
+    _char("dark_blue",  "Dark Blue",  asset_path="assets/player_dblue.png",  preview_path="assets/key_bounce_dblue.webP"),
+    _char("red",        "Red",        asset_path="assets/player_red.png",        preview_path="assets/key_bounce_red.webP"),
     # --- locked below this line ---
-    _char("yellow",  "Yellow",  locked=True),
-    _char("purple",  "Purple",  locked=True),
-    _char("green",   "Green",   locked=True),
-    _char("orange",  "Orange",  locked=True),
-    _char("white",   "White",   locked=True),
-    _char("aqua",    "Aqua",    locked=True),
-    _char("sunset",  "Sunset",  locked=True),
-    _char("silver",  "Silver",  locked=True),
-    _char("gold",    "Gold",    locked=True),
+    _char("yellow",  "Yellow",  locked=True, asset_path="assets/player_yellow.png",  preview_path="assets/key_bounce_yellow.webP"),
+    _char("purple",  "Purple",  locked=True, asset_path="assets/player_purple.png",  preview_path="assets/key_bounce_purple.webP"),
+    _char("green",   "Green",   locked=True, asset_path="assets/player_green.png",   preview_path="assets/key_bounce_green.webP"),
+    _char("orange",  "Orange",  locked=True, asset_path="assets/player_orange.png",  preview_path="assets/key_bounce_orange.webP"),
+    _char("white",   "White",   locked=True, asset_path="assets/player_white.png",   preview_path="assets/key_bounce_white.webP"),
+    _char("aqua",    "Aqua",    locked=True, asset_path="assets/player_aqua.png",    preview_path="assets/key_bounce_aqua.webP"),
+    _char("sunset",  "Sunset",  locked=True, asset_path="assets/player_sunset.png",  preview_path="assets/key_bounce_sunset.webP"),
+    _char("silver",  "Silver",  locked=True, asset_path="assets/player_silver.png",  preview_path="assets/key_bounce_silver.webP"),
+    _char("gold",    "Gold",    locked=True, asset_path="assets/player_gold.png",    preview_path="assets/key_bounce_gold.webP"),
     # fmt: on
 ]
 
@@ -132,22 +132,6 @@ class CharacterSelect:
 
         self.selected_index: int = 0
         self._icon_rects: list[pygame.Rect] = []
-
-        preview_path = CHARACTER_ROSTER[0].preview_path
-        asset_path   = CHARACTER_ROSTER[0].asset_path
-
-        # Animated frames at icon size (shown only for the selected icon).
-        self._icon_frames: list[pygame.Surface] = self._load_frames(
-            preview_path, _ICON_SZ
-        )
-        # Static image at icon size (shown for every unselected icon).
-        self._icon_static: pygame.Surface | None = self._load_static(
-            asset_path, _ICON_SZ
-        )
-        # Animated frames at featured size (right-panel card).
-        self._feat_frames: list[pygame.Surface] = self._load_frames(
-            preview_path, _PREV_SZ
-        )
 
         self._anim_frame: int = 0
         self._last_frame_time: int = 0
@@ -310,12 +294,10 @@ class CharacterSelect:
         mouse_pos = pygame.mouse.get_pos()
 
         # Advance shared animation clock.
-        if self._icon_frames:
-            now = pygame.time.get_ticks()
-            if now - self._last_frame_time >= _FRAME_MS:
-                self._last_frame_time = now
-                total = len(self._icon_frames)
-                self._anim_frame = (self._anim_frame + 1) % total
+        now = pygame.time.get_ticks()
+        if now - self._last_frame_time >= _FRAME_MS:
+            self._last_frame_time = now
+            self._anim_frame += 1
 
         # ---- Title ----
         title = self._font_title.render(
@@ -355,13 +337,16 @@ class CharacterSelect:
 
             img_x = rect.x + (_ICON_CELL - _ICON_SZ) // 2
             img_y = rect.y + (_ICON_CELL - _ICON_SZ) // 2
-            is_locked = CHARACTER_ROSTER[slot].locked
-            if is_sel and self._icon_frames and not is_locked:
-                screen.blit(
-                    self._icon_frames[self._anim_frame], (img_x, img_y)
-                )
-            elif self._icon_static:
-                screen.blit(self._icon_static, (img_x, img_y))
+            char = CHARACTER_ROSTER[slot]
+            is_locked = char.locked
+            if is_sel and not is_locked:
+                frames = self._load_frames(char.preview_path, _ICON_SZ)
+                if frames:
+                    screen.blit(frames[self._anim_frame % len(frames)], (img_x, img_y))
+            else:
+                static = self._load_static(char.asset_path, _ICON_SZ)
+                if static:
+                    screen.blit(static, (img_x, img_y))
 
             # Lock overlay + emoji for locked slots
             if is_locked:
@@ -404,10 +389,11 @@ class CharacterSelect:
         # Featured preview image
         img_x = card_rect.x + (_CARD_W - _PREV_SZ) // 2
         img_y = card_rect.y + 10
-        if self._feat_frames:
-            # feat frames advance at same clock as icon frames
-            feat_frame = self._anim_frame % len(self._feat_frames)
-            screen.blit(self._feat_frames[feat_frame], (img_x, img_y))
+        feat_frames = self._load_frames(
+            CHARACTER_ROSTER[self.selected_index].preview_path, _PREV_SZ
+        )
+        if feat_frames:
+            screen.blit(feat_frames[self._anim_frame % len(feat_frames)], (img_x, img_y))
 
         # Character name
         name = CHARACTER_ROSTER[self.selected_index].name
