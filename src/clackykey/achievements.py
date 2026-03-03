@@ -621,7 +621,7 @@ class Achievements:
         Returns:
             List of newly-unlocked achievement IDs (may be empty).
         """
-        current = self.stats[stat]
+        current = self.stats.get(stat, 0)
         return self._unlock_matching(
             _BY_STAT.get(stat, []),
             lambda e: current >= e.threshold,
