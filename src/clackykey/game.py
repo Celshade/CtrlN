@@ -110,7 +110,7 @@ class Game:
         self.score = 0
         self.shield_used_this_game = False
         self.counter = Counter()
-        self.player = Player(asset_path=self.selected_character.asset_path)
+        self.player = Player(profile=self.profile, asset_path=self.selected_character.asset_path)
         self.background.reset()
         self.spawner.reset()
         self.tutorial.reset()
