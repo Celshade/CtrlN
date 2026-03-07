@@ -38,13 +38,13 @@ RANKS = {
         # TODO move +5% xp to achievement
         # NOTE agility_boost grants x-amount of bonus xp every 50 points
         # without taking damage
-        "unlocks": ["role", "agility_boost"]
+        "unlocks": ["role", "agility_boost", "white"]
     },
     4: {
         "name": "Silver",
         "min_points": 3000,
         # TODO move +2% xp to achievement
-        "unlocks": ["role", "leaderboard_access"]
+        "unlocks": ["role", "leaderboard_access", "grey"]
     },
     5: {
         "name": "Bronze",
@@ -56,12 +56,12 @@ RANKS = {
     6: {
         "name": "Iron",
         "min_points": 500,
-        "unlocks": ["green_key", "orange_key"]
+        "unlocks": ["green", "orange"]
     },
     7: {
         "name": "Bamboo",
         "min_points": 100,
-        "unlocks": ["yellow_key", "purple_key"]
+        "unlocks": ["yellow", "purple"]
     }
 }
 
