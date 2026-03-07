@@ -102,7 +102,7 @@ class TestProfileInitValidation:
         with pytest.raises((ValueError, TypeError)):
             _make(total_xp=bad)
 
-    @pytest.mark.parametrize("bad", [-1, "x", None])
+    @pytest.mark.parametrize("bad", [-2, "x", None])
     def test_invalid_rank(self, bad):
         with pytest.raises((ValueError, TypeError)):
             _make(rank=bad)
@@ -169,7 +169,7 @@ class TestPropertySetters:
     def test_set_rank_negative_raises(self):
         p = _make()
         with pytest.raises(ValueError):
-            p.rank = -1
+            p.rank = -2
 
     def test_set_achievements(self):
         p = _make()
@@ -336,7 +336,7 @@ class TestLoadById:
         assert p.player_id == "missing_player"
         assert p.player_name == "Unknown"
         assert p.current_xp == 0
-        assert p.rank == 0
+        assert p.rank == -1
 
     def test_loads_existing_file(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
