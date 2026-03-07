@@ -139,7 +139,6 @@ class Profile:
         self._games_per_character = value
 
     @property
-
     def achievements(self) -> list:
         """Get list of achievements."""
         return self._achievements
@@ -371,3 +370,49 @@ class Profile:
         for key, value in data.items():
             if hasattr(self, key):
                 setattr(self, key, value)
+
+    def get_character_mastery(self, character_id: str) -> bool:
+        """Return if a character is mastered based on games played.
+
+        Mastery threshold is 10 games per character. A character is either
+        mastered or not.
+
+        Args:
+            character_id: The ID of the character to check mastery for.
+        """
+        games_count = self.games_per_character.get(character_id, 0)
+        return True if games_count >= 10 else False
+
+    def get_total_mastery(self) -> int:
+        """Count total number of characters with mastery.
+
+        Returns the number of unique characters the player has mastered
+        (10+ games each).
+
+        Returns:
+            int: Number of mastered characters.
+        """
+        return sum(self.get_character_mastery(char_id)
+                   for char_id in self.games_per_character)
+
+    def get_character_mastery_display(self, character_id: str) -> str:
+        """Get a formatted display string of character mastery.
+
+        Shows progress toward mastery (e.g., "7/10 games") or a star when
+        mastered.
+
+        Args:
+            character_id: The ID of the character to display mastery for.
+
+        Returns:
+            str: Formatted mastery display string, or "No mastery" if no
+                 games played with the character.
+        """
+        games_count = self.games_per_character.get(character_id, 0)
+        if games_count == 0:
+            return "No mastery"
+
+        if games_count >= 10:
+            return "⭐"
+
+        return f"{games_count}/10 games"

@@ -378,3 +378,126 @@ class TestUpdateProfile:
         p = _make()
         with pytest.raises(ValueError):
             p.update_profile({"current_xp": -5})
+
+
+# ------------------------------------------------------------------ #
+# Character Mastery                                                   #
+# ------------------------------------------------------------------ #
+
+class TestCharacterMastery:
+    def test_no_games_returns_zero_mastery(self):
+        """Character with no games should have 0 mastery."""
+        p = _make(games_per_character={})
+        assert p.get_character_mastery("black") == 0
+
+    def test_below_threshold_returns_zero_mastery(self):
+        """Character with <10 games should have 0 mastery."""
+        p = _make(games_per_character={"black": 9})
+        assert p.get_character_mastery("black") == 0
+
+    def test_exact_threshold_returns_one_mastery(self):
+        """Character with exactly 10 games should have 1 mastery."""
+        p = _make(games_per_character={"black": 10})
+        assert p.get_character_mastery("black") == 1
+
+    def test_above_threshold_returns_one_mastery(self):
+        """Character with 11+ games should still have 1 mastery (not progressive)."""
+        p = _make(games_per_character={"black": 15})
+        assert p.get_character_mastery("black") == 1
+
+        p = _make(games_per_character={"black": 100})
+        assert p.get_character_mastery("black") == 1
+
+    def test_unknown_character_returns_zero(self):
+        """Character not in games_per_character should return 0."""
+        p = _make(games_per_character={"black": 10})
+        assert p.get_character_mastery("unknown_char") == 0
+
+
+class TestTotalMastery:
+    def test_no_characters_return_zero_total_mastery(self):
+        """Profile with no characters played should have 0 total mastery."""
+        p = _make(games_per_character={})
+        assert p.get_total_mastery() == 0
+
+    def test_single_character_mastered(self):
+        """Profile with one mastered character (10+ games)."""
+        p = _make(games_per_character={"black": 10})
+        assert p.get_total_mastery() == 1
+
+    def test_single_character_not_mastered(self):
+        """Profile with one character below threshold."""
+        p = _make(games_per_character={"black": 5})
+        assert p.get_total_mastery() == 0
+
+    def test_multiple_characters_summed(self):
+        """Total mastery counts number of mastered characters."""
+        p = _make(games_per_character={
+            "black": 10,      # mastered
+            "dark_green": 5,  # not mastered
+            "blue": 10,       # mastered
+            "red": 2          # not mastered
+        })
+        assert p.get_total_mastery() == 2
+
+    def test_all_characters_mastered(self):
+        """Total mastery when all characters are mastered."""
+        p = _make(games_per_character={
+            "black": 10,
+            "dark_green": 15,
+            "blue": 10,
+            "red": 50
+        })
+        assert p.get_total_mastery() == 4
+
+
+class TestCharacterMasteryDisplay:
+    def test_no_games_display(self):
+        """Character with no games shows 'No mastery'."""
+        p = _make(games_per_character={})
+        assert p.get_character_mastery_display("black") == "No mastery"
+
+    def test_one_game_display(self):
+        """Character with 1 game shows '1/10 games'."""
+        p = _make(games_per_character={"black": 1})
+        assert p.get_character_mastery_display("black") == "1/10 games"
+
+    def test_halfway_display(self):
+        """Character with 5 games shows '5/10 games'."""
+        p = _make(games_per_character={"black": 5})
+        assert p.get_character_mastery_display("black") == "5/10 games"
+
+    def test_almost_mastered_display(self):
+        """Character with 9 games shows '9/10 games'."""
+        p = _make(games_per_character={"black": 9})
+        assert p.get_character_mastery_display("black") == "9/10 games"
+
+    def test_mastered_display(self):
+        """Character with 10 games shows '⭐'."""
+        p = _make(games_per_character={"black": 10})
+        assert p.get_character_mastery_display("black") == "⭐"
+
+    def test_mastered_many_games_display(self):
+        """Character with 50+ games still shows just '⭐'."""
+        p = _make(games_per_character={"black": 50})
+        assert p.get_character_mastery_display("black") == "⭐"
+
+    def test_unknown_character_display(self):
+        """Unknown character shows 'No mastery'."""
+        p = _make(games_per_character={"black": 10})
+        assert p.get_character_mastery_display("unknown_char") == "No mastery"
+
+    @pytest.mark.parametrize("games,expected", [
+        (0, "No mastery"),
+        (1, "1/10 games"),
+        (5, "5/10 games"),
+        (9, "9/10 games"),
+        (10, "⭐"),
+        (11, "⭐"),
+        (15, "⭐"),
+        (50, "⭐"),
+    ])
+    def test_display_parametrized(self, games, expected):
+        """Parametrized test for display strings with various game counts."""
+        p = _make(games_per_character={"char": games})
+        assert p.get_character_mastery_display("char") == expected
