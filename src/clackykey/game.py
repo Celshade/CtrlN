@@ -4,7 +4,8 @@ import pygame
 
 from achievements import Achievements
 from background import Background
-from character_select import CharacterSelect, CHARACTER_ROSTER
+from character_select import CharacterSelect
+from characters import CHARACTER_ROSTER, CHARACTER_ORDER
 from player import Player
 from profiles import Profile
 from counter import Counter
@@ -44,7 +45,7 @@ class Game:
         self.ui = UI()
         self.tutorial = Tutorial()
         self.char_select = CharacterSelect()
-        self.selected_character = CHARACTER_ROSTER[0]
+        self.selected_character = CHARACTER_ROSTER[CHARACTER_ORDER[0]]
 
         # Load player profile and init achievement tracker from it
         self.profile = Profile.load_by_id(player_id)
@@ -91,7 +92,7 @@ class Game:
                 if self.state == GameState.CHARACTER_SELECT:
                     slot = self.char_select.icon_slot_at(event.pos)
                     if slot is not None:
-                        self.char_select.selected_index = slot
+                        self.char_select.selected_id = slot
                     elif self.char_select.is_play_clicked(event.pos):
                         self._confirm_character()
                 else:
