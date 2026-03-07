@@ -117,17 +117,14 @@ class Player:
         """Get player's current rank based on total XP.
 
         Returns:
-            int: Rank ID (0-7), where 1=Diamond (highest),
-                0=Unranked.
+            int: Rank ID (-1 to 7), where 0=Prestige (highest),
+                -1=Unranked.
         """
-        if self.total_xp == 0:
-            return 0
-
-        for rank_id in range(1, 8):
+        for rank_id in range(0, 8):
             if self.total_xp >= RANKS[rank_id]["min_points"]:
                 return rank_id
 
-        return 7  # Default to Bamboo
+        return -1  # Default to Unranked if XP doesn't qualify for any rank
 
     def get_progress(self) -> dict:
         """Calculate current rank, XP toward next rank, progress %.
@@ -141,19 +138,19 @@ class Player:
         current_rank_name = RANKS[current_rank]["name"]
 
         # Handle Unranked special case
-        if current_rank == 0:
+        if current_rank == -1:
             return {
-                "current_rank": 0,
+                "current_rank": -1,
                 "current_rank_name": "Unranked",
-                "xp_in_rank": 0,
+                "xp_in_rank": self.total_xp,
                 "xp_to_next_rank": 100,
-                "progress_percent": 0.0,
+                "progress_percent": min((self.total_xp / 100) * 100, 100.0),
                 "next_rank": 7
             }
 
         # Handle Diamond (highest rank)
-        if current_rank == 1:
-            current_min = RANKS[1]["min_points"]
+        if current_rank == 0:
+            current_min = RANKS[0]["min_points"]
             return {
                 "current_rank": current_rank,
                 "current_rank_name": current_rank_name,
@@ -220,13 +217,12 @@ class Player:
         current_rank = self.get_current_rank()
         unlocks = []
 
-        if current_rank == 0:
-            return []
+        if current_rank == -1:
+            return []  # Unranked players have no unlocks
 
-        for rank_id in range(current_rank, 7, 1):
-            unlocks.extend(RANKS[rank_id]["unlocks"])
-
-        unlocks.extend(RANKS[7]["unlocks"])
+        for rank_id in range(current_rank, 8):
+            if rank_id in RANKS:
+                unlocks.extend(RANKS[rank_id]["unlocks"])
 
         return list(set(unlocks))
 
