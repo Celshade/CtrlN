@@ -1,11 +1,11 @@
-"""Tests for src/clackykey/achievements.py"""
+"""Tests for src/ctrln/achievements.py"""
 
 from datetime import date, timedelta
 from unittest.mock import patch
 
 import pytest
 
-from clackykey.achievements import (
+from ctrln.achievements import (
     ACHIEVEMENT_REGISTRY,
     Achievements,
     _BY_KIND,
@@ -107,7 +107,7 @@ class TestRecordPlay:
 
     def _call(self, a: Achievements) -> list[str]:
         with patch(
-            "clackykey.achievements.datetime"
+            "ctrln.achievements.datetime"
         ) as mock_dt:
             mock_dt.now.return_value.date.return_value = self.TODAY
             return a.record_play()
