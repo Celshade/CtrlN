@@ -41,17 +41,12 @@ def _char(
 # selection.
 CHARACTER_ROSTER: dict[str, Character] = {
     # fmt: off
+    # Base characters (always available)
     "black": _char(
         cid="black",
         name="Black",
         asset_path="assets/player_black.png",
         preview_path="assets/key_bounce_black.webP",
-    ),
-    "grey": _char(
-        cid="grey",
-        name="Grey",
-        asset_path="assets/player_grey.png",
-        preview_path="assets/key_bounce_grey.webP",
     ),
     "dark_green": _char(
         cid="dark_green",
@@ -71,7 +66,7 @@ CHARACTER_ROSTER: dict[str, Character] = {
         asset_path="assets/player_red.png",
         preview_path="assets/key_bounce_red.webP",
     ),
-    # --- locked below this line ---
+    # Bamboo rank (7) unlocks
     "yellow": _char(
         cid="yellow",
         name="Yellow",
@@ -86,6 +81,7 @@ CHARACTER_ROSTER: dict[str, Character] = {
         asset_path="assets/player_purple.png",
         preview_path="assets/key_bounce_purple.webP",
     ),
+    # Iron rank (6) unlocks
     "green": _char(
         cid="green",
         name="Green",
@@ -100,6 +96,15 @@ CHARACTER_ROSTER: dict[str, Character] = {
         asset_path="assets/player_orange.png",
         preview_path="assets/key_bounce_orange.webP",
     ),
+    # Silver rank (4) unlocks
+    "grey": _char(
+        cid="grey",
+        name="Grey",
+        asset_path="assets/player_grey.png",
+        preview_path="assets/key_bounce_grey.webP",
+        locked=True,
+    ),
+    # Gold rank (3) unlocks
     "white": _char(
         cid="white",
         name="White",
@@ -107,6 +112,7 @@ CHARACTER_ROSTER: dict[str, Character] = {
         asset_path="assets/player_white.png",
         preview_path="assets/key_bounce_white.webP",
     ),
+    # NOTE aqua will be unlocked via store purchase
     "aqua": _char(
         cid="aqua",
         name="Aqua",
@@ -114,6 +120,7 @@ CHARACTER_ROSTER: dict[str, Character] = {
         asset_path="assets/player_aqua.png",
         preview_path="assets/key_bounce_aqua.webP",
     ),
+    # NOTE sunset will be unlocked via store purchase
     "sunset": _char(
         cid="sunset",
         name="Sunset",
@@ -121,6 +128,7 @@ CHARACTER_ROSTER: dict[str, Character] = {
         asset_path="assets/player_sunset.png",
         preview_path="assets/key_bounce_sunset.webP",
     ),
+    # NOTE silver will be unlocked for NFT holders
     "silver": _char(
         cid="silver",
         name="Silver",
@@ -128,6 +136,7 @@ CHARACTER_ROSTER: dict[str, Character] = {
         asset_path="assets/player_silver.png",
         preview_path="assets/key_bounce_silver.webP",
     ),
+    # NOTE gold will be unlocked for NFT holders
     "gold": _char(
         cid="gold",
         name="Gold",

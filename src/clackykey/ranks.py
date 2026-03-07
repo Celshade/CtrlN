@@ -86,6 +86,9 @@ def get_unlocked_characters(rank: int) -> set[str]:
     Lower rank numbers = higher tiers. Characters unlocked at lower
     tiers (higher rank numbers) are available at higher tiers.
 
+    NOTE: aqua and sunset will be unlocked via store purchase.
+    NOTE: silver and gold will be unlocked for NFT holders.
+
     Args:
         rank: Rank ID (-1 for Unranked, 0-7)
 
