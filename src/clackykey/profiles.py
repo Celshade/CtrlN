@@ -14,7 +14,8 @@ class Profile:
     # memory-efficient attribute storage
     __slots__ = ("_player_id", "_player_name", "_current_xp", "_total_xp",
                  "_rank", "_highest_rank", "_prestige", "_seasons_played",
-                 "_games_played", "_achievements", "_achievement_stats")
+                 "_games_played", "_games_per_character", "_achievements",
+                 "_achievement_stats")
 
 # Getters and Setters with type validation
     @property
@@ -126,6 +127,19 @@ class Profile:
         self._games_played = value
 
     @property
+    def games_per_character(self) -> dict:
+        """Get games played per character (character_id -> count)."""
+        return self._games_per_character
+
+    @games_per_character.setter
+    def games_per_character(self, value: dict) -> None:
+        """Set games per character with validation."""
+        if not isinstance(value, dict):
+            raise ValueError("games_per_character must be a dict")
+        self._games_per_character = value
+
+    @property
+
     def achievements(self) -> list:
         """Get list of achievements."""
         return self._achievements
@@ -154,6 +168,7 @@ class Profile:
                  current_xp: int, total_xp: int,
                  rank: int, highest_rank: int = 0, prestige: int = 0,
                  seasons_played: int = 0, games_played: int = 0,
+                 games_per_character: dict = None,
                  achievements: list = None,
                  achievement_stats: dict = None):
         """Initialize a player profile with validation.
@@ -168,6 +183,8 @@ class Profile:
             prestige: Prestige level (default=0).
             seasons_played: Number of completed seasons (default=0).
             games_played: Total number of games played (default=0).
+            games_per_character: Dict mapping character IDs to game counts
+                (default=None=>{}).
             achievements: List of achievement IDs (default=None=>[]).
             achievement_stats: Lifetime stat counters for achievements
                 (default=None=>{}).
@@ -196,6 +213,10 @@ class Profile:
             raise ValueError("seasons_played must be a non-negative integer")
         if not isinstance(games_played, int) or games_played < 0:
             raise ValueError("games_played must be a non-negative integer")
+        if games_per_character is None:
+            games_per_character = {}
+        elif not isinstance(games_per_character, dict):
+            raise ValueError("games_per_character must be a dict")
         if achievements is None:
             achievements = []
         elif not isinstance(achievements, list):
@@ -214,6 +235,7 @@ class Profile:
         self.prestige = prestige
         self.seasons_played = seasons_played
         self.games_played = games_played
+        self.games_per_character = games_per_character
         self.achievements = achievements
         self.achievement_stats = achievement_stats
 
@@ -254,6 +276,7 @@ class Profile:
                 prestige=data.get("prestige", 0),
                 seasons_played=data.get("seasons_played", 0),
                 games_played=data.get("games_played", 0),
+                games_per_character=data.get("games_per_character", {}),
                 achievements=data.get("achievements", []),
                 achievement_stats=data.get("achievement_stats", {})
             )
@@ -326,6 +349,7 @@ class Profile:
                 "prestige": self.prestige,
                 "seasons_played": self.seasons_played,
                 "games_played": self.games_played,
+                "games_per_character": self.games_per_character,
                 "achievements": self.achievements,
                 "achievement_stats": self.achievement_stats
             }
