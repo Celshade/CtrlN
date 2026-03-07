@@ -12,6 +12,10 @@ from counter import Counter
 from spawner import Spawner
 from tutorial import Tutorial
 from ui import UI
+from counter import Counter
+from spawner import Spawner
+from tutorial import Tutorial
+from ui import UI
 from config import (
     GameState, FPS,
     WINDOW_WIDTH, WINDOW_HEIGHT,
@@ -44,8 +48,6 @@ class Game:
         self.spawner = Spawner()
         self.ui = UI()
         self.tutorial = Tutorial()
-        self.char_select = CharacterSelect()
-        self.selected_character = CHARACTER_ROSTER[CHARACTER_ORDER[0]]
 
         # Load player profile and init achievement tracker from it
         self.profile = Profile.load_by_id(player_id)
@@ -53,6 +55,10 @@ class Game:
             unlocked=self.profile.achievements,
             stats=self.profile.achievement_stats
         )
+
+        # Create character select with player's current rank
+        self.char_select = CharacterSelect(player_rank=self.profile.rank)
+        self.selected_character = CHARACTER_ROSTER[CHARACTER_ORDER[0]]
         self.shield_used_this_game = False
         self.notification_queue: list[str] = []
         self.notification_frames = 0
