@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 
 # Source modules use bare imports (e.g. `from ranks import RANKS`) that
-# require src/clackykey itself to be on sys.path in addition to src/.
-_PKG_DIR = Path(__file__).parent.parent / "src" / "clackykey"
+# require src/ctrln itself to be on sys.path in addition to src/.
+_PKG_DIR = Path(__file__).parent.parent / "src" / "ctrln"
 if str(_PKG_DIR) not in sys.path:
     sys.path.insert(0, str(_PKG_DIR))
 
@@ -15,7 +15,7 @@ if str(_PKG_DIR) not in sys.path:
 @pytest.fixture
 def sample_profile():
     """Create a sample profile for testing."""
-    from clackykey.profiles import Profile
+    from ctrln.profiles import Profile
 
     return Profile(
         player_id="test_player",
@@ -34,6 +34,6 @@ def sample_profile():
 @pytest.fixture
 def sample_player(sample_profile):
     """Create a sample player for testing."""
-    from clackykey.player import Player
+    from ctrln.player import Player
 
     return Player(profile=sample_profile)

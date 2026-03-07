@@ -243,7 +243,7 @@ class Player:
         Returns:
             dict: Rank-up notification with unlocks.
         """
-        from clackykey.ranks import get_rank_unlocks
+        from ctrln.ranks import get_rank_unlocks
 
         unlocked_features = get_rank_unlocks(new_rank)
         rank_name = RANKS[new_rank]["name"]

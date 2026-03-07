@@ -1,11 +1,11 @@
-"""Tests for src/clackykey/profiles.py"""
+"""Tests for src/ctrln/profiles.py"""
 
 import json
 from pathlib import Path
 
 import pytest
 
-from clackykey.profiles import Profile
+from ctrln.profiles import Profile
 
 
 # ------------------------------------------------------------------ #

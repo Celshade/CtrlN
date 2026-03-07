@@ -31,7 +31,7 @@ class Game:
         print("Creating window...")
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT),
                                               pygame.SHOWN)
-        pygame.display.set_caption("Clacky Key")  # window title
+        pygame.display.set_caption("CKEY: Ctrl+N")  # window title
         print("Window created!")
 
         self.clock = pygame.time.Clock()  # init game clock

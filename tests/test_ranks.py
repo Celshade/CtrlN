@@ -1,8 +1,8 @@
-"""Tests for src/clackykey/ranks.py"""
+"""Tests for src/ctrln/ranks.py"""
 
 import pytest
 
-from clackykey.ranks import RANKS, display_rank_progression, get_rank_unlocks
+from ctrln.ranks import RANKS, display_rank_progression, get_rank_unlocks
 
 
 # ------------------------------------------------------------------ #

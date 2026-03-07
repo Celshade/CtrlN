@@ -1,8 +1,8 @@
-"""Tests for src/clackykey/config.py"""
+"""Tests for src/ctrln/config.py"""
 
 import pytest
 
-from clackykey.config import (
+from ctrln.config import (
     BLACK,
     FPS,
     GRAVITY,
