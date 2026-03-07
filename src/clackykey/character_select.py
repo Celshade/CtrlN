@@ -1,8 +1,7 @@
-from typing import NamedTuple
-
 import pygame
 from PIL import Image
 
+from characters import Character, CHARACTER_ROSTER, CHARACTER_ORDER
 from config import WINDOW_WIDTH, WINDOW_HEIGHT, GROUND_Y, BLACK, WHITE, YELLOW
 
 
@@ -49,64 +48,6 @@ _FONT_BTN    = 22
 _FONT_HINT   = 18
 
 
-# ====================== #
-# ### Character data ### #
-# ====================== #
-class Character(NamedTuple):
-    """Immutable descriptor for a selectable character."""
-    id: str
-    name: str
-    asset_path: str          # sprite used by the Player class in-game
-    preview_path: str = ""   # animated webP shown on the select screen
-    description: str = ""
-    locked: bool = False     # if True: greyed out and unselectable
-
-
-# Shared placeholder assets; swap per-entry once unique assets exist.
-_DEFAULT_ASSET   = "assets/player.png"
-_DEFAULT_PREVIEW = "assets/key_bounce.webP"
-
-
-def _char(
-    cid: str,
-    name: str,
-    locked: bool = False,
-    asset_path: str = _DEFAULT_ASSET,
-    preview_path: str = _DEFAULT_PREVIEW,
-) -> Character:
-    """Convenience constructor that fills in shared asset defaults."""
-    return Character(
-        id=cid,
-        name=name,
-        asset_path=asset_path,
-        preview_path=preview_path,
-        locked=locked,
-    )
-
-
-# NOTE: Add new entries here; the grid expands automatically up to 15 slots.
-# Characters with locked=True show a padlock overlay and cannot be selected.
-CHARACTER_ROSTER: list[Character] = [
-    # fmt: off
-    _char("black",      "Black",      asset_path="assets/player_black.png",      preview_path="assets/key_bounce_black.webP"),
-    _char("grey",       "Grey",       asset_path="assets/player_grey.png",       preview_path="assets/key_bounce_grey.webP"),
-    _char("dark_green", "Dark Green", asset_path="assets/player_dgreen.png", preview_path="assets/key_bounce_dgreen.webP"),
-    _char("dark_blue",  "Dark Blue",  asset_path="assets/player_dblue.png",  preview_path="assets/key_bounce_dblue.webP"),
-    _char("red",        "Red",        asset_path="assets/player_red.png",        preview_path="assets/key_bounce_red.webP"),
-    # --- locked below this line ---
-    _char("yellow",  "Yellow",  locked=True, asset_path="assets/player_yellow.png",  preview_path="assets/key_bounce_yellow.webP"),
-    _char("purple",  "Purple",  locked=True, asset_path="assets/player_purple.png",  preview_path="assets/key_bounce_purple.webP"),
-    _char("green",   "Green",   locked=True, asset_path="assets/player_green.png",   preview_path="assets/key_bounce_green.webP"),
-    _char("orange",  "Orange",  locked=True, asset_path="assets/player_orange.png",  preview_path="assets/key_bounce_orange.webP"),
-    _char("white",   "White",   locked=True, asset_path="assets/player_white.png",   preview_path="assets/key_bounce_white.webP"),
-    _char("aqua",    "Aqua",    locked=True, asset_path="assets/player_aqua.png",    preview_path="assets/key_bounce_aqua.webP"),
-    _char("sunset",  "Sunset",  locked=True, asset_path="assets/player_sunset.png",  preview_path="assets/key_bounce_sunset.webP"),
-    _char("silver",  "Silver",  locked=True, asset_path="assets/player_silver.png",  preview_path="assets/key_bounce_silver.webP"),
-    _char("gold",    "Gold",    locked=True, asset_path="assets/player_gold.png",    preview_path="assets/key_bounce_gold.webP"),
-    # fmt: on
-]
-
-
 # ============================ #
 # ### CharacterSelect UI   ### #
 # ============================ #
@@ -130,7 +71,8 @@ class CharacterSelect:
         self._font_btn   = pygame.font.Font(None, _FONT_BTN)
         self._font_hint  = pygame.font.Font(None, _FONT_HINT)
 
-        self.selected_index: int = 0
+        default_id = CHARACTER_ORDER[0] if CHARACTER_ORDER else "black"
+        self.selected_id: str = default_id
         self._icon_rects: list[pygame.Rect] = []
 
         self._anim_frame: int = 0
@@ -247,11 +189,13 @@ class CharacterSelect:
 
     def _navigate_by(self, step: int) -> None:
         """Advance selection by *step* slots, wrapping; skips locked entries."""
-        n = len(CHARACTER_ROSTER)
-        idx = (self.selected_index + step) % n
+        n = len(CHARACTER_ORDER)
+        current_idx = CHARACTER_ORDER.index(self.selected_id)
+        idx = (current_idx + step) % n
         for _ in range(n):
-            if not CHARACTER_ROSTER[idx].locked:
-                self.selected_index = idx
+            char_id = CHARACTER_ORDER[idx]
+            if not CHARACTER_ROSTER[char_id].locked:
+                self.selected_id = char_id
                 return
             idx = (idx + step) % n
 
@@ -266,7 +210,7 @@ class CharacterSelect:
     @property
     def selected(self) -> Character:
         """Return the currently highlighted Character."""
-        return CHARACTER_ROSTER[self.selected_index]
+        return CHARACTER_ROSTER[self.selected_id]
 
     # ------------------------------------------------------------------ #
     # Hit-testing                                                        #
@@ -276,13 +220,14 @@ class CharacterSelect:
         """Return True if *pos* is inside the Play button."""
         return self._play_button_rect.collidepoint(pos)
 
-    def icon_slot_at(self, pos: tuple[int, int]) -> int | None:
-        """Return the roster index for the unlocked icon at *pos*, or None."""
+    def icon_slot_at(self, pos: tuple[int, int]) -> str | None:
+        """Return the character ID for the unlocked icon at *pos*, or None."""
         for slot, rect in enumerate(self._icon_rects):
-            if slot >= len(CHARACTER_ROSTER):
+            if slot >= len(CHARACTER_ORDER):
                 break
             if rect.collidepoint(pos):
-                return None if CHARACTER_ROSTER[slot].locked else slot
+                char_id = CHARACTER_ORDER[slot]
+                return None if CHARACTER_ROSTER[char_id].locked else char_id
         return None
 
     # ------------------------------------------------------------------ #
@@ -320,9 +265,10 @@ class CharacterSelect:
     ) -> None:
         """Draw the 5×3 icon grid in the left panel."""
         for slot, rect in enumerate(self._icon_rects):
-            if slot >= len(CHARACTER_ROSTER):
+            if slot >= len(CHARACTER_ORDER):
                 break
-            is_sel = slot == self.selected_index
+            char_id = CHARACTER_ORDER[slot]
+            is_sel = char_id == self.selected_id
             is_hov = rect.collidepoint(mouse_pos)
 
             pygame.draw.rect(screen, _ICON_BG, rect, border_radius=6)
@@ -337,12 +283,13 @@ class CharacterSelect:
 
             img_x = rect.x + (_ICON_CELL - _ICON_SZ) // 2
             img_y = rect.y + (_ICON_CELL - _ICON_SZ) // 2
-            char = CHARACTER_ROSTER[slot]
+            char = CHARACTER_ROSTER[char_id]
             is_locked = char.locked
             if is_sel and not is_locked:
                 frames = self._load_frames(char.preview_path, _ICON_SZ)
                 if frames:
-                    screen.blit(frames[self._anim_frame % len(frames)], (img_x, img_y))
+                    frame_idx = self._anim_frame % len(frames)
+                    screen.blit(frames[frame_idx], (img_x, img_y))
             else:
                 static = self._load_static(char.asset_path, _ICON_SZ)
                 if static:
@@ -389,14 +336,16 @@ class CharacterSelect:
         # Featured preview image
         img_x = card_rect.x + (_CARD_W - _PREV_SZ) // 2
         img_y = card_rect.y + 10
+        selected_char = CHARACTER_ROSTER[self.selected_id]
         feat_frames = self._load_frames(
-            CHARACTER_ROSTER[self.selected_index].preview_path, _PREV_SZ
+            selected_char.preview_path, _PREV_SZ
         )
         if feat_frames:
-            screen.blit(feat_frames[self._anim_frame % len(feat_frames)], (img_x, img_y))
+            frame_idx = self._anim_frame % len(feat_frames)
+            screen.blit(feat_frames[frame_idx], (img_x, img_y))
 
         # Character name
-        name = CHARACTER_ROSTER[self.selected_index].name
+        name = selected_char.name
         name_surf = self._font_name.render(name, True, BLACK)
         name_y = img_y + _PREV_SZ + 6
         screen.blit(
