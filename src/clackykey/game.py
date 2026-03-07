@@ -110,7 +110,9 @@ class Game:
         self.score = 0
         self.shield_used_this_game = False
         self.counter = Counter()
-        self.player = Player(profile=self.profile, asset_path=self.selected_character.asset_path)
+        self.player = Player(profile=self.profile, 
+                             character_id=self.selected_character.id,
+                             asset_path=self.selected_character.asset_path)
         self.background.reset()
         self.spawner.reset()
         self.tutorial.reset()
@@ -275,6 +277,11 @@ class Game:
         self.profile.achievement_stats = self.achievements.stats
         self.profile.games_played = self.achievements.stats.get("games_played",
                                                                  self.profile.games_played)
+        # Increment games played for this character
+        if self.player.character_id:
+            if self.player.character_id not in self.profile.games_per_character:
+                self.profile.games_per_character[self.player.character_id] = 0
+            self.profile.games_per_character[self.player.character_id] += 1
         # Sync player progression data
         self.profile.current_xp = self.player.season_xp
         self.profile.total_xp = self.player.total_xp

@@ -20,14 +20,17 @@ class Player:
     and integrates with player progression profile.
     """
     def __init__(self, profile: Profile | None = None,
+                 character_id: str | None = None,
                  asset_path: str = "assets/player.png") -> None:
         """Initialize player entity.
 
         Args:
-            profile:    Optional Profile for XP/rank persistence.
-            asset_path: Path to the sprite image used for this character.
+            profile:       Optional Profile for XP/rank persistence.
+            character_id:  Optional character ID for tracking games per character.
+            asset_path:    Path to the sprite image used for this character.
         """
         self.profile = profile
+        self.character_id = character_id
         self.x_pos = PLAYER_START_X
         self.y_pos = PLAYER_START_Y
         self.vel = 0
