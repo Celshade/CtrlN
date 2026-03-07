@@ -73,8 +73,8 @@ class Profile:
     @rank.setter
     def rank(self, value: int) -> None:
         """Set current rank with validation."""
-        if not isinstance(value, int) or value < 0:
-            raise ValueError("rank must be a non-negative integer")
+        if not isinstance(value, int) or value < -1:
+            raise ValueError("rank must be -1 (Unranked) or 0-7")
         self._rank = value
 
     @property
@@ -163,7 +163,7 @@ class Profile:
             player_name: Display name.
             current_xp: XP earned in current season.
             total_xp: All-time XP earned.
-            rank: Current rank ID 0-7.
+            rank: Current rank ID (-1 to 7, where -1=Unranked, 0=Prestige).
             highest_rank: Best rank achieved (default=0).
             prestige: Prestige level (default=0).
             seasons_played: Number of completed seasons (default=0).
@@ -184,8 +184,8 @@ class Profile:
             raise ValueError("current_xp must be a non-negative integer")
         if not isinstance(total_xp, int) or total_xp < 0:
             raise ValueError("total_xp must be a non-negative integer")
-        if not isinstance(rank, int) or rank < 0:
-            raise ValueError("rank must be a non-negative integer")
+        if not isinstance(rank, int) or rank < -1:
+            raise ValueError("rank must be -1 (Unranked) or 0-7")
 
         # Validate optional args
         if not isinstance(highest_rank, int) or highest_rank < 0:
@@ -292,7 +292,7 @@ class Profile:
             player_name="Unknown",
             current_xp=0,
             total_xp=0,
-            rank=0
+            rank=-1
         )
 
     def save_to_file(self, filename: str = None, data: dict = None) -> bool:
