@@ -241,10 +241,13 @@ class Profile:
             with open(filename, "r") as f:
                 data = json.load(f)
 
+            # Handle backward compatibility: current_xp -> season_xp
+            season_xp = data.get("season_xp", data.get("current_xp", 0))
+
             return cls(
                 player_id=data["id"],
                 player_name=data["name"],
-                current_xp=data["current_xp"],
+                current_xp=season_xp,
                 total_xp=data["total_xp"],
                 rank=data["rank"],
                 highest_rank=data.get("highest_rank", 0),
@@ -316,7 +319,7 @@ class Profile:
             profile_data = {
                 "id": self.player_id,
                 "name": self.player_name,
-                "current_xp": self.current_xp,
+                "season_xp": self.current_xp,
                 "total_xp": self.total_xp,
                 "rank": self.rank,
                 "highest_rank": self.highest_rank,
