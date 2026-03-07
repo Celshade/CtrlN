@@ -37,7 +37,7 @@ class Player:
         if profile:
             self.player_id = profile.player_id
             self.player_name = profile.player_name
-            self.current_xp = profile.current_xp
+            self.season_xp = profile.current_xp
             self.total_xp = profile.total_xp
             self.rank = profile.rank
             self.highest_rank = profile.highest_rank
@@ -47,7 +47,7 @@ class Player:
         else:
             self.player_id = "guest"
             self.player_name = "Guest"
-            self.current_xp = 0
+            self.season_xp = 0
             self.total_xp = 0
             self.rank = 0
             self.highest_rank = 0
@@ -192,7 +192,7 @@ class Player:
         """
         old_rank = self.get_current_rank()
         self.total_xp += xp_amount
-        self.current_xp += xp_amount
+        self.season_xp += xp_amount
         new_rank = self.get_current_rank()
 
         rank_up = new_rank != old_rank and new_rank < old_rank
@@ -316,7 +316,7 @@ class Player:
 
         # Pass current stats to save_to_file, which handles update_profile
         return self.profile.save_to_file(filename, {
-            "current_xp": self.current_xp,
+            "current_xp": self.season_xp,
             "total_xp": self.total_xp,
             "rank": self.rank,
             "highest_rank": self.highest_rank,

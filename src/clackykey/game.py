@@ -253,6 +253,9 @@ class Game:
         self.state = GameState.GAME_OVER
         if self.score > self.high_score:
             self.high_score = self.score
+        # Award XP based on score (1 XP per point)
+        xp_earned = self.score
+        self.player.add_xp(xp_earned)
         # Achievement checks at game-over
         self._notify(self.achievements.record_play())
         self._notify(self.achievements.increment("games_played"))
@@ -272,6 +275,13 @@ class Game:
         self.profile.achievement_stats = self.achievements.stats
         self.profile.games_played = self.achievements.stats.get("games_played",
                                                                  self.profile.games_played)
+        # Sync player progression data
+        self.profile.current_xp = self.player.season_xp
+        self.profile.total_xp = self.player.total_xp
+        self.profile.rank = self.player.rank
+        self.profile.highest_rank = self.player.highest_rank
+        self.profile.prestige = self.player.prestige
+        self.profile.seasons_played = self.player.seasons_played
         self.profile.save_to_file()
 
     def draw(self) -> None:
