@@ -80,6 +80,43 @@ def get_rank_unlocks(rank: int) -> list[str]:
     return []
 
 
+def get_unlocked_characters(rank: int) -> set[str]:
+    """Get all character IDs unlocked at the given rank or higher.
+
+    Lower rank numbers = higher tiers. Characters unlocked at lower
+    tiers (higher rank numbers) are available at higher tiers.
+
+    Args:
+        rank: Rank ID (-1 for Unranked, 0-7)
+
+    Returns:
+        set: Character IDs available to the player at this rank
+    """
+    # Base characters always available
+    unlocked = {"black", "dark_green", "blue", "red"}
+
+    # Check each rank: include unlocks at this rank and lower tiers
+    # (which have higher rank numbers for non-negative ranks)
+    for check_rank, rank_info in RANKS.items():
+        # Include unlocks if check_rank == rank (current tier)
+        # or if check_rank is a lower tier (higher number for positive ranks)
+        should_include = (check_rank == rank)
+
+        # For positive tiers: higher numbers = lower rank (worse tier)
+        if check_rank >= 0 and rank >= 0:
+            should_include = should_include or (check_rank > rank)
+
+        if should_include:
+            rank_unlocks = rank_info.get("unlocks", [])
+            for unlock in rank_unlocks:
+                if unlock in {
+                    "yellow", "purple", "green", "orange", "white", "grey"
+                }:
+                    unlocked.add(unlock)
+
+    return unlocked
+
+
 def display_rank_progression() -> str:
     """
     Display formatted rank progression table with XP requirements.

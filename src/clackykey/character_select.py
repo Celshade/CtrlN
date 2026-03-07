@@ -2,6 +2,7 @@ import pygame
 from PIL import Image
 
 from characters import Character, CHARACTER_ROSTER, CHARACTER_ORDER
+from ranks import get_unlocked_characters
 from config import WINDOW_WIDTH, WINDOW_HEIGHT, GROUND_Y, BLACK, WHITE, YELLOW
 
 
@@ -65,11 +66,16 @@ class CharacterSelect:
     _frame_cache: dict[tuple[str, int], list[pygame.Surface]] = {}
     _static_cache: dict[tuple[str, int], pygame.Surface] = {}
 
-    def __init__(self) -> None:
+    def __init__(self, player_rank: int = -1) -> None:
         self._font_title = pygame.font.Font(None, _FONT_TITLE)
         self._font_name  = pygame.font.Font(None, _FONT_NAME)
         self._font_btn   = pygame.font.Font(None, _FONT_BTN)
         self._font_hint  = pygame.font.Font(None, _FONT_HINT)
+
+        # Build set of unlocked characters based on player rank
+        self._unlocked_characters = get_unlocked_characters(
+            player_rank
+        )
 
         default_id = CHARACTER_ORDER[0] if CHARACTER_ORDER else "black"
         self.selected_id: str = default_id
@@ -187,6 +193,10 @@ class CharacterSelect:
     # Navigation                                                         #
     # ------------------------------------------------------------------ #
 
+    def _is_character_locked(self, char_id: str) -> bool:
+        """Check if a character is locked for the current player."""
+        return char_id not in self._unlocked_characters
+
     def _navigate_by(self, step: int) -> None:
         """Advance selection by *step* slots, wrapping; skips locked entries."""
         n = len(CHARACTER_ORDER)
@@ -194,7 +204,7 @@ class CharacterSelect:
         idx = (current_idx + step) % n
         for _ in range(n):
             char_id = CHARACTER_ORDER[idx]
-            if not CHARACTER_ROSTER[char_id].locked:
+            if not self._is_character_locked(char_id):
                 self.selected_id = char_id
                 return
             idx = (idx + step) % n
@@ -227,7 +237,8 @@ class CharacterSelect:
                 break
             if rect.collidepoint(pos):
                 char_id = CHARACTER_ORDER[slot]
-                return None if CHARACTER_ROSTER[char_id].locked else char_id
+                is_locked = self._is_character_locked(char_id)
+                return None if is_locked else char_id
         return None
 
     # ------------------------------------------------------------------ #
@@ -284,7 +295,7 @@ class CharacterSelect:
             img_x = rect.x + (_ICON_CELL - _ICON_SZ) // 2
             img_y = rect.y + (_ICON_CELL - _ICON_SZ) // 2
             char = CHARACTER_ROSTER[char_id]
-            is_locked = char.locked
+            is_locked = self._is_character_locked(char_id)
             if is_sel and not is_locked:
                 frames = self._load_frames(char.preview_path, _ICON_SZ)
                 if frames:
