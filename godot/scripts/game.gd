@@ -17,6 +17,7 @@ const CharacterSelectScene := preload("res://scenes/character_select.tscn")
 @onready var counter_node := $UI/Counter
 
 @onready var tut_progress_label: Label = $UI/TutProgressLabel
+@onready var tutorial_image: TextureRect = $UI/TutorialImage
 @onready var dark_overlay: ColorRect = $UI/DarkOverlay
 @onready var tutorial_label: Label = $UI/TutorialLabel
 @onready var tutorial_sub_label: Label = $UI/TutorialSubLabel
@@ -448,6 +449,7 @@ func _refresh_ui() -> void:
 	# Hide all UI elements first
 	counter_node.visible = false
 	tut_progress_label.visible = false
+	tutorial_image.visible = false
 	dark_overlay.visible = false
 	tutorial_label.visible = false
 	tutorial_sub_label.visible = false
@@ -479,6 +481,7 @@ func _refresh_ui() -> void:
 				tutorial_label.visible = true
 			else:
 				if tutorial_active:
+					tutorial_image.visible = true
 					tut_progress_label.text = "Progress: %d/%d" % [score, GameConfig.TUTORIAL_DURATION]
 					tut_progress_label.visible = true
 
