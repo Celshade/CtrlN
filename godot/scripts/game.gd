@@ -6,6 +6,7 @@ const OrbScene := preload("res://scenes/orb.tscn")
 const TreeScene := preload("res://scenes/tree_obstacle.tscn")
 const BirdPerchedScene := preload("res://scenes/bird_perched.tscn")
 const CharacterSelectScene := preload("res://scenes/character_select.tscn")
+const LoginScreenScene := preload("res://scenes/login_screen.tscn")
 
 # Nodes
 @onready var background_node := $Background
@@ -38,6 +39,7 @@ var background: Node = null
 var tutorial: Node = null
 var counter: Node = null
 var char_select: Node = null
+var login_screen: Node = null
 
 var selected_character_id := "black"
 var selected_asset_path := "res://assets/characters/black/player_black_ig.png"
@@ -53,7 +55,7 @@ func _ready() -> void:
 	notification_timer.timeout.connect(_on_notification_timeout)
 	AchievementManager.achievement_unlocked.connect(_on_achievement_unlocked)
 	_setup_background()
-	_show_character_select()
+	_show_login_screen()
 
 
 func _setup_background() -> void:
@@ -113,6 +115,51 @@ func _reset_background() -> void:
 		layer["offset"] = 0.0
 		(layer["sprite1"] as Sprite2D).position.x = 0.0
 		(layer["sprite2"] as Sprite2D).position.x = GameConfig.WINDOW_WIDTH
+
+
+# ── Login Screen ─────────────────────────────────────────────────
+
+func _show_login_screen() -> void:
+	state = GameConfig.GameState.LOGIN
+	if login_screen:
+		login_screen.queue_free()
+	login_screen = LoginScreenScene.instantiate()
+	login_screen.guest_pressed.connect(_on_login_guest)
+	login_screen.login_succeeded.connect(_on_login_login)
+	login_screen.login_failed.connect(_on_login_error)
+	login_screen.store_pressed.connect(_on_login_store)
+	login_screen.website_pressed.connect(_on_login_website)
+	ui_layer.add_child(login_screen)
+
+
+func _dismiss_login_screen() -> void:
+	if login_screen:
+		login_screen.queue_free()
+		login_screen = null
+
+
+func _on_login_guest() -> void:
+	_dismiss_login_screen()
+	_show_character_select()
+
+
+func _on_login_login(profile: Dictionary) -> void:
+	# TODO: merge Matrica profile data into ProfileManager
+	print("Matrica login: ", profile.get("username", "unknown"))
+	_dismiss_login_screen()
+	_show_character_select()
+
+
+func _on_login_error(reason: String) -> void:
+	push_warning("Matrica login failed: " + reason)
+
+
+func _on_login_store() -> void:
+	OS.shell_open("https://ctrln.art/store")
+
+
+func _on_login_website() -> void:
+	OS.shell_open("https://ctrln.art")
 
 
 # ── Character Select ──────────────────────────────────────────────
@@ -459,7 +506,7 @@ func _refresh_ui() -> void:
 
 	match state:
 		GameConfig.GameState.MENU:
-			menu_label.text = "Clacky Key\n\nPress SPACE to Start\nHigh Score: %d" % high_score
+			menu_label.text = "CKEY: Ctrl+N\n\nPress SPACE to Start\nHigh Score: %d" % high_score
 			menu_label.visible = true
 
 		GameConfig.GameState.PLAYING:

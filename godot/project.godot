@@ -25,6 +25,7 @@ config/icon="res://icon.svg"
 GameConfig="*res://scripts/autoload/game_config.gd"
 ProfileManager="*res://scripts/autoload/profile_manager.gd"
 AchievementManager="*res://scripts/autoload/achievement_manager.gd"
+MatricaAuth="*res://scripts/autoload/matrica_auth.gd"
 
 [display]
 
