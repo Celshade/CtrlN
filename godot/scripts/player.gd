@@ -46,8 +46,8 @@ func setup(char_id: String, asset_path: String) -> void:
 		sprite.scale = Vector2(sx, sy)
 
 	# Load shield textures
-	shield_tex_t1 = load("res://assets/shield_3.2.png") as Texture2D
-	shield_tex_t2 = load("res://assets/shield_3.4.png") as Texture2D
+	shield_tex_t1 = load("res://assets/shields/tier1/shield_3.2.png") as Texture2D
+	shield_tex_t2 = load("res://assets/shields/tier2/shield_3.4.png") as Texture2D
 	shield_sprite.centered = false
 	if shield_tex_t1:
 		var ssx := float(GameConfig.PLAYER_SIZE) / shield_tex_t1.get_width()
@@ -82,7 +82,7 @@ static func _build_jump_frames(char_id: String) -> SpriteFrames:
 	frames.set_animation_loop("jump", false)
 	var i := 1
 	while true:
-		var path := "res://assets/keypress_%s/keypress_thruster_fx%d.png" % [char_id, i]
+		var path := "res://assets/characters/%s/keypress/keypress_%d.png" % [char_id, i]
 		if ResourceLoader.exists(path):
 			frames.add_frame("jump", load(path))
 			i += 1
@@ -158,17 +158,20 @@ static func _build_shield_anim_frames(level: int) -> SpriteFrames:
 	var cache_key := "t%d" % level
 	if _shield_frames_cache.has(cache_key):
 		return _shield_frames_cache[cache_key]
-	var frame_count := 7 if level == 1 else 8
+	var color_dir := "tier%d" % level
 	var frames := SpriteFrames.new()
 	var anim_name := "shield_t%d" % level
 	frames.add_animation(anim_name)
 	frames.set_animation_speed(anim_name, 30.0)  # 30 fps = one frame per physics tick
 	frames.set_animation_loop(anim_name, false)
-	# Skip frame 0 (fully transparent blank frame)
-	for i in range(1, frame_count):
-		var tex := load("res://assets/shield_fx_t%d_%d.png" % [level, i]) as Texture2D
-		if tex:
-			frames.add_frame(anim_name, tex)
+	var i := 1
+	while true:
+		var path := "res://assets/shields/%s/charge/charge%d.png" % [color_dir, i]
+		if ResourceLoader.exists(path):
+			frames.add_frame(anim_name, load(path))
+			i += 1
+		else:
+			break
 	if frames.get_frame_count(anim_name) == 0:
 		return null
 	_shield_frames_cache[cache_key] = frames

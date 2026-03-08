@@ -33,7 +33,7 @@ static func _load_frames() -> void:
 	_sprite_frames.set_animation_loop("fly", true)
 
 	for i in range(3):  # BirdFlying.gif has exactly 3 frames
-		var tex := load("res://assets/bird_fly_%d.png" % i) as Texture2D
+		var tex := load("res://assets/bird_yellow/bird_fly_%d.png" % i) as Texture2D
 		if tex:
 			_sprite_frames.add_frame("fly", tex)
 

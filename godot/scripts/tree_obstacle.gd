@@ -5,7 +5,7 @@ extends Node2D
 
 
 func _ready() -> void:
-	var tex := load("res://assets/tree_obj.png") as Texture2D
+	var tex := load("res://assets/objects/tree_obj.png") as Texture2D
 	if tex:
 		sprite.texture = tex
 		sprite.centered = false

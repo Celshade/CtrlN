@@ -68,7 +68,7 @@ func _load_keybounce_frames() -> void:
 	var char_id: String = roster[selected_index]["id"]
 	var i := 1
 	while true:
-		var path := "res://assets/keybounce_%s/keybounce_%s%d.png" % [char_id, char_id, i]
+		var path := "res://assets/characters/%s/keybounce/keybounce%d.png" % [char_id, i]
 		if ResourceLoader.exists(path):
 			_keybounce_frames.append(load(path) as Texture2D)
 			i += 1
@@ -85,20 +85,20 @@ func _preload_textures() -> void:
 func _build_roster() -> void:
 	var unlocked := ProfileManager.get_unlocked_characters()
 	var defs := [
-		{"id": "black", "name": "Black", "asset": "res://assets/player_black.png", "ig_asset": "res://assets/player_black_ig.png", "preview": "res://assets/key_bounce_black.webP"},
-		{"id": "dark_green", "name": "Dark Green", "asset": "res://assets/player_dgreen.png", "preview": "res://assets/key_bounce_dgreen.webP"},
-		{"id": "blue", "name": "Blue", "asset": "res://assets/player_blue.png", "preview": "res://assets/key_bounce_blue.webP"},
-		{"id": "red", "name": "Red", "asset": "res://assets/player_red.png", "preview": "res://assets/key_bounce_red.webP"},
-		{"id": "yellow", "name": "Yellow", "asset": "res://assets/player_yellow.png", "preview": "res://assets/key_bounce_yellow.webP"},
-		{"id": "purple", "name": "Purple", "asset": "res://assets/player_purple.png", "preview": "res://assets/key_bounce_purple.webP"},
-		{"id": "green", "name": "Green", "asset": "res://assets/player_green.png", "preview": "res://assets/key_bounce_green.webP"},
-		{"id": "orange", "name": "Orange", "asset": "res://assets/player_orange.png", "preview": "res://assets/key_bounce_orange.webP"},
-		{"id": "grey", "name": "Grey", "asset": "res://assets/player_grey.png", "preview": "res://assets/key_bounce_grey.webP"},
-		{"id": "white", "name": "White", "asset": "res://assets/player_white.png", "preview": "res://assets/key_bounce_white.webP"},
-		{"id": "aqua", "name": "Aqua", "asset": "res://assets/player_aqua.png", "preview": "res://assets/key_bounce_aqua.webP"},
-		{"id": "sunset", "name": "Sunset", "asset": "res://assets/player_sunset.png", "preview": "res://assets/key_bounce_sunset.webP"},
-		{"id": "silver", "name": "Silver", "asset": "res://assets/player_silver.png", "preview": "res://assets/key_bounce_silver.webP"},
-		{"id": "gold", "name": "Gold", "asset": "res://assets/player_gold.png", "preview": "res://assets/key_bounce_gold.webP"},
+		{"id": "black", "name": "Black", "asset": "res://assets/characters/black/player_black.png", "ig_asset": "res://assets/characters/black/player_black_ig.png"},
+		{"id": "dark_green", "name": "Dark Green", "asset": "res://assets/characters/dark_green/player_dark_green.png"},
+		{"id": "blue", "name": "Blue", "asset": "res://assets/characters/blue/player_blue.png"},
+		{"id": "red", "name": "Red", "asset": "res://assets/characters/red/player_red.png"},
+		{"id": "yellow", "name": "Yellow", "asset": "res://assets/characters/yellow/player_yellow.png"},
+		{"id": "purple", "name": "Purple", "asset": "res://assets/characters/purple/player_purple.png"},
+		{"id": "green", "name": "Green", "asset": "res://assets/characters/green/player_green.png"},
+		{"id": "orange", "name": "Orange", "asset": "res://assets/characters/orange/player_orange.png"},
+		{"id": "grey", "name": "Grey", "asset": "res://assets/characters/grey/player_grey.png"},
+		{"id": "white", "name": "White", "asset": "res://assets/characters/white/player_white.png"},
+		{"id": "aqua", "name": "Aqua", "asset": "res://assets/characters/aqua/player_aqua.png"},
+		{"id": "sunset", "name": "Sunset", "asset": "res://assets/characters/sunset/player_sunset.png"},
+		{"id": "silver", "name": "Silver", "asset": "res://assets/characters/silver/player_silver.png"},
+		{"id": "gold", "name": "Gold", "asset": "res://assets/characters/gold/player_gold.png"},
 	]
 	for d in defs:
 		d["locked"] = d["id"] not in unlocked
