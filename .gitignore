@@ -9,7 +9,6 @@ venv/*
 BuildResources/*
 assets/*
 .godot/
-*.cache
-godot/assets/*
+*.cache*
 player_data/*
 tests/pygame_tests/*
