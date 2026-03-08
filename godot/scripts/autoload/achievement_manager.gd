@@ -91,6 +91,8 @@ func check_game_score(score: int, shield_used: bool) -> Array[String]:
 
 func check_rank(rank: int) -> Array[String]:
 	var newly: Array[String] = []
+	if rank == -1:
+		return newly
 	for aid in registry:
 		if aid in unlocked:
 			continue
