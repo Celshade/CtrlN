@@ -32,6 +32,7 @@ var selected_index := 0
 
 # Cached textures (loaded once in _ready)
 var _icon_textures: Array[Texture2D] = []
+var _locked_key_tex: Texture2D = null
 
 # Keybounce animation for the featured card (character select only)
 # Loaded from: assets/keybounce_{char_id}/key_bounce_{char_id}{i}.png
@@ -80,6 +81,7 @@ func _preload_textures() -> void:
 	_icon_textures.resize(roster.size())
 	for i in range(roster.size()):
 		_icon_textures[i] = load(roster[i]["asset"]) as Texture2D
+	_locked_key_tex = load("res://assets/UI/locked_key.png") as Texture2D
 
 
 func _build_roster() -> void:
@@ -214,17 +216,9 @@ func _draw() -> void:
 				draw_texture_rect(tex, rect, false, Color(0.25, 0.25, 0.25, 0.7))
 				# Dark tint overlay
 				draw_rect(rect, Color(0, 0, 0, 0.55))
-				# Lock symbol: padlock body
-				var lx := x + ICON_SIZE * 0.5
-				var ly := y + ICON_SIZE * 0.5 + 4
-				draw_rect(Rect2(lx - 9, ly - 6, 18, 14), Color(0.85, 0.85, 0.85), true)
-				draw_rect(Rect2(lx - 9, ly - 6, 18, 14), Color(0.5, 0.5, 0.5), false, 1.5)
-				# Shackle arc (4 lines approximating a U)
-				draw_line(Vector2(lx - 5, ly - 6), Vector2(lx - 5, ly - 12), Color(0.85, 0.85, 0.85), 2.5)
-				draw_line(Vector2(lx + 5, ly - 6), Vector2(lx + 5, ly - 12), Color(0.85, 0.85, 0.85), 2.5)
-				draw_arc(Vector2(lx, ly - 12), 5.0, PI, 0.0, 8, Color(0.85, 0.85, 0.85), 2.5)
-				# Keyhole
-				draw_circle(Vector2(lx, ly), 3, Color(0.4, 0.4, 0.4))
+				# Lock icon filling the tile
+				if _locked_key_tex:
+					draw_texture_rect(_locked_key_tex, rect, false)
 			else:
 				draw_texture_rect(tex, rect, false, Color.WHITE)
 
