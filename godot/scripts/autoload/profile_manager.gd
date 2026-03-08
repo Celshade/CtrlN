@@ -40,7 +40,7 @@ func _default_profile(player_id: String) -> Dictionary:
 		"season_xp": 0,
 		"total_xp": 0,
 		"rank": -1,
-		"highest_rank": 0,
+		"highest_rank": 8,
 		"prestige": 0,
 		"seasons_played": 0,
 		"games_played": 0,
@@ -64,7 +64,7 @@ func add_xp(amount: int) -> Dictionary:
 	current_profile["season_xp"] = int(current_profile.get("season_xp", 0)) + amount
 	var new_rank := _calculate_rank(get_total_xp())
 	current_profile["rank"] = new_rank
-	if new_rank < int(current_profile.get("highest_rank", 7)):
+	if new_rank != -1 and new_rank < int(current_profile.get("highest_rank", 8)):
 		current_profile["highest_rank"] = new_rank
 	return {"old_rank": old_rank, "new_rank": new_rank, "rank_up": new_rank < old_rank}
 
