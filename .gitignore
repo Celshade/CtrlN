@@ -8,5 +8,8 @@ venv/*
 .temp/*
 BuildResources/*
 assets/*
+.godot/
+*.cache
+godot/assets/*
 player_data/*
 tests/pygame_tests/*
