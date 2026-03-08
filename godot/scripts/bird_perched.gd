@@ -45,7 +45,7 @@ func _load_sprite() -> void:
 			fly_anim.play("fly")
 	else:
 		fly_anim.visible = false
-		var filename := "res://assets/BirdPerchedRed.png" if is_red else "res://assets/BirdPerched.png"
+		var filename := "res://assets/bird_red/BirdPerchedRed.png" if is_red else "res://assets/bird_yellow/BirdPerched.png"
 		var tex := load(filename) as Texture2D
 		if tex:
 			sprite.texture = tex
@@ -62,7 +62,7 @@ static func _build_fly_frames() -> SpriteFrames:
 	frames.set_animation_speed("fly", 10)
 	frames.set_animation_loop("fly", true)
 	for i in range(3):  # BirdFlying.gif has exactly 3 frames
-		var tex := load("res://assets/bird_fly_%d.png" % i) as Texture2D
+		var tex := load("res://assets/bird_yellow/bird_fly_%d.png" % i) as Texture2D
 		if tex:
 			frames.add_frame("fly", tex)
 	return frames if frames.get_frame_count("fly") > 0 else null

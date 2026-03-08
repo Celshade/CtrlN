@@ -39,7 +39,7 @@ var counter: Node = null
 var char_select: Node = null
 
 var selected_character_id := "black"
-var selected_asset_path := "res://assets/player_black_ig.png"
+var selected_asset_path := "res://assets/characters/black/player_black_ig.png"
 
 # Notification queue
 var notification_queue: Array[String] = []
@@ -57,15 +57,15 @@ func _ready() -> void:
 
 func _setup_background() -> void:
 	var layer_defs := [
-		["sky_and_grass", "res://assets/sky_and_grass.png", 0.0],
-		["big_clouds", "res://assets/big_clouds.png", 0.025],
-		["mountains", "res://assets/mountains.png", 0.0],
-		["little_clouds", "res://assets/little_clouds.png", 0.05],
-		["background", "res://assets/background.png", 0.04],
-		["middleground_back", "res://assets/middleground_back.png", 0.0625],
-		["middleground_middle", "res://assets/middleground_middle.png", 0.08],
-		["middleground_front", "res://assets/middleground_front.png", 0.2],
-		["ground", "res://assets/ground.png", 1.0],
+		["sky_and_grass", "res://assets/level_one/sky_and_grass.png", 0.0],
+		["big_clouds", "res://assets/level_one/big_clouds.png", 0.025],
+		["mountains", "res://assets/level_one/mountains.png", 0.0],
+		["little_clouds", "res://assets/level_one/little_clouds.png", 0.05],
+		["background", "res://assets/level_one/background.png", 0.04],
+		["middleground_back", "res://assets/level_one/middleground_back.png", 0.0625],
+		["middleground_middle", "res://assets/level_one/middleground_middle.png", 0.08],
+		["middleground_front", "res://assets/level_one/middleground_front.png", 0.2],
+		["ground", "res://assets/level_one/ground.png", 1.0],
 	]
 	for def_arr in layer_defs:
 		var tex := load(def_arr[1]) as Texture2D
