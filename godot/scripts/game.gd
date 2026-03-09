@@ -226,7 +226,7 @@ func end_game() -> void:
 
 # ── Input ────────────────────────────────────────────────────────
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if state == GameConfig.GameState.CHARACTER_SELECT:
 		return  # Handled by char_select scene
 
@@ -239,8 +239,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					if player:
 						player.do_jump()
 			GameConfig.GameState.GAME_OVER:
-				state = GameConfig.GameState.MENU
-				_update_ui()
+				restart_game()
 
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		get_tree().quit()
@@ -506,7 +505,7 @@ func _refresh_ui() -> void:
 
 	match state:
 		GameConfig.GameState.MENU:
-			menu_label.text = "CKEY: Ctrl+N\n\nPress SPACE to Start\nHigh Score: %d" % high_score
+			menu_label.text = "CKEY: Ctrl+N\n\nTap to Start\nHigh Score: %d" % high_score
 			menu_label.visible = true
 
 		GameConfig.GameState.PLAYING:
@@ -518,7 +517,7 @@ func _refresh_ui() -> void:
 				tutorial_label.text = "Get Ready!"
 				tutorial_label.add_theme_color_override("font_color", Color.YELLOW)
 				tutorial_label.visible = true
-				tutorial_sub_label.text = "Press SPACE or TAP to Jump"
+				tutorial_sub_label.text = "Tap to Jump"
 				tutorial_sub_label.visible = true
 			elif tutorial_shield_explanation_active:
 				dark_overlay.color = Color(0, 0, 0, 0.6)
@@ -537,6 +536,7 @@ func _refresh_ui() -> void:
 			dark_overlay.visible = true
 			game_over_label.text = "Game Over\n\nScore: %d\nHigh Score: %d" % [score, high_score]
 			game_over_label.visible = true
+			game_over_restart_label.text = "Tap to Play Again"
 			game_over_restart_label.visible = true
 
 
