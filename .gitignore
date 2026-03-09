@@ -1,14 +1,67 @@
 # ### Python ### #
-venv/*
+venv/
 *.pyc*
-*__pycache__/*
+*__pycache__/
+*.egg-info/
+dist/
+build/
+*.pot
+*.mo
 
-# ### Development Resources ### #
+# ### Node.js ### #
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# ### Development IDE & Editor ### #
 .vscode/*
-.temp/*
-BuildResources/*
-assets/*
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+
+# ### Environment & Configuration (SENSITIVE) ### #
+.env
+.env.local
+.env.*.local
+godot/.env.build
+godot/.env
+
+# ### Android Keystore (SENSITIVE - contains private key) ### #
+godot/*.keystore
+godot/*.keystore.*
+godot/.keystore
+
+# ### Godot Cache & Build ### #
 .godot/
 *.cache*
-player_data/*
-tests/pygame_tests/*
+godot/.godot/
+
+# ### Android Build Artifacts ### #
+godot/ctrln.apk
+godot/ctrln-unsigned.apk
+godot/ctrln-debug.apk
+godot/ctrln.apk.idsig
+godot/android/build/build/
+godot/android/build/bin/
+godot/android/build/dist/
+godot/android/build/outputs/
+godot/android/build/intermediates/
+godot/android/build/.gradle/
+
+# ### Asset Metadata (Windows Zone Identifiers) ### #
+*:Zone.Identifier
+
+# ### Development & Test ### #
+BuildResources/
+assets/*
+player_data/
+tests/pygame_tests/
+.temp/*
+scratch/
+*.orig
+*.backup
