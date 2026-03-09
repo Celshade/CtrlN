@@ -41,6 +41,9 @@ godot/.keystore
 *.cache*
 godot/.godot/
 
+# ### Godot Plugins (downloaded separately) ### #
+godot/addons/
+
 # ### Android Build Artifacts ### #
 godot/ctrln.apk
 godot/ctrln-unsigned.apk
