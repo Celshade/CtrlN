@@ -9,7 +9,7 @@ description = ""
 readme = "README.md"
 license = {text = "GPL-3.0"}
 authors = [
-    {name = "Celshade", email = "celshade@gmail.com"}
+    {name = "Celshade", email = "celkeys@gmail.com"}
 ]
 keywords = ["game", "pygame"]
 classifiers = [
