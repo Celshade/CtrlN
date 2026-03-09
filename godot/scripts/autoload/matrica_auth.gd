@@ -88,10 +88,24 @@ func _process(delta: float) -> void:
 
 # ── HTTP callback ─────────────────────────────────────────────────
 
+func _notification(what: int) -> void:
+	# When the app comes back from background (e.g. returning from browser after OAuth),
+	# any in-flight poll may have been silently dropped by the OS. Clear the flag so
+	# _process can send a fresh poll immediately.
+	if what == NOTIFICATION_APPLICATION_FOCUS_IN and _active and _http_stage == "poll":
+		_request_in_flight = false
+		_poll_timer = 0.0
+
+
 func _on_http_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	_request_in_flight = false
 
 	if result != HTTPRequest.RESULT_SUCCESS:
+		# During the poll stage a transient connection error (e.g. the OS dropped the
+		# socket while the app was backgrounded) is not fatal — just retry.
+		if _http_stage == "poll":
+			_poll_timer = POLL_INTERVAL
+			return
 		_fail("Network error (code %d)" % result)
 		return
 	if response_code < 200 or response_code >= 300:
