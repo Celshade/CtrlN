@@ -4,6 +4,14 @@ Fast-paced, skill-based mobile action game. Tap to dodge, compete globally, unlo
 
 Built with Godot 4.6 | Web3-ready with optional Solana NFT profiles | Energy-based free-to-play | Powered by Solana + Matrica
 
+![Godot](https://img.shields.io/badge/Godot-4.6-478CBF?logo=godotengine&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Active%20Development-yellow)
+![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
+![Solana](https://img.shields.io/badge/Solana-14F195?logo=solana&logoColor=black)
+![Bitcoin](https://img.shields.io/badge/Bitcoin-Ordinals-F7931A?logo=bitcoin&logoColor=white)
+![License](https://img.shields.io/badge/License-GPL--3.0%20%2B%20Commons%20Clause-purple)
+
 ---
 
 ## 🚀 [Download v0.1.0 Demo](https://github.com/Celshade/CtrlN/releases/tag/v0.1.0-demo)
