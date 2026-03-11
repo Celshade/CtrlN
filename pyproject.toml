@@ -9,7 +9,7 @@ description = ""
 readme = "README.md"
 license = {text = "GPL-3.0"}
 authors = [
-    {name = "Celshade", email = "celkeys@gmail.com"}
+    {name = "Celshade", email = "celkeys@proton.me"}
 ]
 keywords = ["game", "pygame"]
 classifiers = [
@@ -32,7 +32,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Celshade/CtrlN"
+Homepage = "https://celkeys.io"
 Repository = "https://github.com/Celshade/CtrlN"
 Issues = "https://github.com/Celshade/CtrlN/issues"
 
