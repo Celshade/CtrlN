@@ -30,7 +30,7 @@ func _ready() -> void:
 	custom_minimum_size = Vector2(WINDOW_WIDTH, WINDOW_HEIGHT)
 	size = Vector2(WINDOW_WIDTH, WINDOW_HEIGHT)
 	
-	var labels := ["Login with Matrica", "Login with Solana", "Play as Guest", "Website", "Store"]
+	var labels := ["Play as Guest", "Login with Solana", "Login with Matrica", "Website", "Store"]
 	for i in range(labels.size()):
 		# First 3 buttons in left column (vertical), last 2 in right column
 		var col := COL1_X if i < 3 else COL2_X
@@ -61,7 +61,7 @@ func _input(event: InputEvent) -> void:
 		var pos: Vector2 = event.position
 		_hovered = -1
 		for i in range(_buttons.size()):
-			if i >= 3:  # Only first 3 buttons are interactive (4 and 5 are disabled)
+			if i == 1 or i >= 3:  # Skip Solana (1), Website (3), Store (4) - only allow 0 (Guest) and 2 (Matrica)
 				continue
 			if _buttons[i]["rect"].has_point(pos):
 				_hovered = i
@@ -71,7 +71,7 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton:
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			for i in range(_buttons.size()):
-				if i >= 3:  # Skip disabled buttons
+				if i == 1 or i >= 3:  # Skip Solana (1), Website (3), Store (4)
 					continue
 				if _buttons[i]["rect"].has_point(event.position):
 					_on_button_pressed(i)
@@ -80,23 +80,16 @@ func _input(event: InputEvent) -> void:
 
 func _on_button_pressed(idx: int) -> void:
 	match idx:
-		0:  # Matrica Login
+		0:  # Play as Guest
+			guest_pressed.emit()
+		2:  # Matrica Login
 			_waiting_for_login = true
 			queue_redraw()
 			MatricaAuth.start_login()
-		1:  # Solana Wallet Login
-			_waiting_for_login = true
-			queue_redraw()
-			if ClassDB.class_exists("WalletAdapter"):
-				SolanaAuth.start_wallet_login()
-			else:
-				_on_wallet_error("Solana SDK not installed")
-		2:  # Play as Guest
-			guest_pressed.emit()
-		3:  # Website (disabled)
-			website_pressed.emit()
-		4:  # Store (disabled)
-			store_pressed.emit()
+		1:  # Solana Wallet Login (disabled)
+			pass
+		3, 4:  # Website, Store (disabled)
+			pass
 
 
 func _on_matrica_success(profile: Dictionary) -> void:
@@ -171,11 +164,11 @@ func _draw() -> void:
 		var rect: Rect2 = btn["rect"]
 		var is_hovered := i == _hovered
 
-		var is_disabled := i >= 3  # Only buttons 0, 1, 2 are interactive
-		var bg_color := Color(0.25, 0.55, 0.9) if i == 0 \
+		var is_disabled := i == 1 or i >= 3  # Disable Solana (1), Website (3), Store (4)
+		var bg_color := Color(0.85, 0.55, 0.1) if i == 0 \
 			else Color(0.2, 0.75, 0.35) if i == 1 \
-			else Color(0.85, 0.55, 0.1) if i == 2 \
-			else Color(0.25, 0.25, 0.28)  # Disabled buttons (3+) are grey
+			else Color(0.25, 0.55, 0.9) if i == 2 \
+			else Color(0.25, 0.25, 0.28)  # Disabled buttons are grey
 		if not is_disabled and is_hovered:
 			bg_color = bg_color.lightened(0.18)
 
