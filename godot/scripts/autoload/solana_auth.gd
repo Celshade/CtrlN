@@ -31,9 +31,11 @@ func start_wallet_login() -> void:
 		wallet_error.emit("Solana SDK not installed - see SOLANA_SETUP.md for installation")
 		return
 	
+	print("➤ SolanaAuth: Starting wallet login...")
 	# Request wallet connection
 	wallet_adapter.connect_wallet()
 	await get_tree().create_timer(0.5).timeout
+	print("➤ SolanaAuth: Requesting wallet signature...")
 	_request_wallet_signature()
 
 func _request_wallet_signature() -> void:
@@ -43,9 +45,16 @@ func _request_wallet_signature() -> void:
 	var message = "CtrlN Login\nNonce: %s\nTimestamp: %d" % [nonce, timestamp]
 	var message_bytes = message.to_utf8_buffer()
 	
+	print("➤ SolanaAuth: Waiting for wallet signature...")
 	# Request signature from wallet
 	var signature = await wallet_adapter.sign_message(message_bytes)
-	if signature == null or signature is String:
+	print("✓ SolanaAuth: Signature response received: ", type_string(typeof(signature)))
+	
+	if signature == null:
+		wallet_error.emit("Wallet signing was cancelled")
+		return
+	
+	if signature is String:
 		wallet_error.emit("Wallet signing failed: " + str(signature))
 		return
 	
@@ -55,6 +64,7 @@ func _request_wallet_signature() -> void:
 		wallet_error.emit("Could not retrieve wallet address")
 		return
 	
+	print("✓ SolanaAuth: Got pubkey: ", user_pubkey)
 	# Send to backend for verification
 	_verify_wallet_signature(user_pubkey, signature, nonce, timestamp)
 
@@ -62,7 +72,7 @@ func _verify_wallet_signature(pubkey: String, signature: PackedByteArray, nonce:
 	var http = HTTPRequest.new()
 	add_child(http)
 	http.request_completed.connect(func(_result, _code, _headers, body):
-		_on_wallet_verify_response(http, body))
+		_on_wallet_verify_response(http, _code, body))
 	
 	var body = JSON.stringify({
 		"pubkey": pubkey,
@@ -71,6 +81,7 @@ func _verify_wallet_signature(pubkey: String, signature: PackedByteArray, nonce:
 		"auth_token": ""
 	})
 	
+	print("➤ SolanaAuth: Sending signature to backend...")
 	var headers = ["Content-Type: application/json"]
 	http.request(
 		"https://celkeys.io/api/auth/wallet/verify",
@@ -79,21 +90,35 @@ func _verify_wallet_signature(pubkey: String, signature: PackedByteArray, nonce:
 		body
 	)
 
-func _on_wallet_verify_response(http: HTTPRequest, body: PackedByteArray) -> void:
+func _on_wallet_verify_response(http: HTTPRequest, code: int, body: PackedByteArray) -> void:
+	print("✓ SolanaAuth: Backend response code: ", code)
 	var response = JSON.parse_string(body.get_string_from_utf8())
 	http.queue_free()
 	
-	if response and response.has("gameState"):
+	if response == null:
+		wallet_error.emit("Backend returned invalid JSON: " + body.get_string_from_utf8())
+		return
+	
+	print("✓ SolanaAuth: Backend response: ", response)
+	
+	if code != 200:
+		var error = response.get("error", "HTTP %d" % code) if response is Dictionary else "HTTP %d" % code
+		wallet_error.emit(error)
+		return
+	
+	if response.has("gameState"):
 		_game_state = response["gameState"]
+		print("✓ SolanaAuth: Got gameState: ", _game_state)
 		_start_profile_polling()
 	else:
-		var error = response.get("error", "Wallet verification failed") if response else "Empty response"
+		var error = response.get("error", "No gameState in response") if response is Dictionary else "No gameState in response"
 		wallet_error.emit(error)
 
 func _start_profile_polling() -> void:
 	if is_polling:
 		return
 	
+	print("➤ SolanaAuth: Starting profile polling...")
 	is_polling = true
 	var max_polls = 200  # ~5 minutes with 1.5s interval
 	var poll_count = 0
@@ -112,18 +137,21 @@ func _start_profile_polling() -> void:
 		
 		if response[0] == OK:
 			var data_str = response[3].get_string_from_utf8()
+			print("  Poll #%d: %s" % [poll_count + 1, data_str])
 			
 			# Check if response is still "pending"
 			if data_str != "pending":
 				var profile = JSON.parse_string(data_str)
 				if profile and profile.has("id"):
 					is_polling = false
+					print("✓ SolanaAuth: Profile authenticated!")
 					wallet_authenticated.emit(profile)
 					return
 		
 		poll_count += 1
 	
 	is_polling = false
+	print("✗ SolanaAuth: Polling timeout")
 	wallet_error.emit("Wallet login timeout - please try again")
 
 func _generate_nonce() -> String:
