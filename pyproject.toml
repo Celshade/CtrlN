@@ -3,13 +3,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "clackykey"
+name = "ctrln"
 version = "0.1.0"
 description = ""
 readme = "README.md"
 license = {text = "GPL-3.0"}
 authors = [
-    {name = "Celshade", email = "celshade@gmail.com"}
+    {name = "Celshade", email = "celkeys@proton.me"}
 ]
 keywords = ["game", "pygame"]
 classifiers = [
@@ -32,18 +32,18 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Celshade/ClackyKey"
-Repository = "https://github.com/Celshade/ClackyKey"
-Issues = "https://github.com/Celshade/ClackyKey/issues"
+Homepage = "https://celkeys.io"
+Repository = "https://github.com/Celshade/CtrlN"
+Issues = "https://github.com/Celshade/CtrlN/issues"
 
 [project.scripts]
-clackykey = "clackykey.main:main"
+ctrln = "ctrln.main:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/clackykey"]
+packages = ["src/ctrln"]
 
 [tool.hatch.build.targets.wheel.force-include]
-assets = "clackykey/assets"
+assets = "ctrln/assets"
 
 [tool.pytest.ini_options]
 minversion = "7.0"
@@ -53,7 +53,7 @@ pythonpath = ["src"]
 addopts = "-v --tb=short"
 
 [tool.coverage.run]
-source = ["src/clackykey"]
+source = ["src/ctrln"]
 branch = true
 
 [tool.coverage.report]

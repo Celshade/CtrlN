@@ -38,13 +38,13 @@ RANKS = {
         # TODO move +5% xp to achievement
         # NOTE agility_boost grants x-amount of bonus xp every 50 points
         # without taking damage
-        "unlocks": ["role", "agility_boost"]
+        "unlocks": ["role", "agility_boost", "white"]
     },
     4: {
         "name": "Silver",
         "min_points": 3000,
         # TODO move +2% xp to achievement
-        "unlocks": ["role", "leaderboard_access"]
+        "unlocks": ["role", "leaderboard_access", "grey"]
     },
     5: {
         "name": "Bronze",
@@ -56,12 +56,12 @@ RANKS = {
     6: {
         "name": "Iron",
         "min_points": 500,
-        "unlocks": ["green_key", "orange_key"]
+        "unlocks": ["green", "orange"]
     },
     7: {
         "name": "Bamboo",
         "min_points": 100,
-        "unlocks": ["yellow_key", "purple_key"]
+        "unlocks": ["yellow", "purple"]
     }
 }
 
@@ -78,6 +78,46 @@ def get_rank_unlocks(rank: int) -> list[str]:
     if rank in RANKS:
         return RANKS[rank]["unlocks"]
     return []
+
+
+def get_unlocked_characters(rank: int) -> set[str]:
+    """Get all character IDs unlocked at the given rank or higher.
+
+    Lower rank numbers = higher tiers. Characters unlocked at lower
+    tiers (higher rank numbers) are available at higher tiers.
+
+    NOTE: aqua and sunset will be unlocked via store purchase.
+    NOTE: silver and gold will be unlocked for NFT holders.
+
+    Args:
+        rank: Rank ID (-1 for Unranked, 0-7)
+
+    Returns:
+        set: Character IDs available to the player at this rank
+    """
+    # Base characters always available
+    unlocked = {"black", "dark_green", "blue", "red"}
+
+    # Check each rank: include unlocks at this rank and lower tiers
+    # (which have higher rank numbers for non-negative ranks)
+    for check_rank, rank_info in RANKS.items():
+        # Include unlocks if check_rank == rank (current tier)
+        # or if check_rank is a lower tier (higher number for positive ranks)
+        should_include = (check_rank == rank)
+
+        # For positive tiers: higher numbers = lower rank (worse tier)
+        if check_rank >= 0 and rank >= 0:
+            should_include = should_include or (check_rank > rank)
+
+        if should_include:
+            rank_unlocks = rank_info.get("unlocks", [])
+            for unlock in rank_unlocks:
+                if unlock in {
+                    "yellow", "purple", "green", "orange", "white", "grey"
+                }:
+                    unlocked.add(unlock)
+
+    return unlocked
 
 
 def display_rank_progression() -> str:

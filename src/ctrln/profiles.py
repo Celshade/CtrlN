@@ -14,7 +14,8 @@ class Profile:
     # memory-efficient attribute storage
     __slots__ = ("_player_id", "_player_name", "_current_xp", "_total_xp",
                  "_rank", "_highest_rank", "_prestige", "_seasons_played",
-                 "_games_played", "_achievements", "_achievement_stats")
+                 "_games_played", "_games_per_character", "_achievements",
+                 "_achievement_stats")
 
 # Getters and Setters with type validation
     @property
@@ -73,8 +74,8 @@ class Profile:
     @rank.setter
     def rank(self, value: int) -> None:
         """Set current rank with validation."""
-        if not isinstance(value, int) or value < 0:
-            raise ValueError("rank must be a non-negative integer")
+        if not isinstance(value, int) or value < -1:
+            raise ValueError("rank must be -1 (Unranked) or 0-7")
         self._rank = value
 
     @property
@@ -126,6 +127,18 @@ class Profile:
         self._games_played = value
 
     @property
+    def games_per_character(self) -> dict:
+        """Get games played per character (character_id -> count)."""
+        return self._games_per_character
+
+    @games_per_character.setter
+    def games_per_character(self, value: dict) -> None:
+        """Set games per character with validation."""
+        if not isinstance(value, dict):
+            raise ValueError("games_per_character must be a dict")
+        self._games_per_character = value
+
+    @property
     def achievements(self) -> list:
         """Get list of achievements."""
         return self._achievements
@@ -154,6 +167,7 @@ class Profile:
                  current_xp: int, total_xp: int,
                  rank: int, highest_rank: int = 0, prestige: int = 0,
                  seasons_played: int = 0, games_played: int = 0,
+                 games_per_character: dict = None,
                  achievements: list = None,
                  achievement_stats: dict = None):
         """Initialize a player profile with validation.
@@ -163,11 +177,13 @@ class Profile:
             player_name: Display name.
             current_xp: XP earned in current season.
             total_xp: All-time XP earned.
-            rank: Current rank ID 0-7.
+            rank: Current rank ID (-1 to 7, where -1=Unranked, 0=Prestige).
             highest_rank: Best rank achieved (default=0).
             prestige: Prestige level (default=0).
             seasons_played: Number of completed seasons (default=0).
             games_played: Total number of games played (default=0).
+            games_per_character: Dict mapping character IDs to game counts
+                (default=None=>{}).
             achievements: List of achievement IDs (default=None=>[]).
             achievement_stats: Lifetime stat counters for achievements
                 (default=None=>{}).
@@ -184,8 +200,8 @@ class Profile:
             raise ValueError("current_xp must be a non-negative integer")
         if not isinstance(total_xp, int) or total_xp < 0:
             raise ValueError("total_xp must be a non-negative integer")
-        if not isinstance(rank, int) or rank < 0:
-            raise ValueError("rank must be a non-negative integer")
+        if not isinstance(rank, int) or rank < -1:
+            raise ValueError("rank must be -1 (Unranked) or 0-7")
 
         # Validate optional args
         if not isinstance(highest_rank, int) or highest_rank < 0:
@@ -196,6 +212,10 @@ class Profile:
             raise ValueError("seasons_played must be a non-negative integer")
         if not isinstance(games_played, int) or games_played < 0:
             raise ValueError("games_played must be a non-negative integer")
+        if games_per_character is None:
+            games_per_character = {}
+        elif not isinstance(games_per_character, dict):
+            raise ValueError("games_per_character must be a dict")
         if achievements is None:
             achievements = []
         elif not isinstance(achievements, list):
@@ -214,6 +234,7 @@ class Profile:
         self.prestige = prestige
         self.seasons_played = seasons_played
         self.games_played = games_played
+        self.games_per_character = games_per_character
         self.achievements = achievements
         self.achievement_stats = achievement_stats
 
@@ -241,25 +262,29 @@ class Profile:
             with open(filename, "r") as f:
                 data = json.load(f)
 
+            # Handle backward compatibility: current_xp -> season_xp
+            season_xp = data.get("season_xp", data.get("current_xp", 0))
+
             return cls(
                 player_id=data["id"],
                 player_name=data["name"],
-                current_xp=data["current_xp"],
+                current_xp=season_xp,
                 total_xp=data["total_xp"],
                 rank=data["rank"],
                 highest_rank=data.get("highest_rank", 0),
                 prestige=data.get("prestige", 0),
                 seasons_played=data.get("seasons_played", 0),
                 games_played=data.get("games_played", 0),
+                games_per_character=data.get("games_per_character", {}),
                 achievements=data.get("achievements", []),
                 achievement_stats=data.get("achievement_stats", {})
             )
         except KeyError as ke:
             raise ValueError(f"Missing required field: {ke}") from ke
-        except ValueError as ve:
-            raise ValueError(f"Invalid profile data: {ve}") from ve
         except json.JSONDecodeError as je:
             raise ValueError(f"Malformed JSON in {filename}: {je}") from je
+        except ValueError as ve:
+            raise ValueError(f"Invalid profile data: {ve}") from ve
         except FileNotFoundError as fe:
             raise FileNotFoundError(f"{filename} not found: {fe}") from fe
 
@@ -289,7 +314,7 @@ class Profile:
             player_name="Unknown",
             current_xp=0,
             total_xp=0,
-            rank=0
+            rank=-1
         )
 
     def save_to_file(self, filename: str = None, data: dict = None) -> bool:
@@ -316,13 +341,14 @@ class Profile:
             profile_data = {
                 "id": self.player_id,
                 "name": self.player_name,
-                "current_xp": self.current_xp,
+                "season_xp": self.current_xp,
                 "total_xp": self.total_xp,
                 "rank": self.rank,
                 "highest_rank": self.highest_rank,
                 "prestige": self.prestige,
                 "seasons_played": self.seasons_played,
                 "games_played": self.games_played,
+                "games_per_character": self.games_per_character,
                 "achievements": self.achievements,
                 "achievement_stats": self.achievement_stats
             }
@@ -344,3 +370,49 @@ class Profile:
         for key, value in data.items():
             if hasattr(self, key):
                 setattr(self, key, value)
+
+    def get_character_mastery(self, character_id: str) -> bool:
+        """Return if a character is mastered based on games played.
+
+        Mastery threshold is 10 games per character. A character is either
+        mastered or not.
+
+        Args:
+            character_id: The ID of the character to check mastery for.
+        """
+        games_count = self.games_per_character.get(character_id, 0)
+        return True if games_count >= 10 else False
+
+    def get_total_mastery(self) -> int:
+        """Count total number of characters with mastery.
+
+        Returns the number of unique characters the player has mastered
+        (10+ games each).
+
+        Returns:
+            int: Number of mastered characters.
+        """
+        return sum(self.get_character_mastery(char_id)
+                   for char_id in self.games_per_character)
+
+    def get_character_mastery_display(self, character_id: str) -> str:
+        """Get a formatted display string of character mastery.
+
+        Shows progress toward mastery (e.g., "7/10 games") or a star when
+        mastered.
+
+        Args:
+            character_id: The ID of the character to display mastery for.
+
+        Returns:
+            str: Formatted mastery display string, or "No mastery" if no
+                 games played with the character.
+        """
+        games_count = self.games_per_character.get(character_id, 0)
+        if games_count == 0:
+            return "No mastery"
+
+        if games_count >= 10:
+            return "⭐"
+
+        return f"{games_count}/10 games"

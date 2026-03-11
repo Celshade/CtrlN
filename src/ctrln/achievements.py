@@ -282,7 +282,7 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=1,
     ),
-    # #99
+    # #100
     "buy_keycap": Achievement(
         name="Keycapper",
         description="Buy a keycap from the store",
@@ -290,7 +290,7 @@ ACHIEVEMENT_REGISTRY: dict[str, Achievement] = {
         stat_key=None,
         threshold=1,
     ),
-    # #100
+    # #101
     "buy_thruster": Achievement(
         name="Thruster",
         description="Buy a thruster from the store",
@@ -429,6 +429,17 @@ _DEFAULT_STATS: dict[str, int | str] = {
     "last_played":         "",   # ISO UTC date of last save(); "" = never
 }
 
+# ---------------------------------------------------------------------- #
+# Module-level indexes — built once at import time for O(1) kind/stat   #
+# lookups instead of scanning the full registry on every check call.    #
+# ---------------------------------------------------------------------- #
+_BY_STAT: dict[str, list[tuple[str, Achievement]]] = {}
+_BY_KIND: dict[str, list[tuple[str, Achievement]]] = {}
+for _aid, _entry in ACHIEVEMENT_REGISTRY.items():
+    _BY_KIND.setdefault(_entry.kind, []).append((_aid, _entry))
+    if _entry.stat_key is not None:
+        _BY_STAT.setdefault(_entry.stat_key, []).append((_aid, _entry))
+
 
 class Achievements:
     """Tracks unlocked achievements and lifetime stats for a player.
@@ -484,7 +495,7 @@ class Achievements:
             elif delta == 1:
                 # Consecutive day — advance streak
                 self.stats["daily_streak"] = (
-                    int(self.stats.get("daily_streak", 0)) + 1
+                    int(self.stats["daily_streak"]) + 1
                 )
             else:
                 # Streak broken — reset
@@ -526,19 +537,16 @@ class Achievements:
         Returns:
             List of newly-unlocked achievement IDs (may be empty).
         """
-        newly_unlocked = []
-        for aid, entry in ACHIEVEMENT_REGISTRY.items():
-            if aid in self.unlocked:
-                continue
-            if entry.kind == "game_score" and score >= entry.threshold:
-                self.unlocked.add(aid)
-                newly_unlocked.append(aid)
-            elif (entry.kind == "no_shield"
-                  and not shield_used
-                  and score >= entry.threshold):
-                self.unlocked.add(aid)
-                newly_unlocked.append(aid)
-        return newly_unlocked
+        newly = self._unlock_matching(
+            _BY_KIND.get("game_score", []),
+            lambda e: score >= e.threshold,
+        )
+        if not shield_used:
+            newly += self._unlock_matching(
+                _BY_KIND.get("no_shield", []),
+                lambda e: score >= e.threshold,
+            )
+        return newly
 
     def check_rank(self, rank_id: int) -> list[str]:
         """Check rank achievements after a rank change.
@@ -549,16 +557,12 @@ class Achievements:
         Returns:
             List of newly-unlocked achievement IDs (may be empty).
         """
-        newly_unlocked = []
-        for aid, entry in ACHIEVEMENT_REGISTRY.items():
-            if aid in self.unlocked:
-                continue
-            # threshold stores the required rank_id; lower id = higher rank,
-            # so unlock when the player's rank_id <= the achievement threshold
-            if entry.kind == "rank" and rank_id <= entry.threshold:
-                self.unlocked.add(aid)
-                newly_unlocked.append(aid)
-        return newly_unlocked
+        # threshold stores the required rank_id; lower id = higher rank,
+        # so unlock when the player's rank_id <= the achievement threshold
+        return self._unlock_matching(
+            _BY_KIND.get("rank", []),
+            lambda e: rank_id <= e.threshold,
+        )
 
     def unlock(self, achievement_id: str) -> list[str]:
         """Manually unlock a specific achievement (store / manual types).
@@ -587,6 +591,27 @@ class Achievements:
     # Internal helpers                                                    #
     # ------------------------------------------------------------------ #
 
+    def _unlock_matching(
+        self,
+        candidates: list[tuple[str, Achievement]],
+        predicate,
+    ) -> list[str]:
+        """Unlock every candidate whose entry satisfies *predicate*.
+
+        Args:
+            candidates: ``(id, Achievement)`` pairs to evaluate.
+            predicate: Callable ``(Achievement) -> bool``.
+
+        Returns:
+            List of newly-unlocked achievement IDs (may be empty).
+        """
+        newly: list[str] = []
+        for aid, entry in candidates:
+            if aid not in self.unlocked and predicate(entry):
+                self.unlocked.add(aid)
+                newly.append(aid)
+        return newly
+
     def _check_stat_achievements(self, stat: str) -> list[str]:
         """Check all stat-type achievements tied to the given stat key.
 
@@ -596,14 +621,8 @@ class Achievements:
         Returns:
             List of newly-unlocked achievement IDs (may be empty).
         """
-        current = self.stats[stat]
-        newly_unlocked = []
-        for aid, entry in ACHIEVEMENT_REGISTRY.items():
-            if aid in self.unlocked:
-                continue
-            if (entry.kind == "stat"
-                    and entry.stat_key == stat
-                    and current >= entry.threshold):
-                self.unlocked.add(aid)
-                newly_unlocked.append(aid)
-        return newly_unlocked
+        current = self.stats.get(stat, 0)
+        return self._unlock_matching(
+            _BY_STAT.get(stat, []),
+            lambda e: current >= e.threshold,
+        )

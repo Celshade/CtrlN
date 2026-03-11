@@ -1,8 +1,8 @@
-from typing import NamedTuple
-
 import pygame
 from PIL import Image
 
+from characters import Character, CHARACTER_ROSTER, CHARACTER_ORDER
+from ranks import get_unlocked_characters
 from config import WINDOW_WIDTH, WINDOW_HEIGHT, GROUND_Y, BLACK, WHITE, YELLOW
 
 
@@ -49,64 +49,6 @@ _FONT_BTN    = 22
 _FONT_HINT   = 18
 
 
-# ====================== #
-# ### Character data ### #
-# ====================== #
-class Character(NamedTuple):
-    """Immutable descriptor for a selectable character."""
-    id: str
-    name: str
-    asset_path: str          # sprite used by the Player class in-game
-    preview_path: str = ""   # animated webP shown on the select screen
-    description: str = ""
-    locked: bool = False     # if True: greyed out and unselectable
-
-
-# Shared placeholder assets; swap per-entry once unique assets exist.
-_DEFAULT_ASSET   = "assets/player.png"
-_DEFAULT_PREVIEW = "assets/key_bounce.webP"
-
-
-def _char(
-    cid: str,
-    name: str,
-    locked: bool = False,
-    asset_path: str = _DEFAULT_ASSET,
-    preview_path: str = _DEFAULT_PREVIEW,
-) -> Character:
-    """Convenience constructor that fills in shared asset defaults."""
-    return Character(
-        id=cid,
-        name=name,
-        asset_path=asset_path,
-        preview_path=preview_path,
-        locked=locked,
-    )
-
-
-# NOTE: Add new entries here; the grid expands automatically up to 15 slots.
-# Characters with locked=True show a padlock overlay and cannot be selected.
-CHARACTER_ROSTER: list[Character] = [
-    # fmt: off
-    _char("black",      "Black"),
-    _char("grey",       "Grey"),
-    _char("dark_green", "Dark Green"),
-    _char("dark_blue",  "Dark Blue"),
-    _char("red",        "Red"),
-    # --- locked below this line ---
-    _char("yellow",  "Yellow",  locked=True),
-    _char("purple",  "Purple",  locked=True),
-    _char("green",   "Green",   locked=True),
-    _char("orange",  "Orange",  locked=True),
-    _char("white",   "White",   locked=True),
-    _char("aqua",    "Aqua",    locked=True),
-    _char("sunset",  "Sunset",  locked=True),
-    _char("silver",  "Silver",  locked=True),
-    _char("gold",    "Gold",    locked=True),
-    # fmt: on
-]
-
-
 # ============================ #
 # ### CharacterSelect UI   ### #
 # ============================ #
@@ -124,30 +66,20 @@ class CharacterSelect:
     _frame_cache: dict[tuple[str, int], list[pygame.Surface]] = {}
     _static_cache: dict[tuple[str, int], pygame.Surface] = {}
 
-    def __init__(self) -> None:
+    def __init__(self, player_rank: int = -1) -> None:
         self._font_title = pygame.font.Font(None, _FONT_TITLE)
         self._font_name  = pygame.font.Font(None, _FONT_NAME)
         self._font_btn   = pygame.font.Font(None, _FONT_BTN)
         self._font_hint  = pygame.font.Font(None, _FONT_HINT)
 
-        self.selected_index: int = 0
+        # Build set of unlocked characters based on player rank
+        self._unlocked_characters = get_unlocked_characters(
+            player_rank
+        )
+
+        default_id = CHARACTER_ORDER[0] if CHARACTER_ORDER else "black"
+        self.selected_id: str = default_id
         self._icon_rects: list[pygame.Rect] = []
-
-        preview_path = CHARACTER_ROSTER[0].preview_path
-        asset_path   = CHARACTER_ROSTER[0].asset_path
-
-        # Animated frames at icon size (shown only for the selected icon).
-        self._icon_frames: list[pygame.Surface] = self._load_frames(
-            preview_path, _ICON_SZ
-        )
-        # Static image at icon size (shown for every unselected icon).
-        self._icon_static: pygame.Surface | None = self._load_static(
-            asset_path, _ICON_SZ
-        )
-        # Animated frames at featured size (right-panel card).
-        self._feat_frames: list[pygame.Surface] = self._load_frames(
-            preview_path, _PREV_SZ
-        )
 
         self._anim_frame: int = 0
         self._last_frame_time: int = 0
@@ -261,13 +193,19 @@ class CharacterSelect:
     # Navigation                                                         #
     # ------------------------------------------------------------------ #
 
+    def _is_character_locked(self, char_id: str) -> bool:
+        """Check if a character is locked for the current player."""
+        return char_id not in self._unlocked_characters
+
     def _navigate_by(self, step: int) -> None:
         """Advance selection by *step* slots, wrapping; skips locked entries."""
-        n = len(CHARACTER_ROSTER)
-        idx = (self.selected_index + step) % n
+        n = len(CHARACTER_ORDER)
+        current_idx = CHARACTER_ORDER.index(self.selected_id)
+        idx = (current_idx + step) % n
         for _ in range(n):
-            if not CHARACTER_ROSTER[idx].locked:
-                self.selected_index = idx
+            char_id = CHARACTER_ORDER[idx]
+            if not self._is_character_locked(char_id):
+                self.selected_id = char_id
                 return
             idx = (idx + step) % n
 
@@ -282,7 +220,7 @@ class CharacterSelect:
     @property
     def selected(self) -> Character:
         """Return the currently highlighted Character."""
-        return CHARACTER_ROSTER[self.selected_index]
+        return CHARACTER_ROSTER[self.selected_id]
 
     # ------------------------------------------------------------------ #
     # Hit-testing                                                        #
@@ -292,13 +230,15 @@ class CharacterSelect:
         """Return True if *pos* is inside the Play button."""
         return self._play_button_rect.collidepoint(pos)
 
-    def icon_slot_at(self, pos: tuple[int, int]) -> int | None:
-        """Return the roster index for the unlocked icon at *pos*, or None."""
+    def icon_slot_at(self, pos: tuple[int, int]) -> str | None:
+        """Return the character ID for the unlocked icon at *pos*, or None."""
         for slot, rect in enumerate(self._icon_rects):
-            if slot >= len(CHARACTER_ROSTER):
+            if slot >= len(CHARACTER_ORDER):
                 break
             if rect.collidepoint(pos):
-                return None if CHARACTER_ROSTER[slot].locked else slot
+                char_id = CHARACTER_ORDER[slot]
+                is_locked = self._is_character_locked(char_id)
+                return None if is_locked else char_id
         return None
 
     # ------------------------------------------------------------------ #
@@ -310,12 +250,10 @@ class CharacterSelect:
         mouse_pos = pygame.mouse.get_pos()
 
         # Advance shared animation clock.
-        if self._icon_frames:
-            now = pygame.time.get_ticks()
-            if now - self._last_frame_time >= _FRAME_MS:
-                self._last_frame_time = now
-                total = len(self._icon_frames)
-                self._anim_frame = (self._anim_frame + 1) % total
+        now = pygame.time.get_ticks()
+        if now - self._last_frame_time >= _FRAME_MS:
+            self._last_frame_time = now
+            self._anim_frame += 1
 
         # ---- Title ----
         title = self._font_title.render(
@@ -338,9 +276,10 @@ class CharacterSelect:
     ) -> None:
         """Draw the 5×3 icon grid in the left panel."""
         for slot, rect in enumerate(self._icon_rects):
-            if slot >= len(CHARACTER_ROSTER):
+            if slot >= len(CHARACTER_ORDER):
                 break
-            is_sel = slot == self.selected_index
+            char_id = CHARACTER_ORDER[slot]
+            is_sel = char_id == self.selected_id
             is_hov = rect.collidepoint(mouse_pos)
 
             pygame.draw.rect(screen, _ICON_BG, rect, border_radius=6)
@@ -355,13 +294,17 @@ class CharacterSelect:
 
             img_x = rect.x + (_ICON_CELL - _ICON_SZ) // 2
             img_y = rect.y + (_ICON_CELL - _ICON_SZ) // 2
-            is_locked = CHARACTER_ROSTER[slot].locked
-            if is_sel and self._icon_frames and not is_locked:
-                screen.blit(
-                    self._icon_frames[self._anim_frame], (img_x, img_y)
-                )
-            elif self._icon_static:
-                screen.blit(self._icon_static, (img_x, img_y))
+            char = CHARACTER_ROSTER[char_id]
+            is_locked = self._is_character_locked(char_id)
+            if is_sel and not is_locked:
+                frames = self._load_frames(char.preview_path, _ICON_SZ)
+                if frames:
+                    frame_idx = self._anim_frame % len(frames)
+                    screen.blit(frames[frame_idx], (img_x, img_y))
+            else:
+                static = self._load_static(char.asset_path, _ICON_SZ)
+                if static:
+                    screen.blit(static, (img_x, img_y))
 
             # Lock overlay + emoji for locked slots
             if is_locked:
@@ -404,13 +347,16 @@ class CharacterSelect:
         # Featured preview image
         img_x = card_rect.x + (_CARD_W - _PREV_SZ) // 2
         img_y = card_rect.y + 10
-        if self._feat_frames:
-            # feat frames advance at same clock as icon frames
-            feat_frame = self._anim_frame % len(self._feat_frames)
-            screen.blit(self._feat_frames[feat_frame], (img_x, img_y))
+        selected_char = CHARACTER_ROSTER[self.selected_id]
+        feat_frames = self._load_frames(
+            selected_char.preview_path, _PREV_SZ
+        )
+        if feat_frames:
+            frame_idx = self._anim_frame % len(feat_frames)
+            screen.blit(feat_frames[frame_idx], (img_x, img_y))
 
         # Character name
-        name = CHARACTER_ROSTER[self.selected_index].name
+        name = selected_char.name
         name_surf = self._font_name.render(name, True, BLACK)
         name_y = img_y + _PREV_SZ + 6
         screen.blit(

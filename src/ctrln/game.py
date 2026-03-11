@@ -4,9 +4,14 @@ import pygame
 
 from achievements import Achievements
 from background import Background
-from character_select import CharacterSelect, CHARACTER_ROSTER
+from character_select import CharacterSelect
+from characters import CHARACTER_ROSTER, CHARACTER_ORDER
 from player import Player
 from profiles import Profile
+from counter import Counter
+from spawner import Spawner
+from tutorial import Tutorial
+from ui import UI
 from counter import Counter
 from spawner import Spawner
 from tutorial import Tutorial
@@ -26,7 +31,7 @@ class Game:
         print("Creating window...")
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT),
                                               pygame.SHOWN)
-        pygame.display.set_caption("Clacky Key")  # window title
+        pygame.display.set_caption("CKEY: Ctrl+N")  # window title
         print("Window created!")
 
         self.clock = pygame.time.Clock()  # init game clock
@@ -43,8 +48,6 @@ class Game:
         self.spawner = Spawner()
         self.ui = UI()
         self.tutorial = Tutorial()
-        self.char_select = CharacterSelect()
-        self.selected_character = CHARACTER_ROSTER[0]
 
         # Load player profile and init achievement tracker from it
         self.profile = Profile.load_by_id(player_id)
@@ -52,6 +55,10 @@ class Game:
             unlocked=self.profile.achievements,
             stats=self.profile.achievement_stats
         )
+
+        # Create character select with player's current rank
+        self.char_select = CharacterSelect(player_rank=self.profile.rank)
+        self.selected_character = CHARACTER_ROSTER[CHARACTER_ORDER[0]]
         self.shield_used_this_game = False
         self.notification_queue: list[str] = []
         self.notification_frames = 0
@@ -91,7 +98,7 @@ class Game:
                 if self.state == GameState.CHARACTER_SELECT:
                     slot = self.char_select.icon_slot_at(event.pos)
                     if slot is not None:
-                        self.char_select.selected_index = slot
+                        self.char_select.selected_id = slot
                     elif self.char_select.is_play_clicked(event.pos):
                         self._confirm_character()
                 else:
@@ -103,7 +110,9 @@ class Game:
         self.score = 0
         self.shield_used_this_game = False
         self.counter = Counter()
-        self.player = Player(asset_path=self.selected_character.asset_path)
+        self.player = Player(profile=self.profile, 
+                             character_id=self.selected_character.id,
+                             asset_path=self.selected_character.asset_path)
         self.background.reset()
         self.spawner.reset()
         self.tutorial.reset()
@@ -246,6 +255,9 @@ class Game:
         self.state = GameState.GAME_OVER
         if self.score > self.high_score:
             self.high_score = self.score
+        # Award XP based on score (1 XP per point)
+        xp_earned = self.score
+        self.player.add_xp(xp_earned)
         # Achievement checks at game-over
         self._notify(self.achievements.record_play())
         self._notify(self.achievements.increment("games_played"))
@@ -265,6 +277,18 @@ class Game:
         self.profile.achievement_stats = self.achievements.stats
         self.profile.games_played = self.achievements.stats.get("games_played",
                                                                  self.profile.games_played)
+        # Increment games played for this character
+        if self.player.character_id:
+            if self.player.character_id not in self.profile.games_per_character:
+                self.profile.games_per_character[self.player.character_id] = 0
+            self.profile.games_per_character[self.player.character_id] += 1
+        # Sync player progression data
+        self.profile.current_xp = self.player.season_xp
+        self.profile.total_xp = self.player.total_xp
+        self.profile.rank = self.player.rank
+        self.profile.highest_rank = self.player.highest_rank
+        self.profile.prestige = self.player.prestige
+        self.profile.seasons_played = self.player.seasons_played
         self.profile.save_to_file()
 
     def draw(self) -> None:

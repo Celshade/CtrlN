@@ -20,14 +20,17 @@ class Player:
     and integrates with player progression profile.
     """
     def __init__(self, profile: Profile | None = None,
+                 character_id: str | None = None,
                  asset_path: str = "assets/player.png") -> None:
         """Initialize player entity.
 
         Args:
-            profile:    Optional Profile for XP/rank persistence.
-            asset_path: Path to the sprite image used for this character.
+            profile:       Optional Profile for XP/rank persistence.
+            character_id:  Optional character ID for tracking games per character.
+            asset_path:    Path to the sprite image used for this character.
         """
         self.profile = profile
+        self.character_id = character_id
         self.x_pos = PLAYER_START_X
         self.y_pos = PLAYER_START_Y
         self.vel = 0
@@ -37,7 +40,7 @@ class Player:
         if profile:
             self.player_id = profile.player_id
             self.player_name = profile.player_name
-            self.current_xp = profile.current_xp
+            self.season_xp = profile.current_xp
             self.total_xp = profile.total_xp
             self.rank = profile.rank
             self.highest_rank = profile.highest_rank
@@ -47,7 +50,7 @@ class Player:
         else:
             self.player_id = "guest"
             self.player_name = "Guest"
-            self.current_xp = 0
+            self.season_xp = 0
             self.total_xp = 0
             self.rank = 0
             self.highest_rank = 0
@@ -69,6 +72,9 @@ class Player:
 
         # Load keypress animation frames once at initialization
         self.keypress_animation_frames = self._load_keypress_animation()
+        self.thruster_frames = self._load_animation_frames(
+            "assets/thruster_fx.webP"
+        )
         self.animation_frame = 0
         self.playing_animation = False
 
@@ -85,12 +91,12 @@ class Player:
 
         # Load shield charge animation frames
         self.shield_charge_animation_frames = (
-            self._load_shield_charge_animation(
+            self._load_animation_frames(
                 "assets/shield_fx3.2.webP"
             )
         )
         self.shield_charge_animation_frames_tier2 = (
-            self._load_shield_charge_animation(
+            self._load_animation_frames(
                 "assets/shield_fx3.4.webP"
             )
         )
@@ -114,17 +120,14 @@ class Player:
         """Get player's current rank based on total XP.
 
         Returns:
-            int: Rank ID (0-7), where 1=Diamond (highest),
-                0=Unranked.
+            int: Rank ID (-1 to 7), where 0=Prestige (highest),
+                -1=Unranked.
         """
-        if self.total_xp == 0:
-            return 0
-
-        for rank_id in range(1, 8):
+        for rank_id in range(0, 8):
             if self.total_xp >= RANKS[rank_id]["min_points"]:
                 return rank_id
 
-        return 7  # Default to Bamboo
+        return -1  # Default to Unranked if XP doesn't qualify for any rank
 
     def get_progress(self) -> dict:
         """Calculate current rank, XP toward next rank, progress %.
@@ -138,19 +141,19 @@ class Player:
         current_rank_name = RANKS[current_rank]["name"]
 
         # Handle Unranked special case
-        if current_rank == 0:
+        if current_rank == -1:
             return {
-                "current_rank": 0,
+                "current_rank": -1,
                 "current_rank_name": "Unranked",
-                "xp_in_rank": 0,
+                "xp_in_rank": self.total_xp,
                 "xp_to_next_rank": 100,
-                "progress_percent": 0.0,
+                "progress_percent": min((self.total_xp / 100) * 100, 100.0),
                 "next_rank": 7
             }
 
         # Handle Diamond (highest rank)
-        if current_rank == 1:
-            current_min = RANKS[1]["min_points"]
+        if current_rank == 0:
+            current_min = RANKS[0]["min_points"]
             return {
                 "current_rank": current_rank,
                 "current_rank_name": current_rank_name,
@@ -189,7 +192,7 @@ class Player:
         """
         old_rank = self.get_current_rank()
         self.total_xp += xp_amount
-        self.current_xp += xp_amount
+        self.season_xp += xp_amount
         new_rank = self.get_current_rank()
 
         rank_up = new_rank != old_rank and new_rank < old_rank
@@ -217,13 +220,12 @@ class Player:
         current_rank = self.get_current_rank()
         unlocks = []
 
-        if current_rank == 0:
-            return []
+        if current_rank == -1:
+            return []  # Unranked players have no unlocks
 
-        for rank_id in range(current_rank, 7, 1):
-            unlocks.extend(RANKS[rank_id]["unlocks"])
-
-        unlocks.extend(RANKS[7]["unlocks"])
+        for rank_id in range(current_rank, 8):
+            if rank_id in RANKS:
+                unlocks.extend(RANKS[rank_id]["unlocks"])
 
         return list(set(unlocks))
 
@@ -241,7 +243,7 @@ class Player:
         Returns:
             dict: Rank-up notification with unlocks.
         """
-        from clackykey.ranks import get_rank_unlocks
+        from ctrln.ranks import get_rank_unlocks
 
         unlocked_features = get_rank_unlocks(new_rank)
         rank_name = RANKS[new_rank]["name"]
@@ -313,7 +315,7 @@ class Player:
 
         # Pass current stats to save_to_file, which handles update_profile
         return self.profile.save_to_file(filename, {
-            "current_xp": self.current_xp,
+            "current_xp": self.season_xp,
             "total_xp": self.total_xp,
             "rank": self.rank,
             "highest_rank": self.highest_rank,
@@ -347,7 +349,7 @@ class Player:
         """Load and cache all frames from the keypress animation webp."""
         frames = []
         try:
-            pil_image = Image.open("assets/keypress_thruster_fx.webP")
+            pil_image = Image.open("assets/keypress.webP")
 
             try:
                 while True:
@@ -365,11 +367,10 @@ class Player:
             print(f"Warning: Could not load keypress animation: {e}")
         return frames
 
-    def _load_shield_charge_animation(self, filepath=None):
-        """Load shield charge animation from given filepath."""
+    def _load_animation_frames(self, filepath=None):
+        """Load and scale all frames from an animated image at *filepath*."""
         if filepath is None:
             filepath = "assets/shield_key_fx3.2.webP"
-        """Load and cache all frames from the shield charge animation webp."""
         frames = []
         try:
             pil_image = Image.open(filepath)
@@ -387,11 +388,7 @@ class Player:
             except EOFError:
                 pass  # End of frames
         except Exception as e:
-            msg = (
-                f"Warning: Could not load shield charge animation "
-                f"from {filepath}: {e}"
-            )
-            print(msg)
+            print(f"Warning: Could not load animation from {filepath}: {e}")
         return frames
 
     def update(self) -> None:
@@ -488,6 +485,14 @@ class Player:
                 center=(self.rect.centerx, self.rect.centery)
             )
             screen.blit(current_frame, anim_rect)
+            if self.thruster_frames:
+                thruster_frame = self.thruster_frames[
+                    self.animation_frame % len(self.thruster_frames)
+                ]
+                thruster_rect = thruster_frame.get_rect(
+                    center=(self.rect.centerx, self.rect.centery)
+                )
+                screen.blit(thruster_frame, thruster_rect)
         else:
             screen.blit(self.image, self.rect)
 
