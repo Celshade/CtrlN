@@ -6,6 +6,12 @@ Built with Godot 4.6 | Web3-ready with optional Solana NFT profiles | Energy-bas
 
 ---
 
+## 🚀 [Download v0.1.0 Demo](https://github.com/Celshade/CtrlN/releases/tag/v0.1.0-demo)
+
+**Playable Android demo** with Matrica login. [See what's included →](https://github.com/Celshade/CtrlN/releases/tag/v0.1.0-demo)
+
+---
+
 ## Quick Links
 
 - **Pitch Deck**: [PITCH_DECK.md](PITCH_DECK.md) — Game overview, monetization, roadmap
