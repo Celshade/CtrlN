@@ -2,13 +2,13 @@
 
 ## 🎮 The Game
 
-**CtrlN** is a fast-paced, skill-based mobile action game where timing, reflexes, and competition drive endless engagement. Players control a character to dodge obstacles in an increasingly challenging environment, competing for globally ranked scores.
+**CtrlN** is a fast-paced, skill-based mobile action game with hand-crafted pixel art — developed with a passion for indie games and code itself. Tap to dodge, compete against your fellow degens, unlock new playable characters (keys), flex your rank roles in the community, and have fun. Swipe mechanics coming soon for advanced maneuvers.
 
 ---
 
 ## 🎯 Core Concept
 
-- **One-button gameplay**: Simple tap mechanics, deep skill ceiling
+- **One-button gameplay**: Simple tap and swipe mechanics, deep skill ceiling
 - **Procedurally challenging**: Obstacles escalate in speed and complexity
 - **Real-time competition**: Live leaderboards and ranking system
 - **Social & Multiplayer**: Rankings, achievements, character cosmetics
@@ -28,12 +28,12 @@
 ## ✨ Key Features
 
 ### Player Progression
-- **Energy System**: 4-5 matches per session; Energy regenerates over time
+- **Energy System**: 5 free matches per session; Energy regenerates over time or via $SKR purchase
 - **Achievement System**: Unlock badges and titles (free + purchasable cosmetics)
 - **Character Unlocks**: Earn new playable characters and abilities through gameplay
 - **Rank Tiers**: Progress through competitive ranks (Unranked → Bamboo → ... → Diamond)
 - **Profile Customization**: Equipped character, avatar, bio (cosmetics via $SKR)
-- **Cross-Chain Asset Integration**: Unlock bonuses, characters, and abilities by validating existing NFT traits/assets via Matrica (Bitcoin Ordinals, Ethereum NFTs, Solana collections, etc.)
+- **Cross-Chain Asset Integration**: Unlock bonuses, characters, and abilities by validating existing NFT traits/assets via Matrica (Ethereum NFTs, Solana collections; Bitcoin Ordinals coming soon)
 
 ### Gameplay Evolution (Future Iterations)
 - **Swipe Mechanics**: Advanced input system for complex maneuvers
@@ -47,13 +47,14 @@
 - **Cosmetics**: Character skins and visual items
 
 ### Technical
-- **Cross-Platform**: iOS and Android via Godot
+- **Cross-Platform**: Android (iOS coming Q3 2026) via Godot 4.6
+- **Desktop Support**: Python 3.12 + Pygame for development/testing
 - **Cloud Saves**: Profile tied to login
-  - Matrica OAuth (multi-chain and social logins)
-  - Solana Wallet adapters
+  - **Matrica OAuth** (primary): Multi-chain social login (Discord, X, Telegram + all major Web3 wallets -> including native solana mobile wallet)
+  - **Solana Wallet Adapter** (secondary): Direct wallet signing via Mobile Wallet Adapter 2.0
 - **Energy System**: Tracks playtime, regeneration, and purchases
 - **SKR Integration**: In-game store powered by Solana Mobile token
-- **Website Companion**: Enhanced leaderboard metrics, detailed player stats, achievement tracking
+- **Website Companion**: Enhanced leaderboard metrics, detailed player stats, achievement tracking (coming Q3 2026)
 - **Instant Restarts**: Quick retry loops for skill development
 
 ---
@@ -104,10 +105,10 @@ For players who choose to mint their profile NFT ($1-3 SOL):
 │   Player    │
 └──────┬──────┘
        │
-       ├─ Login: Matrica OAuth or Solana Wallet
+       ├─ Login: Matrica OAuth (primary) or Solana Wallet (secondary)
        ├─ Profile created in Redis (10-min cache)
        │
-       ├─ Energy System: 4-5 free matches
+       ├─ Energy System: 5 free matches per session
        ├─ Store: Purchase $SKR for playtime/cosmetics/power-ups
        │
        ├─ [OPTIONAL] Mint Profile as NFT
@@ -134,11 +135,13 @@ For players who choose to mint their profile NFT ($1-3 SOL):
 
 **CtrlN** was created by a **single developer** with generous support from community artists:
 
-- **Solo Developer**: Full game design, programming, player sprites, particle effects, and animations
-- **Community Artists**: Level backgrounds, environmental design, and concept art
-- **Vision**: Proof-of-concept that indie games can achieve quality production through focused development and collaborative community support
+- **Celshade** (Developer): Game design, programming, player sprites, effects and animation, UI design, infrastructure, marketing, partnerships, and community administration
+- **Psy** (Artist): Level backgrounds and obstacle art/animation
+- **MomoBones** (Artist): Concept art and logo design
 
-This lean structure allows for rapid iteration while maintaining artistic quality through strategic community partnerships.
+**Vision**: Proof-of-concept that indie games can achieve quality production through focused individual development and collaborative community partnerships.
+
+This lean structure allows for rapid iteration while maintaining artistic quality and community involvement.
 
 ---
 
@@ -155,9 +158,9 @@ This lean structure allows for rapid iteration while maintaining artistic qualit
 ### Core Model: Energy-Based Free-to-Play
 
 - **Base Game**: Free-to-play with energy system
-  - 4-5 matches per session (free playtime)
-  - Energy regenerates over time or via purchase
-  - Optional paid fast-regen
+  - 5 matches per session (free playtime)
+  - Energy regenerates over time (configurable timers)
+  - Optional paid energy/fast-regen via $SKR
 
 ### Profile NFT Minting (Optional, One-Time)
 
@@ -193,11 +196,25 @@ Player Lifetime Value (pLTV):
 
 ---
 
-## 🚀 Go-to-Market
+## � Development Status
+
+**Current**: v0.1.0 **Demo** (Public Prototype) — [Download on GitHub Releases](https://github.com/Celshade/CtrlN/releases/tag/v0.1.0-demo)
+
+| Status | Description | Timeline |
+|--------|-------------|----------|
+| **Demo** (NOW) | Single level, core gameplay, auth integrated. Playable, limited scope proof-of-concept. | March 2026 |
+| **Alpha** (v0.2.0+) | Multiple levels, store system, cosmetics. Broader feature set; occasional bugs expected. | April-May 2026 |
+| **Beta** (v0.5.0+) | 3/4 levels, full monetization, NFT minting UI. Public testing; save data stable. | June 2026 |
+| **Release** (v1.0.0) | Full feature set: 4 levels, tournaments, portability. Production-ready. | Q3 2026 |
+
+---
+
+## �🚀 Go-to-Market
 
 ### Phase 1: Soft Launch (Q2 2026)
-- Regional soft launch (Canada, Australia)
-- **Level 1 (Day-Time)**: Launch with single environment
+- Public demo/alpha on GitHub Releases
+- **Level 1 (Day-Time)**: Launched with Matrica OAuth + Solana wallet login
+- **Energy System**: Active (5 free matches per session)
 - Matrica OAuth login only
 - In-game leaderboards operational
 - Energy system + $SKR cosmetic store operational
@@ -315,9 +332,9 @@ Players control role visibility in their privacy settings. Roles sync automatica
 
 ## 💬 Pitch Summary
 
-**CtrlN** is a skill-based mobile action game with an energy-based free-to-play model and optional Web3 profile ownership. Players get 4-5 free matches daily in a day-time environment, then can purchase playtime, cosmetics, and power-ups using $SKR (Solana Mobile token). Those who want lasting portfolio permanence can optionally mint their profile as an NFT for $1-3 SOL, unlocking leaderboard access/participation, and cross-game portability across our trilogy of games.
+**CtrlN** is a skill-based mobile action game with an energy-based free-to-play model and optional Web3 profile ownership. Players get 4-5 free matches daily in a day-time environment, then can purchase playtime, cosmetics, and power-ups using $SKR (Solana Mobile token). Those who want lasting portfolio permanence can optionally mint their profile as an NFT on SOL or Ordinal on BTC (coming soon), unlocking leaderboard access/participation, and cross-game portability across our trilogy of games.
 
-By combining accessible gameplay with optional Web3 integration and a planned series of unique environments (night time, snow, tron grid, miami), we capture both casual and crypto-native players. Our differentiation: **optional on-chain profiles** (not mandatory), leveraging **Matrica's multi-chain asset verification** for Discord community roles, monetizing through **$SKR in-store purchases**, and building a **portable player identity across a trilogy of games**, each with distinct mechanics and level designs.
+By combining accessible gameplay with optional Web3 integration and a planned series of unique environments (night time, snow, tron grid, miami), we capture both casual and crypto-native players. Our differentiation: **hand-crafted (no AI)** pixel and concept art, **optional on-chain profiles** (not mandatory), leveraging **Matrica's multi-chain asset verification** for Discord community roles, monetizing through **$SKR in-store purchases**, and building a **portable player identity across a trilogy of games**, each with distinct mechanics and level designs.
 
 **We're building a Web3-ready game that respects player choice: play for free, upgrade optionally.**
 
