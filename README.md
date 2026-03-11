@@ -1,11 +1,11 @@
 # CtrlN
 
-Fast-paced, skill-based mobile action game. Tap to dodge, compete globally, unlock characters.
+Fast-paced, skill-based mobile action game with hand-crafted pixel art - developed with a passion for indie games and code itself [🐍]. Tap to dodge, swipe to [TBA], compete against your fellow degens, unlock new characters (keys), flex your rank roles in the community, and have fun!
 
-Built with Godot 4.6 | Web3-ready with optional Solana NFT profiles | Energy-based free-to-play | Powered by Solana + Matrica
+Built with Python 3.12 + Godot 4.6 | Web3-ready with optional Solana + Bitcoin ordinal (coming soon) profiles | Energy-based free-to-play | Powered by Solana + Bitcoin + **Matrica**
 
 ![Godot](https://img.shields.io/badge/Godot-4.6-478CBF?logo=godotengine&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Active%20Development-yellow)
 ![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
 ![Solana](https://img.shields.io/badge/Solana-14F195?logo=solana&logoColor=black)
@@ -51,7 +51,7 @@ Download the latest release from the [Releases page](https://github.com/Celshade
 **Prerequisites:**
 - Godot 4.6.1.stable
 - Android SDK for mobile builds
-- Python 3.9+ (optional, for desktop testing)
+- Python 3.12+ (optional, for desktop testing)
 - Optional: Phantom or Solflare wallet app for testing Solana authentication
 
 **Build Steps:**
