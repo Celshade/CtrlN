@@ -10,6 +10,18 @@ Built with Godot 4.6 | Web3-ready with optional Solana NFT profiles | Energy-bas
 
 **Playable Android demo** with Matrica login. [See what's included →](https://github.com/Celshade/CtrlN/releases/tag/v0.1.0-demo)
 
+### 🚧 Early-Stage Development
+
+This project is actively under development and not yet available in app stores. All releases (including demos) are maintained on the [GitHub Releases page](https://github.com/Celshade/CtrlN/releases).
+
+Licensed under **GPL-3.0 + Commons Clause**. Permitted uses:
+- ✅ Personal play & testing
+- ✅ Educational projects & portfolios
+- ✅ Contributing improvements to this repository
+- ❌ Commercial use or selling derivatives
+
+See [LICENSE](LICENSE) for full terms.
+
 ---
 
 ## Quick Links
@@ -22,22 +34,26 @@ Built with Godot 4.6 | Web3-ready with optional Solana NFT profiles | Energy-bas
 
 ## Getting Started
 
-### Prerequisites
-- Godot 4.6.1.stable
-- Python 3.9+ (for desktop version)
-- Android SDK for mobile builds
-- Solana wallet app (Phantom or Solflare)
-  - only needed for native solana wallet login
-  - Matrica login is primary, and supports all major wallets across each chain, while offering discord, X, and TG login options as well
+### Try the Demo (Easiest)
 
-### Build
+Download the latest release from the [Releases page](https://github.com/Celshade/CtrlN/releases) and install `ctrln.apk` on Android 8+.
+
+### Build from Source (Developers)
+
+**Prerequisites:**
+- Godot 4.6.1.stable
+- Android SDK for mobile builds
+- Python 3.9+ (optional, for desktop testing)
+- Optional: Phantom or Solflare wallet app for testing Solana authentication
+
+**Build Steps:**
 
 ```bash
 cd godot
 ./build-release.sh
 ```
 
-Output: `ctrln.apk` (mobile) or web build
+Output: `ctrln.apk` (Android)
 
 ---
 
@@ -50,15 +66,17 @@ Output: `ctrln.apk` (mobile) or web build
 - Unlock characters and achievements
 
 ### Monetization
-- **Energy System**: 4-5 free matches per session
-- **$SKR Store**: In-game cosmetics & playtime purchases
-- **Optional NFT**: Mint profile as NFT for $1-3 SOL (portability, permanence)
+- **Energy System**: 4-5 free matches per session (demo is open play)
+- **$SKR Store**: In-game cosmetics, playtime (energy), action-item purchases
+- **Optional NFT**: Mint profile as NFT portability, permanence, and bonuses
 
 ### Web3 Integration
 - **Matrica OAuth**: Multi-chain social login
-- **Solana Wallet**: Direct wallet signing via Mobile Wallet Adapter
-- **Cross-Chain Assets**: Unlock bonuses by validating Bitcoin/Ethereum NFTs via Matrica
-- **Discord**: Rank-based roles verified via multi-chain asset verification
+  - includes all major web3 wallets (including native solana mobile wallet)
+  - includes social login via discord, x, and tg
+- **Solana Wallet**: Direct wallet signing via Mobile Wallet Adapter (coming soon)
+- **Cross-Chain Assets**: Unlock bonuses by validating Bitcoin/Ethereum NFTs via Matrica (coming soon)
+- **Discord**: Rank-based roles verified via multi-chain asset verification (coming soon)
 
 ---
 
@@ -72,9 +90,7 @@ CtrlN/
 │   │   └── autoload/      # Singletons (MatricaAuth, SolanaAuth)
 │   └── addons/            # Plugins (SolanaSDK GDExtension)
 ├── src/                   # Python desktop version (Pygame)
-├── CelKeysIO/             # Backend API (Node.js + Vercel)
-├── player_data/           # Sample player profiles
-├── BuildResources/        # Game design docs & references
+├── player_data/           # Sample player profiles (Pygame)
 └── docs/                  # Technical documentation
 ```
 
@@ -88,14 +104,11 @@ CtrlN/
 3. Enable **SolanaSDK** (if testing wallet login)
 4. Scenes live in `godot/scenes/`, scripts in `godot/scripts/`
 
-### Backend Setup
-1. Deploy CelKeysIO to Vercel (or local Node.js)
-2. Set environment variables (Redis URL, Database connection)
-3. Endpoints: `/api/auth/start`, `/api/auth/callback`, `/api/auth/poll`, `/api/auth/wallet/verify`
 
 ### Testing
-- **Desktop**: Run scenes directly in Godot editor
-- **Android**: Build APK and test on device with Phantom/Solflare wallet
+- **Demo**: Download the latest release from [Releases](https://github.com/Celshade/CtrlN/releases)
+- **Desktop**: Run scenes directly in Godot editor or call `main.py` with a python setup
+- **Android**: Build APK and test on device with any web3 wallet/social login
 - **Web**: Portfolio/metrics dashboard at celkeys.io (coming soon)
 
 ---
@@ -105,8 +118,8 @@ CtrlN/
 | Phase | Timeline | Features |
 |-------|----------|----------|
 | **Soft Launch** | Q2 2026 | Level 1, Matrica OAuth, Energy system |
-| **Global** | Q3 2026 | Level 2, Solana NFT minting, Website |
-| **Level 3** | Q4 2026 | Snow environment, Tournament system |
+| **Global** | Q3 2026 | Level 2, Solana NFT Profiles, store |
+| **Level 3** | Q4 2026 | Level 3, unique abilities
 | **Ecosystem** | Q1 2027+ | Level 4, Swipe mechanics, Trilogy games |
 
 ---
@@ -129,11 +142,13 @@ See [LICENSE](LICENSE) for full details.
 
 ## Credits
 
-**Developer**: Single developer — game design, programming, player sprites, effects
+**Developer**: Celshade — game design, programming, player sprites/effects and animation, UI design, infra, marketing, collabs, community admin
 
-**Community Artists**: Level backgrounds, environmental design, concept art
+**Community Artists**:
+- **Psy** — Level background and obstacle art/animation
+- **MomoBones** — Concept and logo art
 
-Proof-of-concept: indie games can achieve quality production through focused development + collaborative community support.
+_<3 indie games_
 
 ---
 
@@ -141,5 +156,5 @@ Proof-of-concept: indie games can achieve quality production through focused dev
 
 - **Website**: [celkeys.io](https://celkeys.io)
 - **Email**: celkeys@proton.me
-- **Twitter**: [@CelKeysNFT](https://twitter.com/CelKeysNFT)
+- **X**: [@CelKeysNFT](https://x.com/CelKeysNFT)
 - **Discord**: Private server (coming at launch)
