@@ -32,35 +32,33 @@ if [ -z "$GODOT_ANDROID_KEYSTORE_RELEASE_PATH" ] || [ -z "$GODOT_ANDROID_KEYSTOR
     exit 1
 fi
 
-# Validate that auth relay URL is set (no hardcoded URLs in production builds)
-if [ -z "$CTRLN_AUTH_RELAY_URL" ]; then
-    echo
-    echo "────────────────────────────────────────────────────────────"
-    echo "CtrlN Release Build — Authentication Configuration"
-    echo "────────────────────────────────────────────────────────────"
-    echo
-    read -p "Enter authentication relay URL: " CTRLN_AUTH_RELAY_URL
-    
-    if [ -z "$CTRLN_AUTH_RELAY_URL" ]; then
-        echo "Error: Auth relay URL cannot be empty"
-        exit 1
-    fi
-    echo
-fi
+# Change to godot directory for relative paths to work
+cd "$SCRIPT_DIR"
 
-echo "✓ Auth relay URL: $CTRLN_AUTH_RELAY_URL"
-
-# Verify keystore file exists
+# Verify keystore file exists (now we're in the godot directory)
 if [ ! -f "$GODOT_ANDROID_KEYSTORE_RELEASE_PATH" ]; then
     echo "Error: Keystore not found at $GODOT_ANDROID_KEYSTORE_RELEASE_PATH"
     exit 1
 fi
 
+# Validate that auth relay URL is set (no hardcoded URLs in production builds)
+if [ -z "$CTRLN_AUTH_RELAY_URL" ]; then
+    echo "Error: CTRLN_AUTH_RELAY_URL environment variable must be set"
+    exit 1
+fi
+
+echo "✓ Auth relay URL: $CTRLN_AUTH_RELAY_URL"
 echo "Building signed release APK..."
-cd "$SCRIPT_DIR"
 
 # Write auth config to a temporary file that will be packaged in the APK
 CONFIG_FILE="$SCRIPT_DIR/auth_config.txt"
+CONFIG_FILE_EXISTED=false
+if [ -f "$CONFIG_FILE" ]; then
+    CONFIG_FILE_EXISTED=true
+    CONFIG_FILE_BACKUP="$CONFIG_FILE.backup.build"
+    cp "$CONFIG_FILE" "$CONFIG_FILE_BACKUP"
+fi
+
 echo "$CTRLN_AUTH_RELAY_URL" > "$CONFIG_FILE"
 
 # Build with Godot
@@ -70,7 +68,11 @@ GODOT_ANDROID_KEYSTORE_RELEASE_USER="$GODOT_ANDROID_KEYSTORE_RELEASE_USER" \
 GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD="$GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD" \
 godot --headless --export-release "Android" "$OUTPUT_APK"
 
-# Clean up config file
-rm -f "$CONFIG_FILE"
+# Clean up config file only if it didn't exist before the build
+if [ "$CONFIG_FILE_EXISTED" = true ]; then
+    mv "$CONFIG_FILE_BACKUP" "$CONFIG_FILE"
+else
+    rm -f "$CONFIG_FILE"
+fi
 
 echo "✓ Release APK built: $OUTPUT_APK"
