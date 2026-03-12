@@ -14,9 +14,9 @@ Built with Python 3.12 + Godot 4.6 | Web3-ready with optional Solana + Bitcoin o
 
 ---
 
-## 🚀 [Download v0.1.0 Demo](https://github.com/Celshade/CtrlN/releases/tag/v0.1.0-demo)
+## 🚀 [Download v0.1.1 Demo](https://github.com/Celshade/CtrlN/releases/tag/v0.1.1-demo)
 
-**Playable Android demo** with Matrica login. [See what's included →](https://github.com/Celshade/CtrlN/releases/tag/v0.1.0-demo)
+**Playable Android demo** with Matrica login. [See what's included →](https://github.com/Celshade/CtrlN/releases/tag/v0.1.1-demo)
 
 ### 🚧 Early-Stage Development
 

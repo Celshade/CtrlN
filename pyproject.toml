@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ctrln"
-version = "0.1.1"
+version = "0.1.1-demo"
 description = ""
 readme = "README.md"
 license = {text = "GPL-3.0"}
