@@ -40,21 +40,20 @@ This implementation uses the [godot-solana-sdk](https://github.com/Virus-Axel/go
 │     - Plugin receives: auth_token, user_pubkey                          │
 │                                                                           │
 │  4. Sign message with user's private key:                               │
-│     - Generate nonce: SHA256(timestamp + random)                        │
-│     - Message: "CtrlN Login\nNonce: {nonce}\nTimestamp: {ts}"           │
+│     - Generate cryptographic challenge                                  │
 │     - MWA protocol: signMessages RPC call                               │
 │     - Wallet returns: signature_bytes                                   │
 │                                                                           │
-│  5. Return to game: (pubkey, nonce, signature, auth_token)             │
+│  5. Return to game: (pubkey, signature, challenge)                      │
 │                                                                           │
 └─────────────────────────────────────────────────────────────────────────┘
              ↓
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                    GODOT GAME (Android)                                 │
 │                                                                           │
-│  6. Credential object ready, game calls:                                │
-│     AuthConfig.get_wallet_authenticate_url()                            │
-│     Body: {wallet, challenge, signature}                                │
+│  6. Credential object ready, game calls backend API                    │
+│     AuthConfig endpoint                                                │
+│     Body: {wallet, challenge, signature}                               │
 │                                                                           │
 │  7. Game receives: gameState token for polling                          │
 │                                                                           │
@@ -70,17 +69,16 @@ This implementation uses the [godot-solana-sdk](https://github.com/Virus-Axel/go
 ┌─────────────────────────────────────────────────────────────────────────┐
 │              AUTH RELAY SERVICE BACKEND (Node.js)                        │
 │                                                                           │
-│  Wallet verification endpoint:
-│  - Verify signature against wallet public key (Crypto + Solana SDK)    │
-│  - Verify challenge TTL (prevent replay, max 5 min old)                 │
-│  - Create or fetch user profile from database                           │
-│  - Generate auth token                                                  │
-│  - Store: {profile_json} in temporary storage keyed by auth token       │
-│  - TTL: 10 minutes, one-time retrieval                                  │
-│  - Return: auth token to game for polling                               │
-│                                                                           │
-│  Polling endpoint (same as Matrica flow):                                           │
-│  - Returns cached profile (one-time retrieval via delete)               │
+│  Wallet verification:
+│  - Verify signature against wallet public key                         │
+│  - Verify challenge TTL (prevent replay attacks)                      │
+│  - Create or fetch user profile from database                         │
+│  - Generate auth token                                                │
+│  - Store: profile temporarily keyed by auth token                     │
+│  - Return: auth token to game for polling                             │
+│                                                                       │
+│  Polling endpoint (same as Matrica flow):                              │
+│  - Returns cached profile (one-time retrieval)                        │
 │  - Same as Matrica flow                                                 │
 │                                                                           │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -93,17 +91,16 @@ This implementation uses the [godot-solana-sdk](https://github.com/Virus-Axel/go
 - No intermediary OAuth provider needed
 - On-device signing (Phantom, Solflare handle key management)
 - Nonce + timestamp prevent replay attacks
-- One-time profile retrieval from Redis (same as Matrica)
+- One-time profile retrieval from secure storage (same as Matrica)
 
 **Nonce Verification:**
-- Generated server-side and sent to backend
-- Timestamp embedded in message prevents old nonce reuse
-- Message format: `"CtrlN Login\nNonce: {base64_nonce}\nTimestamp: {unix_ts}"`
-- Server validates nonce TTL (max 5 minutes)
+- Challenge is generated and validated server-side
+- Short TTL prevents replay attacks
+- Server validates challenge freshness before processing
 
 **Signature Verification:**
-- Backend uses `@solana/web3.js` to verify Ed25519 signature
-- Confirms signature is valid for user's public key + message bytes
+- Signature is verified against user's public key
+- Invalid or expired signatures are rejected
 - No private key ever leaves user's wallet
 
 ---
@@ -125,17 +122,12 @@ wallet_adapter.connected.connect(_on_wallet_connected)
 func _on_wallet_login_pressed():
 	wallet_adapter.connect_wallet()  # Opens wallet app (MWA protocol)
 	
-	# Generate nonce + message
-	var nonce = _generate_nonce()
-	var timestamp = int(Time.get_ticks_msec() / 1000)
-	var message = "CtrlN Login\nNonce: %s\nTimestamp: %d" % [nonce, timestamp]
-	
-	# Request signature (user approves in wallet)
-	var signature = await wallet_adapter.sign_message(message.to_utf8_buffer())
+	# Generate challenge and request signature
+	var signature = await wallet_adapter.sign_message(...)
 	var pubkey = wallet_adapter.get_public_key()
 	
 	# Send to backend for verification
-	_verify_wallet_signature(pubkey, signature, nonce, timestamp)
+	_verify_wallet_signature(pubkey, signature)
 ```
 
 ### 2. Android Plugin Setup (godot-solana-sdk)
@@ -147,7 +139,7 @@ func _on_wallet_login_pressed():
 
 **No custom Kotlin code needed** — the SDK handles:
 - Mobile Wallet Adapter protocol (MWA 2.0)
-- Ed25519 signature verification (native implementation)
+- Signature verification
 - Local WebSocket communication with wallet apps
 - Android permission handling
 
@@ -156,7 +148,7 @@ func _on_wallet_login_pressed():
 - Solflare
 - Seed Vault Wallet
 
-**Backend**: Signature verification is handled by a separate backend authentication service. See [CONFIG.md](CONFIG.md) for endpoint configuration.
+**Backend**: Signature verification is handled by a separate backend authentication service. Endpoints are configured via environment variables at deployment time.
 
 ### 4. Build Configuration
 
@@ -227,11 +219,11 @@ permissions = [
 
 ### Security & Testing
 - [ ] Test signature verification with multiple wallets (Phantom, Solflare)
-- [ ] Verify nonce TTL enforcement (reject > 5 min old)
+- [ ] Verify challenge validity enforcement
 - [ ] Test on both devnet and mainnet
 - [ ] Load test polling endpoint
-- [ ] Verify Redis TTL and one-time retrieval
-- [ ] Audit message format for replay attack resistance
+- [ ] Verify one-time retrieval works correctly
+- [ ] Audit for general security issues
 
 ---
 
@@ -287,8 +279,6 @@ export CTRLN_AUTH_RELAY_URL="http://localhost:3000"
 godot --editor
 ```
 
-See [CONFIG.md](CONFIG.md) for all environment configuration options.
-
 ---
 
 ## Troubleshooting
@@ -305,21 +295,19 @@ See [CONFIG.md](CONFIG.md) for all environment configuration options.
 - Check device network connectivity
 
 ### "Invalid signature" from backend
-- Verify message format: exactly `"CtrlN Login\nNonce: {base64}\nTimestamp: {unix_ts}"`
-- Check timestamp is recent (< 5 minutes old)
-- Verify signature is base64 encoded in POST body
-- Test signature verification locally with a known good key
+- Verify signature was generated by the wallet
+- Ensure request was sent to correct endpoint
+- Contact backend administrator if issue persists
 
 ### Profile not retrieved after poll
-- Verify auth relay service is running and accessible
+- Verify auth service is running and accessible
 - Check auth token from verify response matches polling request
-- Verify one-time retrieval works (token should be deleted after first poll)
-- See [CONFIG.md](CONFIG.md) for endpoint configuration
+- Verify profile retrieval works correctly
 
 ### "Invalid challenge format" from backend
-- Ensure challenge is generated correctly as base64
-- Verify format is exactly: `"BASE64_NONCE:UNIX_TIMESTAMP"` (colon separator)
-- Check timestamp is integer seconds (not milliseconds)
+- Ensure challenge was generated by the wallet
+- Check that challenge matches what was signed
+- Verify backend received complete signature data
 
 ### Wallet app doesn't prompt for signature approval
 - Compare message being signed with backend expectation

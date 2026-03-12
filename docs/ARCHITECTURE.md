@@ -41,21 +41,20 @@ When users log in on Android:
 1. **Game initiates login** → Opens browser to auth relay service Matrica endpoint
 2. **Browser redirects to Matrica** → User grants permission
 3. **Matrica redirects back** → auth relay service callback endpoint
-4. **Backend stores profile** → Temporary storage (keyed by auth token)
+4. **Backend stores profile** → Temporary storage (one-time retrieval)
 5. **Backend redirects** → `ctrln://auth?status=done&state=...` (deep link)
 6. **Android OS routes** → to CtrlN app (system-level, can't be hijacked)
 7. **Game polls auth relay** → Retrieves and loads user profile
 
-(See [CONFIG.md](CONFIG.md) for endpoint configuration details)
+(Endpoint configuration is managed via environment variables at deployment time)
 
-**Security**: This flow uses PKCE (Proof Key for Public Clients) because the game is a public client that cannot securely store backend secrets.
+**Security**: This flow uses industry-standard OAuth patterns to ensure security even with public clients that cannot store backend secrets.
 
 ## Configuration & Deployment
 
 - **Godot Build Credentials**: `godot/.env.build` (local-only, git-ignored)
 - **Game Config**: `src/ctrln/config.py`
 - **Backend Authentication Service**: Separate repository and deployment
-  - See [CONFIG.md](CONFIG.md) for OAuth endpoint configuration
 
 ## Documentation
 
@@ -76,8 +75,8 @@ When users log in on Android:
 
 - Matrica OAuth requires `client_secret` that cannot live in public game code
 - Backend authentication service acts as a stateless relay between game and Matrica
-- PKCE ensures security even though game is a public client
-- One-time cached profile delivery prevents replay attacks
+- Standard OAuth security patterns ensure game cannot leak backend secrets
+- One-time profile delivery prevents unauthorized cache access
 
 ### Why Custom Gradle Manifest Injection?
 
@@ -109,9 +108,9 @@ python -m pytest tests/
 
 - ✅ Keystore password: Local-only env vars, never in git
 - ✅ OAuth tokens: Never stored in game; only ephemeral profile
-- ✅ PKCE code_verifier: Browser-secure, embedded in HMAC-signed serverState
+- ✅ State verification: Validated across the OAuth flow to prevent unauthorized bypass
 - ✅ Deep link scheme: (`ctrln://`) Android OS-enforced; can't be hijacked
-- ✅ Redis auth profile: One-time retrieval, 10-minute TTL
+- ✅ Auth profile: One-time retrieval, short expiration
 - ✅ Git history: No credentials exposed (verified clean)
 
 ## Development Workflow

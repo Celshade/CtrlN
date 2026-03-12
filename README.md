@@ -35,8 +35,7 @@ See [LICENSE](LICENSE) for full terms.
 ## Quick Links
 
 - **Pitch Deck**: [PITCH_DECK.md](PITCH_DECK.md) — Game overview, monetization, roadmap
-- **Solana Wallet Integration**: [docs/SOLANA_WALLET_LOGIN.md](docs/SOLANA_WALLET_LOGIN.md) — Architecture & setup
-- **Setup Instructions**: [SOLANA_SETUP.md](SOLANA_SETUP.md) — 3-step quick start
+- **Solana Wallet Integration**: [docs/SOLANA_WALLET_LOGIN.md](docs/SOLANA_WALLET_LOGIN.md) — Architecture, setup instructions, troubleshooting
 
 ---
 
