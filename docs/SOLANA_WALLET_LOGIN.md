@@ -20,67 +20,66 @@ This implementation uses the [godot-solana-sdk](https://github.com/Virus-Axel/go
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                       GODOT GAME (Android)                              │
-│                                                                           │
+│                                                                         │
 │  User selects "Login with Solana Wallet"                                │
-│           ↓                                                              │
+│           ↓                                                             │
 │  1. Game requests wallet authorization                                  │
 │     via SolanaWalletPlugin.authorize()                                  │
-│                                                                           │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
                                     ↓
 ┌─────────────────────────────────────────────────────────────────────────┐
-│              ANDROID RUNTIME (Solana Wallet Plugin)                      │
-│                                                                           │
+│              ANDROID RUNTIME (Solana Wallet Plugin)                     │
+│                                                                         │
 │  2. Establish local WebSocket with wallet app                           │
 │     (via MobileWalletAdapterClient)                                     │
-│                                                                           │
+│                                                                         │
 │  3. MWA protocol: authorize RPC call                                    │
 │     - Same device: Solflare, Phantom, etc.                              │
 │     - User approves in wallet UI                                        │
 │     - Plugin receives: auth_token, user_pubkey                          │
-│                                                                           │
+│                                                                         │
 │  4. Sign message with user's private key:                               │
 │     - Generate cryptographic challenge                                  │
 │     - MWA protocol: signMessages RPC call                               │
 │     - Wallet returns: signature_bytes                                   │
-│                                                                           │
+│                                                                         │
 │  5. Return to game: (pubkey, signature, challenge)                      │
-│                                                                           │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
              ↓
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                    GODOT GAME (Android)                                 │
-│                                                                           │
-│  6. Credential object ready, game calls backend API                    │
-│     AuthConfig endpoint                                                │
-│     Body: {wallet, challenge, signature}                               │
-│                                                                           │
+│                                                                         │
+│  6. Credential object ready, game calls backend API                     │
+│     AuthConfig endpoint                                                 │
+│     Body: {wallet, challenge, signature}                                │
+│                                                                         │
 │  7. Game receives: gameState token for polling                          │
-│                                                                           │
+│                                                                         │
 │  8. Start polling loop:                                                 │
 │     AuthConfig.get_matrica_poll_url(authToken)                          │
 │     Loop runs every 1.5 seconds until success or timeout                │
-│                                                                           │
-│  9. Polling returns: user profile dict (name, avatar, etc.)            │
+│                                                                         │
+│  9. Polling returns: user profile dict (name, avatar, etc.)             │
 │     Profile stored in game's player data                                │
-│                                                                           │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
              ↓
 ┌─────────────────────────────────────────────────────────────────────────┐
-│              AUTH RELAY SERVICE BACKEND (Node.js)                        │
-│                                                                           │
-│  Wallet verification:
-│  - Verify signature against wallet public key                         │
-│  - Verify challenge TTL (prevent replay attacks)                      │
-│  - Create or fetch user profile from database                         │
-│  - Generate auth token                                                │
-│  - Store: profile temporarily keyed by auth token                     │
-│  - Return: auth token to game for polling                             │
-│                                                                       │
-│  Polling endpoint (same as Matrica flow):                              │
-│  - Returns cached profile (one-time retrieval)                        │
+│              AUTH RELAY SERVICE BACKEND (Node.js)                       │
+│                                                                         │
+│  Wallet verification:													  |
+│  - Verify signature against wallet public key                           │
+│  - Verify challenge TTL (prevent replay attacks)                        │
+│  - Create or fetch user profile from database                           │
+│  - Generate auth token                                                  │
+│  - Store: profile temporarily keyed by auth token                       │
+│                                                                         │
+│  Polling endpoint (same as Matrica flow):                               │
+│  - Returns cached profile (one-time retrieval)                          │
 │  - Same as Matrica flow                                                 │
-│                                                                           │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
