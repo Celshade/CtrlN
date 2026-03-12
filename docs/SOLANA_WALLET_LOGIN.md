@@ -53,13 +53,13 @@ This implementation uses the [godot-solana-sdk](https://github.com/Virus-Axel/go
 │                    GODOT GAME (Android)                                 │
 │                                                                           │
 │  6. Credential object ready, game calls:                                │
-│     HTTP POST to celkeys.io/api/auth/wallet/verify                      │
-│     Body: {pubkey, nonce, signature, auth_token}                        │
+│     AuthConfig.get_wallet_authenticate_url()                            │
+│     Body: {wallet, challenge, signature}                                │
 │                                                                           │
 │  7. Game receives: gameState token for polling                          │
 │                                                                           │
 │  8. Start polling loop:                                                 │
-│     HTTP GET celkeys.io/api/auth/poll?state={gameState}                │
+│     AuthConfig.get_matrica_poll_url(authToken)                          │
 │     Loop runs every 1.5 seconds until success or timeout                │
 │                                                                           │
 │  9. Polling returns: user profile dict (name, avatar, etc.)            │
@@ -68,18 +68,18 @@ This implementation uses the [godot-solana-sdk](https://github.com/Virus-Axel/go
 └─────────────────────────────────────────────────────────────────────────┘
              ↓
 ┌─────────────────────────────────────────────────────────────────────────┐
-│              CELKEYS.IO BACKEND (Node.js)                                │
+│              AUTH RELAY SERVICE BACKEND (Node.js)                        │
 │                                                                           │
-│  `/api/auth/wallet/verify` endpoint:                                    │
-│  - Verify signature against pubkey (Crypto + Solana SDK)               │
-│  - Verify nonce TTL (prevent replay, max 5 min old)                     │
+│  Wallet verification endpoint:
+│  - Verify signature against wallet public key (Crypto + Solana SDK)    │
+│  - Verify challenge TTL (prevent replay, max 5 min old)                 │
 │  - Create or fetch user profile from database                           │
-│  - Generate gameState UUID                                              │
-│  - Store: {profile_json} in Redis keyed by gameState                    │
+│  - Generate auth token                                                  │
+│  - Store: {profile_json} in temporary storage keyed by auth token       │
 │  - TTL: 10 minutes, one-time retrieval                                  │
-│  - Return: gameState to game for polling                                │
+│  - Return: auth token to game for polling                               │
 │                                                                           │
-│  `/api/auth/poll` (existing):                                           │
+│  Polling endpoint (same as Matrica flow):                                           │
 │  - Returns cached profile (one-time retrieval via delete)               │
 │  - Same as Matrica flow                                                 │
 │                                                                           │
@@ -156,7 +156,7 @@ func _on_wallet_login_pressed():
 - Solflare
 - Seed Vault Wallet
 
-**Backend**: Implemented in separate [CelKeysIO](https://github.com/Celshade/CelKeysIO) repository.
+**Backend**: Signature verification is handled by a separate backend authentication service. See [CONFIG.md](CONFIG.md) for endpoint configuration.
 
 ### 4. Build Configuration
 
@@ -214,8 +214,8 @@ permissions = [
 - [ ] Test on Android device (requires Phantom/Solflare installed)
 
 ### Backend
-- Implemented in separate [CelKeysIO](https://github.com/Celshade/CelKeysIO) repository
-- See CelKeysIO documentation for `/api/auth/wallet/verify` endpoint setup
+- Implemented in separate backend authentication service repository
+- See backend service documentation for wallet verification endpoint setup
 
 ### Mobile Testing
 - [ ] Install Phantom or Solflare wallet on Android device
@@ -243,7 +243,7 @@ permissions = [
 # https://github.com/Virus-Axel/godot-solana-sdk/releases
 
 # Extract to Godot project:
-cd /home/u_cel/Projects/CtrlN/godot
+cd godot
 mkdir -p addons/SolanaSDK
 unzip ~/Downloads/godot-solana-sdk-4.x.zip -d addons/SolanaSDK/
 
@@ -275,18 +275,19 @@ adb install ctrln.apk
 # Run game and test wallet login
 ```
 
-### 5. Test Backend Endpoint (Local)
+## 5. Test Backend Endpoint (Local)
+
+For development testing, configure the auth relay service locally:
+
 ```bash
-# With Redis running on backend:
-curl -X POST http://localhost:3000/api/auth/wallet/verify \
-	-H "Content-Type: application/json" \
-	-d '{
-		"pubkey": "9B5X5wUhZzngwFePWwNSqJ2BHAhMhJ1ChZQkE2NP2o4K",
-		"nonce": "SGVsbG9Xb3JsZHhGVEdKeE1ubw==:1234567890",
-		"signature": "4Z5kpAZ8..." ,
-		"auth_token": ""
-	}'
+# Set environment variable for local testing
+export CTRLN_AUTH_RELAY_URL="http://localhost:3000"
+
+# Then run CtrlN - AuthConfig will use this URL
+godot --editor
 ```
+
+See [CONFIG.md](CONFIG.md) for all environment configuration options.
 
 ---
 
@@ -310,13 +311,13 @@ curl -X POST http://localhost:3000/api/auth/wallet/verify \
 - Test signature verification locally with a known good key
 
 ### Profile not retrieved after poll
-- Check Redis is running on backend
-- Verify gameState UUID matches between verify response and poll request
-- Check one-time retrieval works (key should be deleted after first GET)
-- Verify polling URL is correct: `celkeys.io/api/auth/poll?state=...`
+- Verify auth relay service is running and accessible
+- Check auth token from verify response matches polling request
+- Verify one-time retrieval works (token should be deleted after first poll)
+- See [CONFIG.md](CONFIG.md) for endpoint configuration
 
-### "Invalid nonce format" from backend
-- Ensure nonce is generated correctly as base64
+### "Invalid challenge format" from backend
+- Ensure challenge is generated correctly as base64
 - Verify format is exactly: `"BASE64_NONCE:UNIX_TIMESTAMP"` (colon separator)
 - Check timestamp is integer seconds (not milliseconds)
 
