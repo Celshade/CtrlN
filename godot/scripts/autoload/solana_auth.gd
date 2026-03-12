@@ -28,7 +28,7 @@ func _initialize_wallet_adapter() -> void:
 
 func start_wallet_login() -> void:
 	if not _sdk_available or not wallet_adapter:
-		wallet_error.emit("Solana SDK not installed - see SOLANA_SETUP.md for installation")
+		wallet_error.emit("Solana SDK not installed - see docs/SOLANA_WALLET_LOGIN.md for installation")
 		return
 	
 	print("➤ SolanaAuth: Starting wallet login...")
@@ -39,10 +39,19 @@ func start_wallet_login() -> void:
 	_request_wallet_signature()
 
 func _request_wallet_signature() -> void:
-	# Generate nonce and message
-	var nonce = _generate_nonce()
+	print("➤ SolanaAuth: Getting wallet address...")
+	# Get user's public key first
+	var user_wallet = wallet_adapter.get_public_key()
+	if not user_wallet:
+		wallet_error.emit("Could not retrieve wallet address")
+		return
+	
+	print("✓ SolanaAuth: Got wallet: ", user_wallet)
+	
+	# Generate challenge and message (v2 format with wallet address)
+	var challenge = _generate_nonce()
 	var timestamp = int(Time.get_ticks_msec() / 1000)
-	var message = "CtrlN Login\nNonce: %s\nTimestamp: %d" % [nonce, timestamp]
+	var message = "AUTH:v2:%s:%s:%d" % [user_wallet, challenge, int(timestamp / 10)]
 	var message_bytes = message.to_utf8_buffer()
 	
 	print("➤ SolanaAuth: Waiting for wallet signature...")
@@ -58,33 +67,25 @@ func _request_wallet_signature() -> void:
 		wallet_error.emit("Wallet signing failed: " + str(signature))
 		return
 	
-	# Get user's public key
-	var user_pubkey = wallet_adapter.get_public_key()
-	if not user_pubkey:
-		wallet_error.emit("Could not retrieve wallet address")
-		return
-	
-	print("✓ SolanaAuth: Got pubkey: ", user_pubkey)
 	# Send to backend for verification
-	_verify_wallet_signature(user_pubkey, signature, nonce, timestamp)
+	_verify_wallet_signature(user_wallet, signature, challenge, timestamp)
 
-func _verify_wallet_signature(pubkey: String, signature: PackedByteArray, nonce: String, timestamp: int) -> void:
+func _verify_wallet_signature(wallet: String, signature: PackedByteArray, challenge: String, timestamp: int) -> void:
 	var http = HTTPRequest.new()
 	add_child(http)
 	http.request_completed.connect(func(_result, _code, _headers, body):
 		_on_wallet_verify_response(http, _code, body))
 	
 	var body = JSON.stringify({
-		"pubkey": pubkey,
-		"nonce": nonce + ":" + str(timestamp),
-		"signature": Marshalls.raw_to_base64(signature),
-		"auth_token": ""
+		"wallet": wallet,
+		"challenge": challenge + ":" + str(timestamp),
+		"signature": Marshalls.raw_to_base64(signature)
 	})
 	
 	print("➤ SolanaAuth: Sending signature to backend...")
 	var headers = ["Content-Type: application/json"]
 	http.request(
-		"https://celkeys.io/api/auth/wallet/verify",
+		AuthConfig.get_wallet_authenticate_url(),
 		headers,
 		HTTPClient.METHOD_POST,
 		body
@@ -106,12 +107,12 @@ func _on_wallet_verify_response(http: HTTPRequest, code: int, body: PackedByteAr
 		wallet_error.emit(error)
 		return
 	
-	if response.has("gameState"):
-		_game_state = response["gameState"]
-		print("✓ SolanaAuth: Got gameState: ", _game_state)
+	if response.has("authToken"):
+		_game_state = response["authToken"]
+		print("✓ SolanaAuth: Got authToken: ", _game_state)
 		_start_profile_polling()
 	else:
-		var error = response.get("error", "No gameState in response") if response is Dictionary else "No gameState in response"
+		var error = response.get("error", "No authToken in response") if response is Dictionary else "No authToken in response"
 		wallet_error.emit(error)
 
 func _start_profile_polling() -> void:
@@ -129,7 +130,7 @@ func _start_profile_polling() -> void:
 		var http = HTTPRequest.new()
 		add_child(http)
 		
-		var poll_url = "https://celkeys.io/api/auth/poll?state=" + _game_state
+		var poll_url = AuthConfig.get_matrica_poll_url(_game_state)
 		http.request(poll_url)
 		
 		var response = await http.request_completed

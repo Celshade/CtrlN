@@ -3,10 +3,10 @@ extends Node
 ##
 ## Flow:
 ##   1. call start_login()
-##   2. GET celkeys.io/api/auth/start?state=<token>  → authUrl
+##   2. GET auth relay service → authUrl
 ##   3. OS.shell_open(authUrl) — user logs in via browser
-##   4. celkeys.io/api/auth/callback stores the profile in KV
-##   5. Poll celkeys.io/api/auth/poll?state=<token> every 1.5 s
+##   4. auth relay service stores the profile in KV
+##   5. Poll auth relay service every 1.5 s
 ##   6. emits login_succeeded(profile) or login_failed(reason)
 ##
 ## The game never handles secrets or tokens — only the profile dict.
@@ -15,7 +15,6 @@ signal login_succeeded(profile: Dictionary)
 signal login_failed(reason: String)
 signal browser_open_failed(url: String)
 
-const RELAY_BASE_URL  := "https://www.celkeys.io"
 const POLL_INTERVAL   := 1.5   # seconds between poll attempts
 const POLL_TIMEOUT    := 300.0 # 5 minutes before giving up
 
@@ -57,7 +56,7 @@ func start_login() -> void:
 	_active            = true
 	set_process(true)
 
-	var url := RELAY_BASE_URL + "/api/auth/start?state=" + _state_token.uri_encode()
+	var url := AuthConfig.get_matrica_start_url(_state_token.uri_encode())
 	_http_request.request(url)
 
 
@@ -82,7 +81,7 @@ func _process(delta: float) -> void:
 
 	_poll_timer        = POLL_INTERVAL
 	_request_in_flight = true
-	var url := RELAY_BASE_URL + "/api/auth/poll?state=" + _state_token.uri_encode()
+	var url := AuthConfig.get_matrica_poll_url(_state_token.uri_encode())
 	_http_request.request(url)
 
 
