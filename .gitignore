@@ -22,6 +22,9 @@ yarn-error.log
 .DS_Store
 Thumbs.db
 
+# ### Local Development Guidelines (SECURITY REMINDERS) ### #
+.commit-checklist
+
 # ### Environment & Configuration (SENSITIVE) ### #
 .env
 .env.local
@@ -45,6 +48,10 @@ godot/addons/
 # ### Android Build Artifacts ### #
 ctrln.apk
 godot/ctrln.apk
+
+# ### Asset Files (Media) ### #
+assets/
+godot/assets/
 godot/ctrln-unsigned.apk
 godot/ctrln-debug.apk
 godot/ctrln.apk.idsig

@@ -21,6 +21,7 @@ Built with Python 3.12 + Godot 4.6 | Web3-ready with optional Solana + Bitcoin o
 ### 🚧 Early-Stage Development
 
 This project is actively under development and not yet available in app stores. All releases (including demos) are maintained on the [GitHub Releases page](https://github.com/Celshade/CtrlN/releases).
+_Security note: v1 endpoints were deprecated at public release. Legacy integration points have been disabled—please refer to current documentation for v2 setup._
 
 Licensed under **GPL-3.0 + Commons Clause**. Permitted uses:
 - ✅ Personal play & testing
@@ -35,8 +36,7 @@ See [LICENSE](LICENSE) for full terms.
 ## Quick Links
 
 - **Pitch Deck**: [PITCH_DECK.md](PITCH_DECK.md) — Game overview, monetization, roadmap
-- **Solana Wallet Integration**: [docs/SOLANA_WALLET_LOGIN.md](docs/SOLANA_WALLET_LOGIN.md) — Architecture & setup
-- **Setup Instructions**: [SOLANA_SETUP.md](SOLANA_SETUP.md) — 3-step quick start
+- **Solana Wallet Integration**: [docs/SOLANA_WALLET_LOGIN.md](docs/SOLANA_WALLET_LOGIN.md) — Architecture, setup instructions, troubleshooting
 
 ---
 

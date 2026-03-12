@@ -38,22 +38,23 @@ CtrlN/
 
 When users log in on Android:
 
-1. **Game initiates login** → Opens browser to `https://celkeys.io/api/auth/start`
+1. **Game initiates login** → Opens browser to auth relay service Matrica endpoint
 2. **Browser redirects to Matrica** → User grants permission
-3. **Matrica redirects back** → `https://celkeys.io/api/auth/callback?code=...`
-4. **Backend stores profile** → Redis (keyed by gameState)
+3. **Matrica redirects back** → auth relay service callback endpoint
+4. **Backend stores profile** → Temporary storage (one-time retrieval)
 5. **Backend redirects** → `ctrln://auth?status=done&state=...` (deep link)
 6. **Android OS routes** → to CtrlN app (system-level, can't be hijacked)
-7. **Game polls Redis** → Retrieves and loads user profile
+7. **Game polls auth relay** → Retrieves and loads user profile
 
-**Security**: This flow uses PKCE (Proof Key for Public Clients) because the game is a public client that cannot securely store backend secrets.
+(Endpoint configuration is managed via environment variables at deployment time)
+
+**Security**: This flow uses industry-standard OAuth patterns to ensure security even with public clients that cannot store backend secrets.
 
 ## Configuration & Deployment
 
 - **Godot Build Credentials**: `godot/.env.build` (local-only, git-ignored)
 - **Game Config**: `src/ctrln/config.py`
-- **Backend (CelKeysIO)**: Separate repository with Vercel deployment
-  - See [CelKeysIO](https://github.com/Celshade/CelKeysIO) for OAuth endpoints and Redis setup
+- **Backend Authentication Service**: Separate repository and deployment
 
 ## Documentation
 
@@ -70,12 +71,12 @@ When users log in on Android:
 - **Python**: Development tools, testing infrastructure, and algorithm prototyping
 - They coexist but are independent; Python not shipped in production
 
-### Why External OAuth Backend (CelKeysIO)?
+### Why External OAuth Backend?
 
 - Matrica OAuth requires `client_secret` that cannot live in public game code
-- CelKeysIO acts as a stateless relay between game and Matrica
-- PKCE ensures security even though game is a public client
-- One-time Redis-backed profile delivery prevents replay attacks
+- Backend authentication service acts as a stateless relay between game and Matrica
+- Standard OAuth security patterns ensure game cannot leak backend secrets
+- One-time profile delivery prevents unauthorized cache access
 
 ### Why Custom Gradle Manifest Injection?
 
@@ -107,9 +108,9 @@ python -m pytest tests/
 
 - ✅ Keystore password: Local-only env vars, never in git
 - ✅ OAuth tokens: Never stored in game; only ephemeral profile
-- ✅ PKCE code_verifier: Browser-secure, embedded in HMAC-signed serverState
+- ✅ State verification: Validated across the OAuth flow to prevent unauthorized bypass
 - ✅ Deep link scheme: (`ctrln://`) Android OS-enforced; can't be hijacked
-- ✅ Redis auth profile: One-time retrieval, 10-minute TTL
+- ✅ Auth profile: One-time retrieval, short expiration
 - ✅ Git history: No credentials exposed (verified clean)
 
 ## Development Workflow

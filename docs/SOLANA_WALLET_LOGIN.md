@@ -20,69 +20,66 @@ This implementation uses the [godot-solana-sdk](https://github.com/Virus-Axel/go
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                       GODOT GAME (Android)                              │
-│                                                                           │
+│                                                                         │
 │  User selects "Login with Solana Wallet"                                │
-│           ↓                                                              │
+│           ↓                                                             │
 │  1. Game requests wallet authorization                                  │
 │     via SolanaWalletPlugin.authorize()                                  │
-│                                                                           │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
                                     ↓
 ┌─────────────────────────────────────────────────────────────────────────┐
-│              ANDROID RUNTIME (Solana Wallet Plugin)                      │
-│                                                                           │
+│              ANDROID RUNTIME (Solana Wallet Plugin)                     │
+│                                                                         │
 │  2. Establish local WebSocket with wallet app                           │
 │     (via MobileWalletAdapterClient)                                     │
-│                                                                           │
+│                                                                         │
 │  3. MWA protocol: authorize RPC call                                    │
 │     - Same device: Solflare, Phantom, etc.                              │
 │     - User approves in wallet UI                                        │
 │     - Plugin receives: auth_token, user_pubkey                          │
-│                                                                           │
+│                                                                         │
 │  4. Sign message with user's private key:                               │
-│     - Generate nonce: SHA256(timestamp + random)                        │
-│     - Message: "CtrlN Login\nNonce: {nonce}\nTimestamp: {ts}"           │
+│     - Generate cryptographic challenge                                  │
 │     - MWA protocol: signMessages RPC call                               │
 │     - Wallet returns: signature_bytes                                   │
-│                                                                           │
-│  5. Return to game: (pubkey, nonce, signature, auth_token)             │
-│                                                                           │
+│                                                                         │
+│  5. Return to game: (pubkey, signature, challenge)                      │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
              ↓
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                    GODOT GAME (Android)                                 │
-│                                                                           │
-│  6. Credential object ready, game calls:                                │
-│     HTTP POST to celkeys.io/api/auth/wallet/verify                      │
-│     Body: {pubkey, nonce, signature, auth_token}                        │
-│                                                                           │
+│                                                                         │
+│  6. Credential object ready, game calls backend API                     │
+│     AuthConfig endpoint                                                 │
+│     Body: {wallet, challenge, signature}                                │
+│                                                                         │
 │  7. Game receives: gameState token for polling                          │
-│                                                                           │
+│                                                                         │
 │  8. Start polling loop:                                                 │
-│     HTTP GET celkeys.io/api/auth/poll?state={gameState}                │
+│     AuthConfig.get_matrica_poll_url(authToken)                          │
 │     Loop runs every 1.5 seconds until success or timeout                │
-│                                                                           │
-│  9. Polling returns: user profile dict (name, avatar, etc.)            │
+│                                                                         │
+│  9. Polling returns: user profile dict (name, avatar, etc.)             │
 │     Profile stored in game's player data                                │
-│                                                                           │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
              ↓
 ┌─────────────────────────────────────────────────────────────────────────┐
-│              CELKEYS.IO BACKEND (Node.js)                                │
-│                                                                           │
-│  `/api/auth/wallet/verify` endpoint:                                    │
-│  - Verify signature against pubkey (Crypto + Solana SDK)               │
-│  - Verify nonce TTL (prevent replay, max 5 min old)                     │
+│              AUTH RELAY SERVICE BACKEND (Node.js)                       │
+│                                                                         │
+│  Wallet verification:													  |
+│  - Verify signature against wallet public key                           │
+│  - Verify challenge TTL (prevent replay attacks)                        │
 │  - Create or fetch user profile from database                           │
-│  - Generate gameState UUID                                              │
-│  - Store: {profile_json} in Redis keyed by gameState                    │
-│  - TTL: 10 minutes, one-time retrieval                                  │
-│  - Return: gameState to game for polling                                │
-│                                                                           │
-│  `/api/auth/poll` (existing):                                           │
-│  - Returns cached profile (one-time retrieval via delete)               │
+│  - Generate auth token                                                  │
+│  - Store: profile temporarily keyed by auth token                       │
+│                                                                         │
+│  Polling endpoint (same as Matrica flow):                               │
+│  - Returns cached profile (one-time retrieval)                          │
 │  - Same as Matrica flow                                                 │
-│                                                                           │
+│                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -93,17 +90,16 @@ This implementation uses the [godot-solana-sdk](https://github.com/Virus-Axel/go
 - No intermediary OAuth provider needed
 - On-device signing (Phantom, Solflare handle key management)
 - Nonce + timestamp prevent replay attacks
-- One-time profile retrieval from Redis (same as Matrica)
+- One-time profile retrieval from secure storage (same as Matrica)
 
 **Nonce Verification:**
-- Generated server-side and sent to backend
-- Timestamp embedded in message prevents old nonce reuse
-- Message format: `"CtrlN Login\nNonce: {base64_nonce}\nTimestamp: {unix_ts}"`
-- Server validates nonce TTL (max 5 minutes)
+- Challenge is generated and validated server-side
+- Short TTL prevents replay attacks
+- Server validates challenge freshness before processing
 
 **Signature Verification:**
-- Backend uses `@solana/web3.js` to verify Ed25519 signature
-- Confirms signature is valid for user's public key + message bytes
+- Signature is verified against user's public key
+- Invalid or expired signatures are rejected
 - No private key ever leaves user's wallet
 
 ---
@@ -125,17 +121,12 @@ wallet_adapter.connected.connect(_on_wallet_connected)
 func _on_wallet_login_pressed():
 	wallet_adapter.connect_wallet()  # Opens wallet app (MWA protocol)
 	
-	# Generate nonce + message
-	var nonce = _generate_nonce()
-	var timestamp = int(Time.get_ticks_msec() / 1000)
-	var message = "CtrlN Login\nNonce: %s\nTimestamp: %d" % [nonce, timestamp]
-	
-	# Request signature (user approves in wallet)
-	var signature = await wallet_adapter.sign_message(message.to_utf8_buffer())
+	# Generate challenge and request signature
+	var signature = await wallet_adapter.sign_message(...)
 	var pubkey = wallet_adapter.get_public_key()
 	
 	# Send to backend for verification
-	_verify_wallet_signature(pubkey, signature, nonce, timestamp)
+	_verify_wallet_signature(pubkey, signature)
 ```
 
 ### 2. Android Plugin Setup (godot-solana-sdk)
@@ -147,7 +138,7 @@ func _on_wallet_login_pressed():
 
 **No custom Kotlin code needed** — the SDK handles:
 - Mobile Wallet Adapter protocol (MWA 2.0)
-- Ed25519 signature verification (native implementation)
+- Signature verification
 - Local WebSocket communication with wallet apps
 - Android permission handling
 
@@ -156,7 +147,7 @@ func _on_wallet_login_pressed():
 - Solflare
 - Seed Vault Wallet
 
-**Backend**: Implemented in separate [CelKeysIO](https://github.com/Celshade/CelKeysIO) repository.
+**Backend**: Signature verification is handled by a separate backend authentication service. Endpoints are configured via environment variables at deployment time.
 
 ### 4. Build Configuration
 
@@ -214,8 +205,8 @@ permissions = [
 - [ ] Test on Android device (requires Phantom/Solflare installed)
 
 ### Backend
-- Implemented in separate [CelKeysIO](https://github.com/Celshade/CelKeysIO) repository
-- See CelKeysIO documentation for `/api/auth/wallet/verify` endpoint setup
+- Implemented in separate backend authentication service repository
+- See backend service documentation for wallet verification endpoint setup
 
 ### Mobile Testing
 - [ ] Install Phantom or Solflare wallet on Android device
@@ -227,11 +218,11 @@ permissions = [
 
 ### Security & Testing
 - [ ] Test signature verification with multiple wallets (Phantom, Solflare)
-- [ ] Verify nonce TTL enforcement (reject > 5 min old)
+- [ ] Verify challenge validity enforcement
 - [ ] Test on both devnet and mainnet
 - [ ] Load test polling endpoint
-- [ ] Verify Redis TTL and one-time retrieval
-- [ ] Audit message format for replay attack resistance
+- [ ] Verify one-time retrieval works correctly
+- [ ] Audit for general security issues
 
 ---
 
@@ -243,7 +234,7 @@ permissions = [
 # https://github.com/Virus-Axel/godot-solana-sdk/releases
 
 # Extract to Godot project:
-cd /home/u_cel/Projects/CtrlN/godot
+cd godot
 mkdir -p addons/SolanaSDK
 unzip ~/Downloads/godot-solana-sdk-4.x.zip -d addons/SolanaSDK/
 
@@ -275,17 +266,16 @@ adb install ctrln.apk
 # Run game and test wallet login
 ```
 
-### 5. Test Backend Endpoint (Local)
+## 5. Test Backend Endpoint (Local)
+
+For development testing, configure the auth relay service locally:
+
 ```bash
-# With Redis running on backend:
-curl -X POST http://localhost:3000/api/auth/wallet/verify \
-	-H "Content-Type: application/json" \
-	-d '{
-		"pubkey": "9B5X5wUhZzngwFePWwNSqJ2BHAhMhJ1ChZQkE2NP2o4K",
-		"nonce": "SGVsbG9Xb3JsZHhGVEdKeE1ubw==:1234567890",
-		"signature": "4Z5kpAZ8..." ,
-		"auth_token": ""
-	}'
+# Set environment variable for local testing
+export CTRLN_AUTH_RELAY_URL="http://localhost:3000"
+
+# Then run CtrlN - AuthConfig will use this URL
+godot --editor
 ```
 
 ---
@@ -304,21 +294,19 @@ curl -X POST http://localhost:3000/api/auth/wallet/verify \
 - Check device network connectivity
 
 ### "Invalid signature" from backend
-- Verify message format: exactly `"CtrlN Login\nNonce: {base64}\nTimestamp: {unix_ts}"`
-- Check timestamp is recent (< 5 minutes old)
-- Verify signature is base64 encoded in POST body
-- Test signature verification locally with a known good key
+- Verify signature was generated by the wallet
+- Ensure request was sent to correct endpoint
+- Contact backend administrator if issue persists
 
 ### Profile not retrieved after poll
-- Check Redis is running on backend
-- Verify gameState UUID matches between verify response and poll request
-- Check one-time retrieval works (key should be deleted after first GET)
-- Verify polling URL is correct: `celkeys.io/api/auth/poll?state=...`
+- Verify auth service is running and accessible
+- Check auth token from verify response matches polling request
+- Verify profile retrieval works correctly
 
-### "Invalid nonce format" from backend
-- Ensure nonce is generated correctly as base64
-- Verify format is exactly: `"BASE64_NONCE:UNIX_TIMESTAMP"` (colon separator)
-- Check timestamp is integer seconds (not milliseconds)
+### "Invalid challenge format" from backend
+- Ensure challenge was generated by the wallet
+- Check that challenge matches what was signed
+- Verify backend received complete signature data
 
 ### Wallet app doesn't prompt for signature approval
 - Compare message being signed with backend expectation
