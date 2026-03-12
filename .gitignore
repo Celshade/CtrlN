@@ -48,6 +48,10 @@ godot/addons/
 # ### Android Build Artifacts ### #
 ctrln.apk
 godot/ctrln.apk
+
+# ### Asset Files (Media) ### #
+assets/
+godot/assets/
 godot/ctrln-unsigned.apk
 godot/ctrln-debug.apk
 godot/ctrln.apk.idsig
