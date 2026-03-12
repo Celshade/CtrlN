@@ -35,6 +35,15 @@ func _ready() -> void:
 func _load_configuration() -> void:
 	# Load from environment or use defaults
 	_auth_relay_url = OS.get_environment(ENV_AUTH_RELAY_URL) if OS.get_environment(ENV_AUTH_RELAY_URL) else DEFAULT_AUTH_RELAY_BASE_URL
+	
+	# If using placeholder, try to load from packaged config file (set at APK build time)
+	if _auth_relay_url.contains("auth-relay.local"):
+		var config_file = "auth_config.txt"
+		if ResourceLoader.exists(config_file):
+			var config = FileAccess.get_file_as_string("res://" + config_file)
+			if config:
+				_auth_relay_url = config.strip_edges()
+	
 	_matrica_endpoint = OS.get_environment(ENV_MATRICA_ENDPOINT) if OS.get_environment(ENV_MATRICA_ENDPOINT) else DEFAULT_MATRICA_ENDPOINT
 	_matrica_poll_endpoint = DEFAULT_MATRICA_POLL_ENDPOINT
 	_wallet_endpoint = OS.get_environment(ENV_WALLET_ENDPOINT) if OS.get_environment(ENV_WALLET_ENDPOINT) else DEFAULT_WALLET_ENDPOINT

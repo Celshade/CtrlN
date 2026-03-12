@@ -42,6 +42,9 @@ godot/.keystore
 *.cache*
 godot/.godot/
 
+# ### Godot Build Configuration (GENERATED) ### #
+godot/auth_config.txt
+
 # ### Godot Plugins (downloaded separately) ### #
 godot/addons/
 
