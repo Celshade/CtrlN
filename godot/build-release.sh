@@ -7,7 +7,9 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 ENV_FILE="$SCRIPT_DIR/.env.build"
+OUTPUT_APK="$ROOT_DIR/ctrln.apk"
 
 # Source .env.build for credentials if it exists
 if [ -f "$ENV_FILE" ]; then
@@ -36,6 +38,6 @@ cd "$SCRIPT_DIR"
 GODOT_ANDROID_KEYSTORE_RELEASE_PATH="$GODOT_ANDROID_KEYSTORE_RELEASE_PATH" \
 GODOT_ANDROID_KEYSTORE_RELEASE_USER="$GODOT_ANDROID_KEYSTORE_RELEASE_USER" \
 GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD="$GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD" \
-godot --headless --export-release "Android" ./ctrln.apk
+godot --headless --export-release "Android" "$OUTPUT_APK"
 
-echo "✓ Release APK built: $SCRIPT_DIR/ctrln.apk"
+echo "✓ Release APK built: $OUTPUT_APK"
