@@ -1,0 +1,3 @@
+# Exclude SolanaSDK demo files from project scan (they cause many parse errors)
+addons/SolanaSDK/Demos/
+addons/SolanaSDK/example/

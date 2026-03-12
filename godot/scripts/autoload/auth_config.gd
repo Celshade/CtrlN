@@ -19,9 +19,9 @@ const ENV_WALLET_ENDPOINT := "CTRLN_WALLET_ENDPOINT"
 
 # Default endpoints (placeholder domain prevents accidental hardcoding)
 const DEFAULT_AUTH_RELAY_BASE_URL := "https://api.auth-relay.local"
-const DEFAULT_MATRICA_ENDPOINT := "/auth/start"
-const DEFAULT_MATRICA_POLL_ENDPOINT := "/auth/poll"
-const DEFAULT_WALLET_ENDPOINT := "/wallet-authenticate"
+const DEFAULT_MATRICA_ENDPOINT := "/api/auth/start"
+const DEFAULT_MATRICA_POLL_ENDPOINT := "/api/auth/poll"
+const DEFAULT_WALLET_ENDPOINT := "/api/auth/wallet/verify"
 
 # Cached configuration values
 var _auth_relay_url: String
@@ -38,11 +38,13 @@ func _load_configuration() -> void:
 	
 	# If using placeholder, try to load from packaged config file (set at APK build time)
 	if _auth_relay_url.contains("auth-relay.local"):
-		var config_file = "auth_config.txt"
-		if ResourceLoader.exists(config_file):
-			var config = FileAccess.get_file_as_string("res://" + config_file)
+		# Try to load from res://auth_config.txt (project root)
+		var config_path = "res://auth_config.txt"
+		if FileAccess.file_exists(config_path):
+			var config = FileAccess.get_file_as_string(config_path)
 			if config:
 				_auth_relay_url = config.strip_edges()
+				print("✓ AuthConfig: Loaded from %s" % config_path)
 	
 	_matrica_endpoint = OS.get_environment(ENV_MATRICA_ENDPOINT) if OS.get_environment(ENV_MATRICA_ENDPOINT) else DEFAULT_MATRICA_ENDPOINT
 	_matrica_poll_endpoint = DEFAULT_MATRICA_POLL_ENDPOINT

@@ -57,6 +57,7 @@ func start_login() -> void:
 	set_process(true)
 
 	var url := AuthConfig.get_matrica_start_url(_state_token.uri_encode())
+	print("🔗 MatricaAuth: Requesting start URL: ", url)
 	_http_request.request(url)
 
 
@@ -141,6 +142,7 @@ func _on_http_completed(result: int, response_code: int, _headers: PackedStringA
 # ── Helpers ───────────────────────────────────────────────────────
 
 func _fail(reason: String) -> void:
+	print("❌ MatricaAuth failed: ", reason)
 	_active = false
 	set_process(false)
 	login_failed.emit(reason)
