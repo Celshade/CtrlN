@@ -28,7 +28,7 @@ func _initialize_wallet_adapter() -> void:
 
 func start_wallet_login() -> void:
 	if not _sdk_available or not wallet_adapter:
-		wallet_error.emit("Solana SDK not installed - see SOLANA_SETUP.md for installation")
+		wallet_error.emit("Solana SDK not installed - see docs/SOLANA_WALLET_LOGIN.md for installation")
 		return
 	
 	print("➤ SolanaAuth: Starting wallet login...")

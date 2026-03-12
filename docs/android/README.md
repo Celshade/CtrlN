@@ -19,15 +19,14 @@ Complete chronicle of the deep link intent-filter issue and the final Gradle pos
 ### [MATRICA_OAUTH_MOBILE_FLOW.md](../../BuildResources/MATRICA_OAUTH_MOBILE_FLOW.md)
 Complete OAuth flow architecture with security rationale. Read this to understand:
 - How login works on Android
-- Why we use PKCE (Proof Key for Public Clients)
+- Why we use secure OAuth patterns
 - Security model (why the game never sees tokens)
-- Integration with CelKeysIO backend
+- Integration with backend authentication service
 
 **Topics covered**:
 - 6-stage OAuth flow with ASCII diagram
-- PKCE code_verifier and challenge explained
-- HMAC state verification for replay attack prevention
-- One-time Redis profile retrieval
+- Secure state verification for preventing attacks
+- One-time profile retrieval
 - Deep link redirect on Android OS
 - Deployment checklist for environment variables
 
@@ -46,6 +45,6 @@ See `../ARCHITECTURE.md` for high-level project structure and design decisions.
 ## Key Takeaways
 
 1. **Deep links work via post-merge Gradle injection** — not in source manifest
-2. **OAuth uses PKCE for public clients** — game never stores secrets
+2. **OAuth uses industry-standard security patterns** — game never stores secrets
 3. **Keystore credentials come from env vars** — never in version control
 4. **Build script is required** — `godot export-release` alone won't work
