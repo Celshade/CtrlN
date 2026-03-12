@@ -125,10 +125,10 @@ CtrlN/
 
 | Phase | Timeline | Features |
 |-------|----------|----------|
-| **Soft Launch** | Q2 2026 | Level 1, Matrica OAuth, Energy system |
-| **Global** | Q3 2026 | Level 2, Solana NFT Profiles, store |
-| **Level 3** | Q4 2026 | Level 3, unique abilities
-| **Ecosystem** | Q1 2027+ | Level 4, Swipe mechanics, Trilogy games |
+| **Soft Launch** | Q2 2026 | Level 1 (Day-Time), Matrica OAuth, Energy system |
+| **Global Launch** | Q3 2026 | Level 2 (Night Time), Solana NFT Profiles, Store, Unique abilities |
+| **Level 3** | Q4 2026 | Level 3 (Snow), Unique abilities, Swipe mechanics |
+| **Level 4+ Ecosystem** | Q1 2027+ | Level 4 (Tron Grid/Miami), Trilogy games, Cross-game portability |
 
 ---
 

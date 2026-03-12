@@ -112,9 +112,9 @@ For players who choose to mint their profile NFT ($1-3 SOL):
        ├─ Store: Purchase $SKR for playtime/cosmetics/power-ups
        │
        ├─ [OPTIONAL] Mint Profile as NFT
-       │   ├─ Cost: $1-3 SOL
-       │   ├─ Unlocks: Leaderboard verification, portability
-       │   └─ NFT metadata on Solana blockchain
+       │   ├─ Cost: mint/inscription cost + <=$5
+       │   ├─ Unlocks: Leaderboard verification, portability, etc
+       │   └─ NFT metadata on Solana/Bitcoin blockchain
        │       └─ Character unlocks, achievements, cosmetics
        │
        └─ Leaderboard: Rankings synced with/without NFT
@@ -162,11 +162,11 @@ This lean structure allows for rapid iteration while maintaining artistic qualit
   - Energy regenerates over time (configurable timers)
   - Optional paid energy/fast-regen via $SKR
 
-### Profile NFT Minting (Optional, One-Time)
+### Solana NFT Profiles (Optional, One-Time)
 
 - **Cost**: $1-3 SOL one-time
 - **Benefits**: Enhanced security, portability across games, leaderboard verification
-- **Not required**: Players can enjoy full game without minting
+- **Not required**: Players can enjoy full game without NFT Profile
 
 ### In-Store Purchases ($SKR)
 
@@ -186,12 +186,12 @@ Revenue Streams:
 ├─ Energy/Playtime sales ($SKR)
 ├─ Cosmetics ($SKR)
 ├─ Power-ups ($SKR)
-└─ Profile NFT minting (SOL)
+└─ Solana NFT Profiles (SOL)
 
 Player Lifetime Value (pLTV):
 ├─ Casual: $0-2 (free players, occasional purchase)
 ├─ Engaged: $10-30 ($SKR cosmetics + playtime)
-└─ Hardcore: $50-200+ (cosmetics + playtime + power-ups + NFT minting + marketplace)
+└─ Hardcore: $50-200+ (cosmetics + playtime + power-ups + NFT Profiles + marketplace)
 ```
 
 ---
@@ -212,19 +212,18 @@ Player Lifetime Value (pLTV):
 ## �🚀 Go-to-Market
 
 ### Phase 1: Soft Launch (Q2 2026)
-- Public demo/alpha on GitHub Releases
+- Public demo on GitHub Releases
 - **Level 1 (Day-Time)**: Launched with Matrica OAuth + Solana wallet login
-- **Energy System**: Active (5 free matches per session)
-- Matrica OAuth login only
+- **Energy System**: Active (5 free matches per session, regeneration over time or $SKR purchase)
 - In-game leaderboards operational
-- Energy system + $SKR cosmetic store operational
+- $SKR cosmetic store operational
 - Gather analytics and balance gameplay
 - Community feedback integration
 
 ### Phase 2: Full Launch (Q3 2026)
 - Global iOS/Android release
 - **Level 2 (Night Time)**: New environment with unique mechanics
-- Solana Wallet login + optional NFT minting ($1-3 SOL)
+- **Solana NFT Profiles**: Optional minting ($1-3 SOL)
 - $SKR in-store purchases (playtime, cosmetics, power-ups)
 - **Website companion launch**: Enhanced leaderboard metrics, player stats, achievement profiles
 - Leaderboard reset with season 1
@@ -344,10 +343,10 @@ By combining accessible gameplay with optional Web3 integration and a planned se
 
 | Phase | Timeline | Deliverables |
 |-------|----------|--------------|
-| **Soft Launch** | Q2 2026 | Level 1 (Day-Time), 2K DAU, Matrica OAuth |
-| **Global Launch** | Q3 2026 | Level 2 (Night Time), Solana NFT minting, Season 1 (leaderboard) | Store | Unique abilities
-| **Level 3 Release** | Q4 2026 | Level 3 (Snow) | Unique abilities | Swipe mechanics
-| **Level 4 & Ecosystem** | Q1 2027+ | Level 4 (Tron Grid/Miami) | Unique abilities | -> game 2 of 3, etc.
+| **Soft Launch** | Q2 2026 | Level 1 (Day-Time), Matrica OAuth, Energy system |
+| **Global Launch** | Q3 2026 | Level 2 (Night Time), Solana NFT Profiles, Store, Unique abilities |
+| **Level 3 Release** | Q4 2026 | Level 3 (Snow), Unique abilities, Swipe mechanics |
+| **Level 4 & Ecosystem** | Q1 2027+ | Level 4 (Tron Grid/Miami), Trilogy games, Cross-game portability |
 
 ---
 

@@ -75,9 +75,8 @@ SolanaAuth="*res://scripts/autoload/solana_auth.gd"
 - Verify wallet app works manually before testing login
 
 ### Signature verification fails on backend
-- Check `/api/auth/wallet/verify` is deployed in CelKeysIO
-- Verify Redis is running with correct URL in backend env
-- Check server logs for validation errors
+- Verify backend is properly deployed (see [CelKeysIO repository](https://github.com/Celshade/CelKeysIO))
+- Check backend logs for validation errors
 
 ---
 
