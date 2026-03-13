@@ -19,7 +19,7 @@ func load_profile(player_id: String) -> Dictionary:
 	if FileAccess.file_exists(path):
 		var f := FileAccess.open(path, FileAccess.READ)
 		var json := JSON.new()
-		if json.parse(f.get_as_text()) == OK:
+		if json.parse(f.get_as_text()) == OK:  # TODO test mobile persistance
 			current_profile = json.data
 			return current_profile
 	# Default new profile
@@ -90,12 +90,13 @@ func increment_games_played(character_id: String) -> void:
 func get_unlocked_characters() -> Array[String]:
 	var rank := get_rank()
 	var unlocked: Array[String] = ["black", "dark_green", "blue", "red"]
-	if rank <= 7 and rank >= 0:
-		unlocked.append_array(["yellow", "purple"])
-	if rank <= 6 and rank >= 0:
-		unlocked.append_array(["green", "orange"])
-	if rank <= 4 and rank >= 0:
-		unlocked.append("grey")
-	if rank <= 3 and rank >= 0:
-		unlocked.append("white")
+	# TODO: Re-enable locked characters when system is implemented
+	# if rank <= 7 and rank >= 0:
+	# 	unlocked.append_array(["yellow", "purple"])
+	# if rank <= 6 and rank >= 0:
+	# 	unlocked.append_array(["green", "orange"])
+	# if rank <= 4 and rank >= 0:
+	# 	unlocked.append("grey")
+	# if rank <= 3 and rank >= 0:
+	# 	unlocked.append("white")
 	return unlocked
