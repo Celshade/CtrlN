@@ -18,6 +18,8 @@ Built with Python 3.12 + Godot 4.6 | Web3-ready with optional Solana + Bitcoin o
 
 **Playable Android demo** with Matrica login. [See what's included →](https://github.com/Celshade/CtrlN/releases/tag/v0.1.1-demo)
 
+> **Note:** Only the black player key is fully animated in this build. You can play as the 3 other base keys (dark_green, blue, red), but they won't have full in-game animations yet.
+
 ### 🚧 Early-Stage Development
 
 This project is actively under development and not yet available in app stores. All releases (including demos) are maintained on the [GitHub Releases page](https://github.com/Celshade/CtrlN/releases).
