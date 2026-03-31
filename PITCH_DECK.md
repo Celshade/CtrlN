@@ -99,7 +99,7 @@ _* = TBD_
 └──────┬──────┘
        │
        ├─ Login: Matrica OAuth (primary) or Solana Wallet (secondary)
-       ├─ Profile created in Redis (10-min cache)
+       ├─ Profile created/loaded
        │
        ├─ Energy System: 5 free matches per session
        ├─ Store: Purchase $SKR for playtime/cosmetics/power-ups
