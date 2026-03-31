@@ -1,6 +1,6 @@
-# CtrlN
+# CKEY: CTRL+N
 
-Fast-paced, skill-based mobile action game with hand-crafted pixel art - developed with a passion for indie games and code itself [🐍]. Tap to dodge, swipe to [TBA], compete against your fellow degens, unlock new characters (keys), flex your rank roles in the community, and have fun!
+Fast-paced, skill-based mobile action game with hand-crafted pixel art - developed with a passion for indie games and code itself [🐍]. Tap to dodge, swipe to [TBA], compete against your fellow degens, unlock new characters (keys), flex your rank roles in the community, try different audio packs (coming soon), and have fun!
 
 Built with Python 3.12 + Godot 4.6 | Web3-ready with optional Solana + Bitcoin ordinal (coming soon) profiles | Energy-based free-to-play | Powered by Solana + Bitcoin + **Matrica**
 
@@ -16,7 +16,7 @@ Built with Python 3.12 + Godot 4.6 | Web3-ready with optional Solana + Bitcoin o
 
 ## 🚀 [Download v0.1.1 Demo](https://github.com/Celshade/CtrlN/releases/tag/v0.1.1-demo)
 
-**Playable Android demo** with Matrica login. [See what's included →](https://github.com/Celshade/CtrlN/releases/tag/v0.1.1-demo)
+**Playable Android demo** with Matrica login. [Latest release →](https://github.com/Celshade/CtrlN/releases/tag/v0.1.1-demo)
 
 > **Note:** Only the black player key is fully animated in this build. You can play as the 3 other base keys (dark_green, blue, red), but they won't have full in-game animations yet.
 
@@ -77,15 +77,15 @@ Output: `ctrln.apk` (Android)
 - Unlock characters and achievements
 
 ### Monetization
-- **Energy System**: 4-5 free matches per session (demo is open play)
+- **Energy System**: 5 free matches per session/day (TBD) — demo is open play
 - **$SKR Store**: In-game cosmetics, playtime (energy), action-item purchases
 - **Optional NFT**: Mint profile as NFT portability, permanence, and bonuses
 
 ### Web3 Integration
-- **Matrica OAuth**: Multi-chain social login
+- **Matrica OAuth** (primary): Multi-chain social login
   - includes all major web3 wallets (including native solana mobile wallet)
   - includes social login via discord, x, and tg
-- **Solana Wallet**: Direct wallet signing via Mobile Wallet Adapter (coming soon)
+- **Solana Wallet Adapter** (secondary, coming soon): Direct wallet signing via Mobile Wallet Adapter
 - **Cross-Chain Assets**: Unlock bonuses by validating Bitcoin/Ethereum NFTs via Matrica (coming soon)
 - **Discord**: Rank-based roles verified via multi-chain asset verification (coming soon)
 

@@ -8,59 +8,51 @@
 
 ---
 
-## 🎯 Core Concept
+## 🎯 Core Loop
 
-- **One-button gameplay**: Simple tap and swipe mechanics, deep skill ceiling
-- **Procedurally challenging**: Obstacles escalate in speed and complexity
-- **Real-time competition**: Live leaderboards and ranking system
-- **Social & Multiplayer**: Rankings, achievements, character cosmetics
-- **Multi-chain Engagement**: Launched in the Solana dApp store, but not limited to Solana users.
+1. **Select Character** — Choose from unlockable keyboard keys (characters with unique audio signatures)
+2. **Play** — Tap to dodge procedurally-challenging obstacles (birds, trees, hazards); higher score = better rank
+3. **Compete** — Compare scores on global/friend leaderboards; earn rank tiers (Bamboo → Iron → Bronze → Gold → Platinum → Diamond)
+4. **Progress** — Unlock new key characters, achievements, cosmetics, and audio packs
 
----
-
-## 🕹️ Gameplay Loop
-
-1. **Select Character** — Choose from a roster of unlockable characters with unique visuals
-2. **Play** — Tap to dodge obstacles; higher score = better rank
-3. **Compete** — Compare scores against global and friend leaderboards
-4. **Progress** — Unlock new characters and achievements through gameplay
+**Key Mechanics**: One-button tap + swipe for advanced maneuvers (coming soon), real-time competition, cross-chain asset integration via Matrica
 
 ---
 
 ## ✨ Key Features
 
-### Player Progression
-- **Energy System**: 5 free matches per session; Energy regenerates over time or via $SKR purchase
+### 📊 Player Progression
+- **Energy System**: 5 free matches per session/day (TBD); Energy regenerates over time or via $SKR purchase
 - **Achievement System**: Unlock badges and titles (free + purchasable cosmetics)
 - **Character Unlocks**: Earn new playable characters and abilities through gameplay
 - **Rank Tiers**: Progress through competitive ranks (Unranked → Bamboo → ... → Diamond)
 - **Profile Customization**: Equipped character, avatar, bio (cosmetics via $SKR)
 - **Cross-Chain Asset Integration**: Unlock bonuses, characters, and abilities by validating existing NFT traits/assets via Matrica (Ethereum NFTs, Solana collections; Bitcoin Ordinals coming soon)
 
-### Gameplay Evolution (Future Iterations)
-- **Swipe Mechanics**: Advanced input system for complex maneuvers
-- **Unique Player Abilities**: Character-specific gameplay mechanics and power-ups
-- **Level Expansions**: Night Time, Snow, Tron Grid, Miami Bonus (3-4 additional levels planned)
-
-### Social & Engagement
-- **Global Leaderboards**: Real-time competitive ranking
-- **Friend Rankings**: Compare scores with friends
-- **Achievements**: Visible badges and milestones
-- **Cosmetics**: Character skins and visual items
-
-### Audio Packs
+### 🎵 Audio Packs
 - **Keyboard-Based Audio Identity**: Each playable character is a key from a keyboard; gameplay includes dynamic keypress sounds that vary by equipped audio pack
 - **Unlockable Audio Packs**: Players unlock different keyboard audio packs through gameplay progression or $SKR store purchases
 - **Authentic Keyboard Recordings**: Each audio pack contains keypress sounds recorded from actual mechanical/membrane keyboards with distinct acoustic signatures
 - **Per-Keyboard Variety**: Multiple packs available (Cherry MX Red, Cherry MX Blue, Topre, Membrane, etc.) — each with authentic keycap click/clack characteristics
 - **Audio Feedback Loop**: Tie visual character identity (the "key") directly to audio feedback, reinforcing the keyboard theme and adding personality to each play session
 
-### Technical
+### 🚀 Gameplay Evolution (Future Iterations)
+- **Swipe Mechanics**: Advanced input system for complex maneuvers
+- **Unique Player Abilities**: Character-specific gameplay mechanics and power-ups
+- **Level Expansions**: Day, Night, Snow, ???, Miami [Bonus], ??? (3-6 additional levels already planned)
+
+### 👥 Social & Engagement
+- **Global Leaderboards**: Real-time competitive ranking
+- **Friend Rankings**: Compare scores with friends
+- **Achievements**: Visible badges and milestones
+- **Cosmetics**: Character skins and visual items
+
+### ⚙️ Technical
 - **Cross-Platform**: Android (iOS coming Q3 2026) via Godot 4.6
 - **Desktop Support**: Python 3.12 + Pygame for development/testing
 - **Cloud Saves**: Profile tied to login
   - **Matrica OAuth** (primary): Multi-chain social login (Discord, X, Telegram + all major Web3 wallets -> including native solana mobile wallet)
-  - **Solana Wallet Adapter** (secondary): Direct wallet signing via Mobile Wallet Adapter 2.0
+  - **Solana Wallet Adapter** (secondary, coming soon): Direct wallet signing via Mobile Wallet Adapter 2.0
 - **Energy System**: Tracks playtime, regeneration, and purchases
 - **SKR Integration**: In-game store powered by Solana Mobile token
 - **Website Companion**: Enhanced leaderboard metrics, detailed player stats, achievement tracking (coming Q3 2026)
@@ -70,18 +62,22 @@
 
 ## 🔐 Web3 Integration: Optional Profile NFT Minting
 
-**CtrlN profiles can be optionally minted as NFTs on Solana**, giving players enhanced security and portability:
+**CTRL+N profiles can be optionally minted as NFTs on Solana**, giving players enhanced security and portability:
 
-### Profile NFT Value Proposition
+### Value Proposition
+_* = TBD_
 
-- **Cost**: $1-3 SOL one-time overhead charge (optional)
+- **Cost**: $1-5* (+ network fees) one-time (optional to mint)
 - **Benefits**:
   - Enhanced security: Profile backed by on-chain assets
   - Portability: Use profile across compatible games
   - Permanence: Leaderboard history immutably stored
   - Composability: Future games can read CtrlN achievements
+  - **Leaderboard Participation***: Required to compete in seasonal leaderboards (free-to-play players can still play; profile data saves locally and to database with less frequent syncs, but not on-chain)
 
-### What's Stored in Profile NFTs
+**Future Expansion**: Bitcoin Ordinal profiles planned for a future iteration, allowing players to mint profiles as Bitcoin NFTs alongside Solana options.
+
+### On-Chain Storage
 
 - **Account Data**
   - Public portfolio (score, rank, cosmetics)
@@ -89,23 +85,11 @@
   - Timestamps and progression milestones
   
 - **Character Ownership**
-  - Equipped character NFT
+  - Equipped character NFT (if any)
   - Unlocked character collection
   - Visual metadata (colors, animations)
 
-- **Portability**
-  - Players own their profile NFT outright
-  - Transferable across games/platforms using blockchain standards
-  - Metadata stored on-chain
-
-### Optional NFT Benefits
-
-For players who choose to mint their profile NFT ($1-3 SOL):
-
-✅ **True Ownership** — Profile backed by blockchain  
-✅ **Portability** — Use your character across compatible games  
-✅ **Permanence** — Leaderboard history immutably recorded  
-✅ **Composability** — Future games can read your CtrlN achievements
+- **On-Chain Metadata**: Profile data stored on Solana/Bitcoin blockchain with NFT/Inscription protocols
 
 ### Technical Architecture
 
@@ -121,12 +105,12 @@ For players who choose to mint their profile NFT ($1-3 SOL):
        ├─ Store: Purchase $SKR for playtime/cosmetics/power-ups
        │
        ├─ [OPTIONAL] Mint Profile as NFT
-       │   ├─ Cost: mint/inscription cost + <=$5
-       │   ├─ Unlocks: Leaderboard verification, portability, etc
+       │   ├─ Cost: mint/inscription cost + $1-5*
+       │   ├─ Unlocks: Leaderboard participation, portability, cross-game play
        │   └─ NFT metadata on Solana/Bitcoin blockchain
        │       └─ Character unlocks, achievements, cosmetics
        │
-       └─ Leaderboard: Rankings synced with/without NFT
+       └─ Leaderboard: Ranked participation requires minted profile NFT
 ```
 
 ---
@@ -135,14 +119,14 @@ For players who choose to mint their profile NFT ($1-3 SOL):
 
 - **Minimalist Style**: Clean pixel-art characters and obstacles
 - **Responsive Feedback**: Particle effects, screen shake, sound cues
-- **Colorful Characters**: Distinct visual personalities (Black Bird, Yellow Bird, etc.)
-- **Themed Obstacles**: Procedural trees, platforms, hazards
+- **Playable Key Characters**: Keyboard keys with distinct visual personalities and audio signatures; unlockable variants
+- **Dynamic Obstacles**: Birds, trees, platforms, and hazards that escalate in speed/complexity
 
 ---
 
 ## 👥 Development Team
 
-**CtrlN** was created by a **single developer** with generous support from community artists:
+**CtrlN** was created by a **single developer** with support from community artists:
 
 - **Celshade** (Developer): Game design, programming, player sprites, effects and animation, UI design, infrastructure, marketing, partnerships, and community administration
 - **Psy** (Artist): Level backgrounds and obstacle art/animation
@@ -156,9 +140,9 @@ This lean structure allows for rapid iteration while maintaining artistic qualit
 
 ## 🌍 Target Audience
 
-- **Primary**: Casual mobile gamers (18-35) seeking quick, skill-based challenges
-- **Secondary**: Mobile game speedrunners and competitive niches
-- **Tertiary**: Web3-curious players interested in on-chain profile ownership
+- **Primary**: Casual mobile gamers (18-35) seeking quick, skill-based (but relaxed) action
+- **Secondary**: Mobile streamers & competitive skill-based speedrunners
+- **Tertiary**: Web3 gamers seeking optional blockchain profile verification & cross-game portability
 
 ---
 
@@ -173,8 +157,8 @@ This lean structure allows for rapid iteration while maintaining artistic qualit
 
 ### Solana NFT Profiles (Optional, One-Time)
 
-- **Cost**: $1-3 SOL one-time
-- **Benefits**: Enhanced security, portability across games, leaderboard verification
+- **Cost**: $1-5* (+ network fees) one-time
+- **Benefits**: Enhanced data security, portability across games, leaderboard participation
 - **Not required**: Players can enjoy full game without NFT Profile
 
 ### In-Store Purchases ($SKR)
@@ -188,163 +172,69 @@ All premium purchases use **$SKR (Solana Mobile Token)**:
 
 ---
 
-## 📊 Business Model
-
-```
-Revenue Streams:
-├─ Energy/Playtime sales ($SKR)
-├─ Cosmetics ($SKR)
-├─ Power-ups ($SKR)
-└─ Solana NFT Profiles (SOL)
-
-Player Lifetime Value (pLTV):
-├─ Casual: $0-2 (free players, occasional purchase)
-├─ Engaged: $10-30 ($SKR cosmetics + playtime)
-└─ Hardcore: $50-200+ (cosmetics + playtime + power-ups + NFT Profiles + marketplace)
-```
-
----
-
 ## � Development Status
 
-**Current**: v0.1.0 **Demo** (Public Prototype) — [Download on GitHub Releases](https://github.com/Celshade/CtrlN/releases/tag/v0.1.0-demo)
+**Current**: v0.1.1 **Demo** (Public Prototype) — [Download on GitHub Releases](https://github.com/Celshade/CtrlN/releases/tag/v0.1.1-demo)
 
 | Status | Description | Timeline |
 |--------|-------------|----------|
-| **Demo** (NOW) | Single level, core gameplay, auth integrated. Playable, limited scope proof-of-concept. | March 2026 |
-| **Alpha** (v0.2.0+) | Multiple levels, store system, cosmetics. Broader feature set; occasional bugs expected. | April-May 2026 |
-| **Beta** (v0.5.0+) | 3/4 levels, full monetization, NFT minting UI. Public testing; save data stable. | June 2026 |
-| **Release** (v1.0.0) | Full feature set: 4 levels, tournaments, portability. Production-ready. | Q3 2026 |
+| **Demo** (NOW) | Single level, core gameplay, auth integrated. | April-May 2026 |
+| **Alpha** (v0.2.0+) | Store system, cosmetics, broader feature set. | May-June 2026 |
+| **Beta** (v0.5.0+) | Full monetization, NFT minting UI, save data stable. | July-August 2026 |
+| **Release** (v1.0.0) | Tournaments, portability, cross-platform optimization. | Q3-Q4 2026 |
 
 ---
 
-## �🚀 Go-to-Market
+## 🚀 Go-to-Market
 
-### Phase 1: Soft Launch (Q2 2026)
-- Public demo on GitHub Releases
-- **Level 1 (Day-Time)**: Launched with Matrica OAuth + Solana wallet login
-- **Energy System**: Active (5 free matches per session, regeneration over time or $SKR purchase)
-- In-game leaderboards operational
-- $SKR cosmetic store operational
-- Gather analytics and balance gameplay
-- Community feedback integration
+**Phase 1: Demo → Soft Launch (Q2 2026)**
+- Public demo on GitHub Releases with Matrica OAuth integration
+- Level 1 (Day-Time) with core gameplay and energy system operational
+- In-game leaderboards and $SKR cosmetic store live
+- Community feedback gathering
 
-### Phase 2: Full Launch (Q3 2026)
+**Phase 2: Alpha → Full Launch (Q3 2026)**
+- Level 2 (Night Time) with unique mechanics
+- Solana NFT Profile minting available ($1-5* SOL + network fees)
+- Website companion with enhanced leaderboard metrics and player stats
 - Global iOS/Android release
-- **Level 2 (Night Time)**: New environment with unique mechanics
-- **Solana NFT Profiles**: Optional minting ($1-3 SOL)
-- $SKR in-store purchases (playtime, cosmetics, power-ups)
-- **Website companion launch**: Enhanced leaderboard metrics, player stats, achievement profiles
-- Leaderboard reset with season 1
-- Marketing campaign
 
-### Phase 3: Web3 Expansion (Q4 2026)
-- **Level 3 (Snow)**: Third environment released
-- Marketplace foundation and trading mechanics
-- Tournament system with prize pools
+**Phase 3: Web3 Expansion (Q4 2026+)**
+- Level 3 (Snow) with expanded audio pack ecosystem
+- Marketplace foundation and tournament system
 - Cross-game character portability (trilogy foundation)
-- DAO governance exploration
 
 ---
 
 ## 🎮 Competitive Advantage
 
-1. **Web3 Native Progression** — One of the first casual games leveraging Matrica's enterprise-level multi-chain API for cross-blockchain asset integration (Solana, Ethereum, Bitcoin Ordinals, etc.)
-2. **Portable Profile** — Players own & transfer their achievement history
-3. **Creator-Friendly** — Streamers benefit from documented, verifiable progress
-4. **Composable Assets** — Future games can recognize CtrlN achievements
-5. **Deep Gameplay** — One-button control doesn't mean shallow mechanics
-6. **Trilogy Architecture** — CtrlN is Part 1 of a 3-series; each game plays uniquely with shared profile continuity
+1. **Web3 Native** — Leverages Matrica's multi-chain asset verification (Solana, Ethereum, Bitcoin) for cross-blockchain integration
+2. **Optional Ownership** — Play free, or mint profile as NFT for portability & permanence
+3. **Verified Community** — Discord roles tied to on-chain assets prevent farming and boost trust
+4. **Creator-Friendly** — Documented, verifiable progress visible on leaderboards
+5. **Trilogy Architecture** — Shared portable profiles across 3 unique games with distinct mechanics
+6. **Quality + Indie Ethos** — Hand-crafted pixel art (no AI), solo developer model with community collaboration
 
 ---
 
 ## 📈 Key Metrics (Target)
 
-- **First Month**: 10K downloads
+- **First Month**: 1K downloads
 - **DAU/MAU**: 30% day-1 → 8% 30-day retention
-- **Average Session**: 8-12 minutes
+- **Average Session**: 3-11 minutes
 - **ARPU**: $2-5/month (energy purchases + cosmetics)
 - **NFT Adoption**: 10-15% of players opt to mint profile (optional)
 
 ---
-
-## 🔧 Technical Stack
-
-| Component | Technology |
-|-----------|------------|
-| **Game Engine** | Godot Engine 4.6 |
-| **Mobile** | Android (iOS coming) |
-| **Desktop** | Python + Pygame |
-| **Backend** | Node.js + Vercel |
-| **Authentication** | Matrica OAuth + Solana Mobile Wallet Adapter |
-| **Blockchain** | Solana + Bitcoin (NFT storage) |
-| **Database** | Redis (session), PostgreSQL (analytics) |
-| **Wallet Integration** | godot-solana-sdk v1.4.5 GDExtension |
-
----
-
-## � Community & Discord Integration
-
-**CtrlN Discord Server** provides exclusive community features tied to in-game progress:
-
-### Rank-Based Roles
-
-Players earn Discord roles automatically based on in-game competitive rank:
-(These are actual game ranks)
-
-- 🥚 **Unranked** — New players (0-99 XP)
-- 🎋 **Bamboo** — Rank 7 (100-499 XP)
-- ⚙️ **Iron** — Rank 6 (500-1,499 XP)
-- 🥉 **Bronze** — Rank 5 (1,500-2,999 XP)
-- 🥈 **Silver** — Rank 4 (3,000-4,999 XP)
-- 🥇 **Gold** — Rank 3 (5,000-7,499 XP)
-- 💜 **Platinum** — Rank 2 (7,500-9,999 XP)
-- 💎 **Diamond** — Rank 1 (10,000+ XP)
-
-### Achievement Badges
-
-Special roles unlocked via gameplay achievements:
-(Examples)
-
-- 🔥 **Speedrunner** — Clear 1000 levels
-- 💎 **Perfectionist** — Record 50 consecutive flawless runs
-- 🏆 **Rank 1** — Reach #1 global leaderboard
-- 🎯 **Accumulator** — Unlock all 15 characters
-- 🌟 **Achiever** — Complete 20 achievements
-
-### Community Features
-
-- **Leaderboard Integration**: Discord embeds show live global rankings
-- **Achievement Notifications**: Announce major milestones in #achievements
-- **Role Verification**: Roles automatically sync with in-game profile + on-chain assets verified via Matrica (Solana, Ethereum, Bitcoin, etc.)
-- **Exclusive Channels**: High-rank players unlock strategy and competitive channels
-- **Community Events**: Seasonal tournaments with Discord-exclusive rewards
-
-### Anti-Sybil Protection
-
-Discord roles are **verified against on-chain assets via Matrica**, which can see across multiple blockchains:
-
-- **Solana**: CtrlN profile NFT + wallet assets
-- **Ethereum**: NFT collections, token holdings
-- **Bitcoin**: Ordinals inscriptions, token ownership
-- **Other chains**: Any asset Matrica supports
-
-This multi-chain asset verification prevents:
-- Role farming via fake accounts
-- Rank spoofing
-- Achievement boosting
-
-Players control role visibility in their privacy settings. Roles sync automatically when on-chain asset ownership changes.
-
----
-
 ## 💬 Pitch Summary
 
-**CtrlN** is a skill-based mobile action game with an energy-based free-to-play model and optional Web3 profile ownership. Players get 4-5 free matches daily in a day-time environment, then can purchase playtime, cosmetics, and power-ups using $SKR (Solana Mobile token). Those who want lasting portfolio permanence can optionally mint their profile as an NFT on SOL or Ordinal on BTC (coming soon), unlocking leaderboard access/participation, and cross-game portability across our trilogy of games.
+**CTRL+N** is a skill-based mobile action game where each playable character is a keyboard key with a unique audio identity. Players earn 5 free daily matches in the Day-Time environment, then optionally purchase playtime, cosmetics, and audio packs via $SKR. Those seeking permanence can mint their profile as an NFT ($1-5\* SOL/BTC TBA), unlocking leaderboard participation and cross-game portability.
 
-By combining accessible gameplay with optional Web3 integration and a planned series of unique environments (night time, snow, tron grid, miami), we capture both casual and crypto-native players. Our differentiation: **hand-crafted (no AI)** pixel and concept art, **optional on-chain profiles** (not mandatory), leveraging **Matrica's multi-chain asset verification** for Discord community roles, monetizing through **$SKR in-store purchases**, and building a **portable player identity across a trilogy of games**, each with distinct mechanics and level designs.
+**Core differentiators**: Hand-crafted pixel art, authentic keyboard audio feedback system with unlockable packs, optional Web3 (not mandatory), multi-chain asset verification, and a trilogy of games with distinct mechanics.
 
-**We're building a Web3-ready game that respects player choice: play for free, upgrade optionally.**
+**Monetization**: Free-to-play base + energy/cosmetics/audio ($SKR) + optional NFT profiles (SOL).
+
+**Vision**: Web3-ready game built on audio identity and player choice.
 
 ---
 
@@ -362,8 +252,8 @@ By combining accessible gameplay with optional Web3 integration and a planned se
 ## 🎯 Call to Action
 
 **Investors**: Ideally, no seed/investor rounds outside of grants, donations, and in-game purchases
-**Partners**: Integrate CtrlN profile NFTs into your games  
-**Players**: Join the beta and own your first profile NFT 
+**Partners**: Integrate CTRL+N profile NFTs into your games  
+**Players**: Join the beta and mint your first profile NFT 
 
 ---
 
@@ -372,4 +262,4 @@ By combining accessible gameplay with optional Web3 integration and a planned se
 **Website**: celkeys.io (site available, but no game on there yet)
 **Email**: celkeys@proton.me
 **Twitter**: @CelKeysNFT  
-**Discord**: (private server until release)
+**Discord**: https://discord.gg/ckey (core server gated; game section coming soon)
