@@ -1,6 +1,6 @@
 # CtrlN — Pitch Deck
 
-**[Watch the demo on YouTube](https://youtu.be/hiHF5U4OsPU)** — 90-second gameplay highlight with commentary
+**[Watch the demo on YouTube](https://youtu.be/hiHF5U4OsPU)** — 90-seconds of in-app usage with commentary
 
 ## 🎮 The Game
 
