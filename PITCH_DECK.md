@@ -1,10 +1,10 @@
-# CtrlN — Pitch Deck
+# CKEY: CTRL+N — Pitch Deck
 
 **[Watch the demo on YouTube](https://youtu.be/hiHF5U4OsPU)** — 90-seconds of in-app usage with commentary
 
 ## 🎮 The Game
 
-**CtrlN** is a fast-paced, skill-based mobile action game with hand-crafted pixel art — developed with a passion for indie games and code itself. Tap to dodge, compete against your fellow degens, unlock new playable characters (keys), flex your rank roles in the community, and have fun. Swipe mechanics coming soon for advanced maneuvers.
+**CTRL+N** is a fast-paced, skill-based mobile action game with hand-crafted pixel art — developed with a passion for indie games and code itself. Tap to dodge, compete against your fellow degens, unlock new playable characters (keys), flex your rank roles in the community, and have fun. Swipe mechanics coming soon for advanced maneuvers.
 
 ---
 
@@ -47,6 +47,13 @@
 - **Friend Rankings**: Compare scores with friends
 - **Achievements**: Visible badges and milestones
 - **Cosmetics**: Character skins and visual items
+
+### Audio Packs
+- **Keyboard-Based Audio Identity**: Each playable character is a key from a keyboard; gameplay includes dynamic keypress sounds that vary by equipped audio pack
+- **Unlockable Audio Packs**: Players unlock different keyboard audio packs through gameplay progression or $SKR store purchases
+- **Authentic Keyboard Recordings**: Each audio pack contains keypress sounds recorded from actual mechanical/membrane keyboards with distinct acoustic signatures
+- **Per-Keyboard Variety**: Multiple packs available (Cherry MX Red, Cherry MX Blue, Topre, Membrane, etc.) — each with authentic keycap click/clack characteristics
+- **Audio Feedback Loop**: Tie visual character identity (the "key") directly to audio feedback, reinforcing the keyboard theme and adding personality to each play session
 
 ### Technical
 - **Cross-Platform**: Android (iOS coming Q3 2026) via Godot 4.6
