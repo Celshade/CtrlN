@@ -1,5 +1,7 @@
 # CtrlN — Pitch Deck
 
+**[Watch the demo on YouTube](https://youtu.be/hiHF5U4OsPU)** — 90-second gameplay highlight with commentary
+
 ## 🎮 The Game
 
 **CtrlN** is a fast-paced, skill-based mobile action game with hand-crafted pixel art — developed with a passion for indie games and code itself. Tap to dodge, compete against your fellow degens, unlock new playable characters (keys), flex your rank roles in the community, and have fun. Swipe mechanics coming soon for advanced maneuvers.

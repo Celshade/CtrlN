@@ -37,6 +37,7 @@ See [LICENSE](LICENSE) for full terms.
 
 ## Quick Links
 
+- **YouTube Demo**: [Watch the gameplay](https://youtu.be/hiHF5U4OsPU) — 60-second highlight reel
 - **Pitch Deck**: [PITCH_DECK.md](PITCH_DECK.md) — Game overview, monetization, roadmap
 - **Solana Wallet Integration**: [docs/SOLANA_WALLET_LOGIN.md](docs/SOLANA_WALLET_LOGIN.md) — Architecture, setup instructions, troubleshooting
 
