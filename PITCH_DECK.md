@@ -4,7 +4,7 @@
 
 ## 🎮 The Game
 
-**CTRL+N** is a fast-paced, skill-based mobile action game with hand-crafted pixel art — developed with a passion for indie games and code itself. Tap to dodge, compete against your fellow degens, unlock new playable characters (keys), flex your rank roles in the community, and have fun. Swipe mechanics coming soon for advanced maneuvers.
+**CTRL+N** is a fast-paced, skill-based mobile action game with hand-crafted pixel art — developed with a passion for indie games and code itself. Tap to dodge, compete against your fellow degens, unlock new playable characters (keys), flex your rank roles in the community, and have fun.
 
 ---
 
@@ -15,7 +15,7 @@
 3. **Compete** — Compare scores on global/friend leaderboards; earn rank tiers (Bamboo → Iron → Bronze → Gold → Platinum → Diamond)
 4. **Progress** — Unlock new key characters, achievements, cosmetics, and audio packs
 
-**Key Mechanics**: One-button tap + swipe for advanced maneuvers (coming soon), real-time competition, cross-chain asset integration via Matrica
+**Key Mechanics**: One-button tap, real-time competition, cross-chain asset integration via Matrica
 
 ---
 
@@ -48,7 +48,7 @@
 - **Cosmetics**: Character skins and visual items
 
 ### ⚙️ Technical
-- **Cross-Platform**: Android (iOS coming Q3 2026) via Godot 4.6
+- **Cross-Platform**: Solana Seeker (Android) (iOS/browser Q3/Q4) via Godot, Python, and JS/TS
 - **Desktop Support**: Python 3.12 + Pygame for development/testing
 - **Cloud Saves**: Profile tied to login
   - **Matrica OAuth** (primary): Multi-chain social login (Discord, X, Telegram + all major Web3 wallets -> including native solana mobile wallet)
@@ -62,7 +62,7 @@
 
 ## 🔐 Web3 Integration: Optional Profile NFT Minting
 
-**CTRL+N profiles can be optionally minted as NFTs on Solana**, giving players enhanced security and portability:
+**CTRL+N profiles can be optionally minted as NFTs on Solana (or inscriptions on Bitcoin)**, giving players enhanced security and portability:
 
 ### Value Proposition
 _* = TBD_
@@ -72,7 +72,7 @@ _* = TBD_
   - Enhanced security: Profile backed by on-chain assets
   - Portability: Use profile across compatible games
   - Permanence: Leaderboard history immutably stored
-  - Composability: Future games can read CtrlN achievements
+  - Composability: Future games can read CtrlN achievements/progress
   - **Leaderboard Participation***: Required to compete in seasonal leaderboards (free-to-play players can still play; profile data saves locally and to database with less frequent syncs, but not on-chain)
 
 **Future Expansion**: Bitcoin Ordinal profiles planned for a future iteration, allowing players to mint profiles as Bitcoin NFTs alongside Solana options.
@@ -89,7 +89,7 @@ _* = TBD_
   - Unlocked character collection
   - Visual metadata (colors, animations)
 
-- **On-Chain Metadata**: Profile data stored on Solana/Bitcoin blockchain with NFT/Inscription protocols
+- **On-Chain Metadata**: Profile data stored on blockchain with NFT/Inscription protocols
 
 ### Technical Architecture
 
@@ -120,19 +120,21 @@ _* = TBD_
 - **Minimalist Style**: Clean pixel-art characters and obstacles
 - **Responsive Feedback**: Particle effects, screen shake, sound cues
 - **Playable Key Characters**: Keyboard keys with distinct visual personalities and audio signatures; unlockable variants
-- **Dynamic Obstacles**: Birds, trees, platforms, and hazards that escalate in speed/complexity
+- **Dynamic Obstacles**: Birds/trees/etc, platforms, and hazards that escalate in speed/complexity
 
 ---
 
 ## 👥 Development Team
 
-**CtrlN** was created by a **single developer** with support from community artists:
+**CtrlN** was created by a **single developer** with support from artists/OG members of the **CelKeys community**:
 
-- **Celshade** (Developer): Game design, programming, player sprites, effects and animation, UI design, infrastructure, marketing, partnerships, and community administration
-- **Psy** (Artist): Level backgrounds and obstacle art/animation
+- **Celshade** (Developer/Founder): Game design, programming, player sprites, effects and animation, UI design, infrastructure, marketing, partnerships, and community administration
+- **psy.** (Artist): Level backgrounds and obstacle art/animation
 - **MomoBones** (Artist): Concept art and logo design
+- **SuckMyLegHair** (Player Experience): Feedback/QA on features/designs/roadmap
+- **McMoney** (Inspiration): The legend that pushed me (Celshade) to build this
 
-**Vision**: Proof-of-concept that indie games can achieve quality production through focused individual development and collaborative community partnerships.
+**Vision**: Proof-of-concept that indie games can achieve quality production through focused individual development and collaborative community partnerships - built on crypto rails.
 
 This lean structure allows for rapid iteration while maintaining artistic quality and community involvement.
 
@@ -142,7 +144,7 @@ This lean structure allows for rapid iteration while maintaining artistic qualit
 
 - **Primary**: Casual mobile gamers (18-35) seeking quick, skill-based (but relaxed) action
 - **Secondary**: Mobile streamers & competitive skill-based speedrunners
-- **Tertiary**: Web3 gamers seeking optional blockchain profile verification & cross-game portability
+- **Tertiary**: Web3 gamers/developers seeking optional blockchain profile verification & cross-game portability
 
 ---
 
@@ -155,7 +157,7 @@ This lean structure allows for rapid iteration while maintaining artistic qualit
   - Energy regenerates over time (configurable timers)
   - Optional paid energy/fast-regen via $SKR
 
-### Solana NFT Profiles (Optional, One-Time)
+### Solana/Ordinal NFT Profiles (Optional, One-Time)
 
 - **Cost**: $1-5* (+ network fees) one-time
 - **Benefits**: Enhanced data security, portability across games, leaderboard participation
@@ -168,7 +170,8 @@ All premium purchases use **$SKR (Solana Mobile Token)**:
 - **Cosmetics**: Character skins, effects, avatars
 - **Playtime**: Additional energy/matches
 - **Power-ups**: Temporary gameplay enhancements
-- **Battle Pass** (future): Seasonal cosmetic bundles
+- **Audio Packs**: Unique audio signatures for key mechanics
+- **?? Pass** (future): Seasonal TBD
 
 ---
 
@@ -192,16 +195,18 @@ All premium purchases use **$SKR (Solana Mobile Token)**:
 - Level 1 (Day-Time) with core gameplay and energy system operational
 - In-game leaderboards and $SKR cosmetic store live
 - Community feedback gathering
+- Seeker dApp store launch
 
-**Phase 2: Alpha → Full Launch (Q3 2026)**
-- Level 2 (Night Time) with unique mechanics
+**Phase 2: Alpha → Full Launch (Q3-Q4 2026)**
+- Level 2 (Night-Time) with unique mechanics
 - Solana NFT Profile minting available ($1-5* SOL + network fees)
 - Website companion with enhanced leaderboard metrics and player stats
 - Global iOS/Android release
 
 **Phase 3: Web3 Expansion (Q4 2026+)**
 - Level 3 (Snow) with expanded audio pack ecosystem
-- Marketplace foundation and tournament system
+- Leaderboard expansion/goals
+- BTC (ordinal) Profile minting available ($1-5* BTC + network fees)
 - Cross-game character portability (trilogy foundation)
 
 ---
@@ -232,7 +237,7 @@ All premium purchases use **$SKR (Solana Mobile Token)**:
 
 **Core differentiators**: Hand-crafted pixel art, authentic keyboard audio feedback system with unlockable packs, optional Web3 (not mandatory), multi-chain asset verification, and a trilogy of games with distinct mechanics.
 
-**Monetization**: Free-to-play base + energy/cosmetics/audio ($SKR) + optional NFT profiles (SOL).
+**Monetization**: Free-to-play base + energy/cosmetics/audio ($SKR) + optional NFT profiles (SOL/BTC).
 
 **Vision**: Web3-ready game built on audio identity and player choice.
 
@@ -251,15 +256,16 @@ All premium purchases use **$SKR (Solana Mobile Token)**:
 
 ## 🎯 Call to Action
 
-**Investors**: Ideally, no seed/investor rounds outside of grants, donations, and in-game purchases
-**Partners**: Integrate CTRL+N profile NFTs into your games  
-**Players**: Join the beta and mint your first profile NFT 
+**Investors**: Ideally, no seed/investor rounds outside of grants donations, and in-game purchases \
+**Partners**: Integrate CTRL+N profile NFTs into your games \
+**Players**: Join the beta and mint your first profile NFT
 
 ---
 
 ## 📞 Contact
 
-**Website**: celkeys.io (site available, but no game on there yet)
-**Email**: celkeys@proton.me
-**Twitter**: @CelKeysNFT  
-**Discord**: https://discord.gg/ckey (core server gated; game section coming soon)
+**Website**: celkeys.io (site available, but no game on there yet) \
+**Email**: celkeys@proton.me \
+**Twitter**: @CelKeysNFT \
+**Discord**: https://discord.gg/ckey (core server gated; game section closed coming soon)
+
