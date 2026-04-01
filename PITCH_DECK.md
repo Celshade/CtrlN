@@ -256,7 +256,7 @@ All premium purchases use **$SKR (Solana Mobile Token)**:
 
 ## 🎯 Call to Action
 
-**Investors**: Ideally, no seed/investor rounds outside of grants donations, and in-game purchases \
+**Investors**: Ideally, no seed/investor rounds outside of grants, donations, and in-game purchases \
 **Partners**: Integrate CTRL+N profile NFTs into your games \
 **Players**: Join the beta and mint your first profile NFT
 
