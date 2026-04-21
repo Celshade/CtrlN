@@ -27,8 +27,9 @@ GameConfig="*res://scripts/autoload/game_config.gd"
 ProfileManager="*res://scripts/autoload/profile_manager.gd"
 AchievementManager="*res://scripts/autoload/achievement_manager.gd"
 MatricaAuth="*res://scripts/autoload/matrica_auth.gd"
-SolanaAuth="*res://scripts/autoload/solana_auth.gd"
-SolanaService="*uid://b2dmsrk6j12y4"
+# TODO: Re-enable SolanaSDK integration
+# SolanaAuth="*res://scripts/autoload/solana_auth.gd"
+# SolanaService="*uid://b2dmsrk6j12y4"
 HttpRequestHandler="*uid://fa45moquo0p0"
 
 [display]
@@ -40,7 +41,8 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/SolanaSDK/plugin.cfg")
+# TODO: Re-enable SolanaSDK plugin when ready
+enabled=PackedStringArray()
 
 [input]
 

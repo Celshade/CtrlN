@@ -45,10 +45,11 @@ func _ready() -> void:
 	MatricaAuth.login_failed.connect(_on_matrica_failed)
 	MatricaAuth.browser_open_failed.connect(_on_browser_open_failed)
 	
+	# TODO: Re-enable Solana wallet callbacks when SolanaSDK is ready
 	# Solana wallet callbacks (if SDK available)
-	if ClassDB.class_exists("WalletAdapter"):
-		SolanaAuth.wallet_authenticated.connect(_on_wallet_success)
-		SolanaAuth.wallet_error.connect(_on_wallet_error)
+	# if ClassDB.class_exists("WalletAdapter"):
+	# 	SolanaAuth.wallet_authenticated.connect(_on_wallet_success)
+	# 	SolanaAuth.wallet_error.connect(_on_wallet_error)
 	
 	set_process_input(true)
 	queue_redraw()  # Ensure login screen renders immediately
@@ -102,11 +103,13 @@ func _on_matrica_failed(reason: String) -> void:
 	login_failed.emit(reason)
 
 
+# TODO: Re-enable when SolanaSDK integration is ready
 func _on_wallet_success(profile: Dictionary) -> void:
 	_waiting_for_login = false
 	login_succeeded.emit(profile)
 
 
+# TODO: Re-enable when SolanaSDK integration is ready
 func _on_wallet_error(reason: String) -> void:
 	_waiting_for_login = false
 	login_failed.emit(reason)

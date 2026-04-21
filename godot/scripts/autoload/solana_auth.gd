@@ -1,5 +1,6 @@
 ## SolanaAuth — Solana wallet authentication manager (autoload singleton)
 ##
+## TODO: Re-enable when SolanaSDK integration is ready
 ## Integrates godot-solana-sdk WalletAdapter for Solana Mobile Wallet Adapter (MWA)
 ## authentication on Android. Gracefully handles case where SDK not installed.
 
