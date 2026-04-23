@@ -28,7 +28,7 @@ var _waiting_for_login := false
 func _ready() -> void:
 	# Set Control size to fill viewport
 	custom_minimum_size = Vector2(WINDOW_WIDTH, WINDOW_HEIGHT)
-	size = Vector2(WINDOW_WIDTH, WINDOW_HEIGHT)
+	# Don't set size directly - let anchors control it
 	
 	var labels := ["Play as Guest", "Login with Solana", "Login with Matrica", "Website", "Store"]
 	for i in range(labels.size()):
