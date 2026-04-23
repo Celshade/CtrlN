@@ -4,7 +4,7 @@ extends Node2D
 ##   - Character sprite (Sprite2D):      passed in via setup() asset_path
 ##   - Jump animation (AnimatedSprite2D): keypress_{char_id}/keypress_thruster_fx{i}.png
 ##                                        plays during in-game keypresses; replaces sprite briefly
-##   - Shield sprite/anim:               shield_3.2.png, shield_3.4.png, shield gain anim frames
+##   - Shield sprite/anim:               tier1/shield.png, tier2/shield.png, shield gain anim frames
 
 @onready var sprite: Sprite2D = $Sprite
 @onready var shield_sprite: Sprite2D = $ShieldSprite
@@ -46,8 +46,8 @@ func setup(char_id: String, asset_path: String) -> void:
 		sprite.scale = Vector2(sx, sy)
 
 	# Load shield textures
-	shield_tex_t1 = load("res://assets/shields/tier1/shield_3.2.png") as Texture2D
-	shield_tex_t2 = load("res://assets/shields/tier2/shield_3.4.png") as Texture2D
+	shield_tex_t1 = load("res://assets/shields/tier1/shield.png") as Texture2D
+	shield_tex_t2 = load("res://assets/shields/tier2/shield.png") as Texture2D
 	shield_sprite.centered = false
 	if shield_tex_t1:
 		var ssx := float(GameConfig.PLAYER_SIZE) / shield_tex_t1.get_width()

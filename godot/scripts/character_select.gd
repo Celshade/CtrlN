@@ -87,7 +87,7 @@ func _preload_textures() -> void:
 func _build_roster() -> void:
 	var unlocked := ProfileManager.get_unlocked_characters()
 	var defs := [
-		{"id": "black", "name": "Black", "asset": "res://assets/characters/black/player_black.png", "ig_asset": "res://assets/characters/black/player_black_ig.png"},
+		{"id": "black", "name": "Black", "asset": "res://assets/characters/black/player_black.png", "ig_asset": "res://assets/characters/black/player_black.png"},
 		{"id": "dark_green", "name": "Dark Green", "asset": "res://assets/characters/dark_green/player_dark_green.png"},
 		{"id": "blue", "name": "Blue", "asset": "res://assets/characters/blue/player_blue.png"},
 		{"id": "red", "name": "Red", "asset": "res://assets/characters/red/player_red.png"},

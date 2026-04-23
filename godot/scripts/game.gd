@@ -42,7 +42,7 @@ var char_select: Node = null
 var login_screen: Node = null
 
 var selected_character_id := "black"
-var selected_asset_path := "res://assets/characters/black/player_black_ig.png"
+var selected_asset_path := "res://assets/characters/black/player_black.png"
 
 # Notification queue
 var notification_queue: Array[String] = []
