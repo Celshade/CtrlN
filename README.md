@@ -142,11 +142,10 @@ See [LICENSE](LICENSE) for full details.
 
 **Summary:**
 - ✅ Open source: study, modify, contribute
-- ✅ Personal use, education, portfolio projects
+- ✅ Personal play, education, portfolio projects
 - ❌ No commercial use: can't sell or monetize derivatives
-- ℹ️ Creator retains full commercial rights to CtrlN
-
-**For licensing inquiries**: celkeys@proton.me
+- ℹ️ The creator and any business they own or operate retain full commercial
+  rights to CTRL+N
 
 ---
 
@@ -159,12 +158,3 @@ See [LICENSE](LICENSE) for full details.
 - **MomoBones** — Concept and logo art
 
 _<3 indie games_
-
----
-
-## Contact
-
-- **Website**: [celkeys.io](https://celkeys.io)
-- **Email**: celkeys@proton.me
-- **X**: [@CelKeysNFT](https://x.com/CelKeysNFT)
-- **Discord**: Private server (coming at launch)
