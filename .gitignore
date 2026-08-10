@@ -68,6 +68,9 @@ godot/android/build/.gradle/
 # ### Asset Metadata (Windows Zone Identifiers) ### #
 *:Zone.Identifier
 
+# ### Pitch Deck (SENSITIVE - business/monetization details) ### #
+PITCH_DECK.md
+
 # ### Development & Test ### #
 BuildResources/
 assets/*

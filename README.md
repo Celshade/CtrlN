@@ -38,7 +38,6 @@ See [LICENSE](LICENSE) for full terms.
 ## Quick Links
 
 - **YouTube Demo**: [Watch the gameplay](https://youtu.be/hiHF5U4OsPU) — 90-seconds of in-app usage with commentary
-- **Pitch Deck**: [PITCH_DECK.md](PITCH_DECK.md) — Game overview, monetization, roadmap
 
 ---
 
