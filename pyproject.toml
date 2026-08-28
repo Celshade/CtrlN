@@ -7,7 +7,7 @@ name = "ctrln"
 version = "0.1.1-demo"
 description = ""
 readme = "README.md"
-license = {text = "GPL-3.0"}
+license = {text = "PolyForm-Noncommercial-1.0.0"}
 authors = [
     {name = "Celshade", email = "celkeys@proton.me"}
 ]
@@ -16,7 +16,7 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
     "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "License :: Other/Proprietary License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",

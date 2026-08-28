@@ -10,7 +10,7 @@ Built with Python 3.12 + Godot 4.6 | Web3-ready with optional Solana + Bitcoin o
 ![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
 ![Solana](https://img.shields.io/badge/Solana-14F195?logo=solana&logoColor=black)
 ![Bitcoin](https://img.shields.io/badge/Bitcoin-Ordinals-F7931A?logo=bitcoin&logoColor=white)
-![License](https://img.shields.io/badge/License-GPL--3.0%20%2B%20Commons%20Clause-purple)
+![License](https://img.shields.io/badge/License-PolyForm%20Noncommercial%201.0.0-purple)
 
 ---
 
@@ -25,7 +25,7 @@ Built with Python 3.12 + Godot 4.6 | Web3-ready with optional Solana + Bitcoin o
 This project is actively under development and not yet available in app stores. All releases (including demos) are maintained on the [GitHub Releases page](https://github.com/Celshade/CtrlN/releases).
 _Security note: v1 endpoints were deprecated at public release. Legacy integration points have been disabled—please refer to current documentation for v2 setup._
 
-Licensed under **GPL-3.0 + Commons Clause**. Permitted uses:
+Licensed under **PolyForm Noncommercial 1.0.0**. Permitted uses:
 - ✅ Personal play & testing
 - ✅ Educational projects & portfolios
 - ✅ Contributing improvements to this repository
@@ -124,16 +124,19 @@ CtrlN/
 
 ## License
 
-**GPL-3.0 + Commons Clause**
+**PolyForm Noncommercial License 1.0.0** — source-available (not
+OSI-approved open source).
 
 See [LICENSE](LICENSE) for full details.
 
 **Summary:**
-- ✅ Open source: study, modify, contribute
+- ✅ Study, modify, contribute
 - ✅ Personal play, education, portfolio projects
-- ❌ No commercial use: can't sell or monetize derivatives
 - ℹ️ The creator and any business they own or operate retain full commercial
   rights to CTRL+N
+- ❌ No commercial use: can't sell or monetize derivatives
+- ℹ️ Redistributing a modified version requires attribution — see the
+  Attribution Addendum in [LICENSE](LICENSE)
 
 ---
 
